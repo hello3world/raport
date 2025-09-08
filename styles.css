@@ -215,12 +215,13 @@ body {
 }
 
 .form-step {
-    display: none;
+    display: none !important;
     padding: 2rem;
 }
 
 .form-step.active {
-    display: block;
+    display: block !important;
+    visibility: visible !important;
 }
 
 .form-step h2 {
@@ -231,13 +232,16 @@ body {
 
 .form-group {
     margin-bottom: 1.5rem;
+    display: block !important;
+    visibility: visible !important;
 }
 
 .form-group label {
-    display: block;
+    display: block !important;
     margin-bottom: 8px;
     font-weight: 500;
     color: #2c3e50;
+    visibility: visible !important;
 }
 
 .required {
@@ -253,6 +257,9 @@ body {
     border-radius: 6px;
     font-size: 16px;
     transition: border-color 0.3s ease;
+    background-color: white;
+    display: block !important;
+    visibility: visible !important;
 }
 
 .form-group input:focus,
@@ -265,30 +272,39 @@ body {
 .form-group textarea {
     resize: vertical;
     min-height: 100px;
+    display: block !important;
+    visibility: visible !important;
+    background-color: white !important;
 }
 
 .radio-group {
-    display: flex;
+    display: flex !important;
     flex-wrap: wrap;
     gap: 15px;
     margin-top: 8px;
+    visibility: visible !important;
 }
 
 .radio-label {
-    display: flex;
+    display: flex !important;
     align-items: center;
     cursor: pointer;
     margin-bottom: 0;
+    visibility: visible !important;
 }
 
 .radio-label input[type="radio"] {
-    width: auto;
+    width: auto !important;
     margin-right: 8px;
+    display: inline-block !important;
+    visibility: visible !important;
 }
 
 .form-group input[type="checkbox"] {
-    width: auto;
+    width: auto !important;
     margin-right: 8px;
+    display: inline-block !important;
+    visibility: visible !important;
 }
 
 .error-message {
