@@ -356,6 +356,42 @@ class ReportFormApp {
             const formGroups = currentStepElement.querySelectorAll('.form-group');
             console.log(`Найдено групп полей в шаге ${this.currentStep}: ${formGroups.length}`);
 
+            // Дополнительная диагностика если групп не найдено
+            if (formGroups.length === 0) {
+                console.log('Диагностика: проверяем содержимое шага');
+                console.log('Элемент шага ID:', currentStepElement.id);
+                console.log('Элемент шага классы:', currentStepElement.className);
+                console.log('Элемент шага data-step:', currentStepElement.dataset.step);
+                console.log('HTML содержимое шага (первые 500 символов):', currentStepElement.innerHTML.substring(0, 500));
+                console.log('Все элементы в шаге:', currentStepElement.children.length);
+
+                // Попробуем найти элементы по разным селекторам
+                const allDivs = currentStepElement.querySelectorAll('div');
+                const allInputs = currentStepElement.querySelectorAll('input, select, textarea');
+                const allLabels = currentStepElement.querySelectorAll('label');
+                const allFormGroupsByClass = currentStepElement.getElementsByClassName('form-group');
+                console.log('Всего div элементов:', allDivs.length);
+                console.log('Всего input/select/textarea элементов:', allInputs.length);
+                console.log('Всего label элементов:', allLabels.length);
+                console.log('form-group через getElementsByClassName:', allFormGroupsByClass.length);
+
+                // Принудительно делаем все найденные элементы видимыми
+                allInputs.forEach(input => {
+                    input.style.display = input.type === 'radio' || input.type === 'checkbox' ? 'inline-block' : 'block';
+                    input.style.visibility = 'visible';
+                });
+                allLabels.forEach(label => {
+                    label.style.display = 'block';
+                    label.style.visibility = 'visible';
+                });
+                allDivs.forEach(div => {
+                    if (div.classList.contains('form-group') || div.querySelector('input, select, textarea')) {
+                        div.style.display = 'block';
+                        div.style.visibility = 'visible';
+                    }
+                });
+            }
+
             // Принудительно делаем все группы видимыми
             formGroups.forEach((group, index) => {
                 group.style.display = 'block';
@@ -372,6 +408,24 @@ class ReportFormApp {
                     }
                     input.style.visibility = 'visible';
                 });
+            });
+
+            // Дополнительно принудительно отображаем все элементы в шаге
+            const allElements = currentStepElement.querySelectorAll('*');
+            console.log(`Принудительное отображение всех ${allElements.length} элементов в шаге ${this.currentStep}`);
+            allElements.forEach(el => {
+                if (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA' || el.tagName === 'LABEL' ||
+                    el.classList.contains('form-group') || el.classList.contains('radio-group') || el.classList.contains('radio-label')) {
+                    if (el.type === 'radio' || el.type === 'checkbox') {
+                        el.style.display = 'inline-block';
+                    } else if (el.classList.contains('radio-group')) {
+                        el.style.display = 'flex';
+                    } else {
+                        el.style.display = 'block';
+                    }
+                    el.style.visibility = 'visible';
+                    el.style.opacity = '1';
+                }
             });
         } else {
             console.error(`Шаг с data-step="${this.currentStep}" не найден!`);
@@ -738,6 +792,30 @@ class ReportFormApp {
     showFormScreen() {
         console.log('Показываем экран формы...');
         this.showScreen('form-screen');
+
+        // Проверяем основную форму
+        const mainForm = document.getElementById('main-form');
+        if (mainForm) {
+            console.log('Основная форма найдена');
+            const formStyle = window.getComputedStyle(mainForm);
+            console.log('Стили основной формы:');
+            console.log('  display:', formStyle.display);
+            console.log('  visibility:', formStyle.visibility);
+            console.log('  opacity:', formStyle.opacity);
+            console.log('  width:', formStyle.width);
+            console.log('  height:', formStyle.height);
+
+            // Принудительно делаем форму видимой
+            mainForm.style.display = 'block';
+            mainForm.style.visibility = 'visible';
+            mainForm.style.opacity = '1';
+            mainForm.style.width = '100%';
+            mainForm.style.position = 'relative';
+            console.log('Основная форма принудительно сделана видимой');
+        } else {
+            console.error('Основная форма не найдена!');
+        }
+
         this.updateFormStep();
 
         // Принудительно делаем все элементы формы видимыми
@@ -749,8 +827,25 @@ class ReportFormApp {
     ensureFormVisibility() {
         console.log('Принудительное обеспечение видимости всех элементов формы...');
 
+        // Сначала убеждаемся, что сама форма видима
+        const mainForm = document.getElementById('main-form');
+        if (mainForm) {
+            mainForm.style.display = 'block';
+            mainForm.style.visibility = 'visible';
+            mainForm.style.opacity = '1';
+            console.log('Основная форма принудительно отображена');
+        }
+
         // Проходим по всем шагам формы
         document.querySelectorAll('.form-step').forEach((step, stepIndex) => {
+            // Принудительно делаем шаг видимым если он активен
+            if (step.classList.contains('active')) {
+                step.style.display = 'block';
+                step.style.visibility = 'visible';
+                step.style.opacity = '1';
+                console.log(`Активный шаг ${stepIndex + 1} принудительно отображен`);
+            }
+
             // Проверяем все группы в каждом шаге
             const groups = step.querySelectorAll('.form-group');
             console.log(`Шаг ${stepIndex + 1}: найдено ${groups.length} групп`);
@@ -759,6 +854,7 @@ class ReportFormApp {
                 // Принудительно делаем группу видимой
                 group.style.display = 'block';
                 group.style.visibility = 'visible';
+                group.style.opacity = '1';
 
                 // Проверяем все элементы в группе
                 const elements = group.querySelectorAll('label, input, select, textarea, .radio-group, .radio-label');
@@ -771,10 +867,31 @@ class ReportFormApp {
                         element.style.display = 'block';
                     }
                     element.style.visibility = 'visible';
+                    element.style.opacity = '1';
                 });
 
                 console.log(`  Группа ${groupIndex + 1}: обработано ${elements.length} элементов`);
             });
+        });
+
+        // Дополнительная проверка: принудительно отображаем ВСЕ элементы формы
+        const allFormElements = document.querySelectorAll('#main-form *');
+        console.log(`Дополнительная обработка ${allFormElements.length} элементов формы`);
+        allFormElements.forEach(el => {
+            if (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA' ||
+                el.tagName === 'LABEL' || el.tagName === 'H2' || el.classList.contains('form-group') ||
+                el.classList.contains('radio-group') || el.classList.contains('radio-label')) {
+
+                if (el.type === 'radio' || el.type === 'checkbox') {
+                    el.style.display = 'inline-block';
+                } else if (el.classList.contains('radio-group')) {
+                    el.style.display = 'flex';
+                } else {
+                    el.style.display = 'block';
+                }
+                el.style.visibility = 'visible';
+                el.style.opacity = '1';
+            }
         });
 
         console.log('Обеспечение видимости завершено');

@@ -214,6 +214,46 @@ body {
     max-width: 900px;
 }
 
+/* Основная форма */
+#main-form {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    position: relative !important;
+    opacity: 1 !important;
+}
+
+/* Принудительное отображение всех элементов формы */
+#main-form * {
+    box-sizing: border-box !important;
+}
+
+#main-form .form-step,
+#main-form .form-group,
+#main-form label,
+#main-form input,
+#main-form select,
+#main-form textarea {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#main-form input[type="radio"],
+#main-form input[type="checkbox"] {
+    display: inline-block !important;
+}
+
+#main-form .radio-group {
+    display: flex !important;
+    visibility: visible !important;
+}
+
+#main-form .radio-label {
+    display: flex !important;
+    visibility: visible !important;
+}
+
 .form-step {
     display: none !important;
     padding: 2rem;
@@ -222,6 +262,7 @@ body {
 .form-step.active {
     display: block !important;
     visibility: visible !important;
+    flex-direction: column !important;
 }
 
 .form-step h2 {
