@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заполнение формы - Суточный рапорт</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Загрузочный экран -->
+        <div id="loading-screen" class="screen active">
+            <div class="container">
+                <h1>Суточный рапорт</h1>
+                <div class="loading-content">
+                    <p>Проверка сохраненных черновиков...</p>
+                    <div id="draft-detection" class="draft-options" style="display: none;">
+                        <p class="draft-found">Найден незавершенный черновик от <span id="draft-date"></span></p>
+                        <div class="button-group">
+                            <button id="restore-draft" class="btn btn-primary">Восстановить черновик</button>
+                            <button id="start-new" class="btn btn-secondary">Начать новый</button>
+                        </div>
+                    </div>
+                    <div id="no-draft" class="no-draft" style="display: none;">
+                        <button id="start-form" class="btn btn-primary">Начать заполнение</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Форма -->
+        <div id="form-screen" class="screen">
+            <div class="container">
+                <div class="progress-bar">
+                    <div class="progress-step active" data-step="1">
+                        <span class="step-number">1</span>
+                        <span class="step-title">Личные данные</span>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <span class="step-number">2</span>
+                        <span class="step-title">Служебная информация</span>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <span class="step-number">3</span>
+                        <span class="step-title">Дополнительно</span>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <span class="step-number">4</span>
+                        <span class="step-title">Предпросмотр</span>
+                    </div>
+                </div>
+
+                <form id="main-form">
+                    <!-- Шаг 1: Личные данные -->
+                    <div class="form-step active" data-step="1">
+                        <h2>Шаг 1: Личные данные</h2>
+
+                        <div class="form-group">
+                            <label for="fullName">ФИО <span class="required">*</span></label>
+                            <input type="text" id="fullName" name="fullName" required>
+                            <div class="error-message" data-field="fullName"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rank">Звание <span class="required">*</span></label>
+                            <select id="rank" name="rank" required>
+                                <option value="">Выберите звание</option>
+                                <option value="рядовой">Рядовой</option>
+                                <option value="ефрейтор">Ефрейтор</option>
+                                <option value="младший сержант">Младший сержант</option>
+                                <option value="сержант">Сержант</option>
+                                <option value="старший сержант">Старший сержант</option>
+                                <option value="старшина">Старшина</option>
+                                <option value="прапорщик">Прапорщик</option>
+                                <option value="старший прапорщик">Старший прапорщик</option>
+                                <option value="младший лейтенант">Младший лейтенант</option>
+                                <option value="лейтенант">Лейтенант</option>
+                                <option value="старший лейтенант">Старший лейтенант</option>
+                                <option value="капитан">Капитан</option>
+                                <option value="майор">Майор</option>
+                                <option value="подполковник">Подполковник</option>
+                                <option value="полковник">Полковник</option>
+                            </select>
+                            <div class="error-message" data-field="rank"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="position">Должность <span class="required">*</span></label>
+                            <input type="text" id="position" name="position" required>
+                            <div class="error-message" data-field="position"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="unit">Подразделение <span class="required">*</span></label>
+                            <input type="text" id="unit" name="unit" required>
+                            <div class="error-message" data-field="unit"></div>
+                        </div>
+                    </div>
+
+                    <!-- Шаг 2: Служебная информация -->
+                    <div class="form-step" data-step="2">
+                        <h2>Шаг 2: Служебная информация</h2>
+
+                        <div class="form-group">
+                            <label for="reportDate">Дата рапорта <span class="required">*</span></label>
+                            <input type="date" id="reportDate" name="reportDate" required>
+                            <div class="error-message" data-field="reportDate"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dutyType">Тип службы <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="dutyType" value="караул" required>
+                                    <span>Караул</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="dutyType" value="дежурство" required>
+                                    <span>Дежурство</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="dutyType" value="наряд" required>
+                                    <span>Наряд</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="dutyType" value="патруль" required>
+                                    <span>Патруль</span>
+                                </label>
+                            </div>
+                            <div class="error-message" data-field="dutyType"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dutyStart">Время заступления</label>
+                            <input type="time" id="dutyStart" name="dutyStart">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dutyEnd">Время окончания</label>
+                            <input type="time" id="dutyEnd" name="dutyEnd">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location">Место несения службы</label>
+                            <input type="text" id="location" name="location">
+                        </div>
+                    </div>
+
+                    <!-- Шаг 3: Дополнительная информация -->
+                    <div class="form-step" data-step="3">
+                        <h2>Шаг 3: Дополнительная информация</h2>
+
+                        <div class="form-group">
+                            <label for="incidents">Происшествия и особые отметки</label>
+                            <textarea id="incidents" name="incidents" rows="5"
+                                placeholder="Опишите все происшествия, нарушения, особые обстоятельства..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="equipment">Состояние оборудования и техники</label>
+                            <textarea id="equipment" name="equipment" rows="3"
+                                placeholder="Опишите состояние переданного оборудования, техники..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="weather">Погодные условия</label>
+                            <select id="weather" name="weather">
+                                <option value="">Выберите погодные условия</option>
+                                <option value="ясно">Ясно</option>
+                                <option value="облачно">Облачно</option>
+                                <option value="дождь">Дождь</option>
+                                <option value="снег">Снег</option>
+                                <option value="туман">Туман</option>
+                                <option value="ветрено">Ветрено</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="noIncidents" name="noIncidents">
+                                Происшествий не было
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="attachments">Приложения (фото, документы)</label>
+                            <input type="file" id="attachments" name="attachments" multiple
+                                accept="image/*,.pdf,.doc,.docx">
+                            <div class="file-list" id="file-list"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="additionalNotes">Дополнительные замечания</label>
+                            <textarea id="additionalNotes" name="additionalNotes" rows="4"
+                                placeholder="Любая дополнительная информация..."></textarea>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="form-actions">
+                    <button type="button" id="prev-step" class="btn btn-secondary" style="display: none;">Назад</button>
+                    <button type="button" id="save-draft" class="btn btn-outline">Сохранить черновик</button>
+                    <button type="button" id="next-step" class="btn btn-primary">Далее</button>
+                </div>
+
+                <div class="save-status" id="save-status"></div>
+            </div>
+        </div>
+
+        <!-- Предпросмотр -->
+        <div id="preview-screen" class="screen">
+            <div class="container">
+                <h2>Предпросмотр рапорта</h2>
+
+                <div id="preview-content" class="preview-content">
+                    <!-- Содержимое будет сгенерировано JavaScript -->
+                </div>
+
+                <div class="preview-actions">
+                    <button type="button" id="edit-form" class="btn btn-secondary">Редактировать</button>
+                    <button type="button" id="save-final" class="btn btn-outline">Сохранить</button>
+                    <button type="button" id="export-pdf" class="btn btn-primary">Экспорт в PDF</button>
+                    <button type="button" id="submit-form" class="btn btn-success">Отправить/Завершить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Подтверждение</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">Сообщение</p>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-cancel" class="btn btn-secondary">Отмена</button>
+                <button id="modal-confirm" class="btn btn-primary">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="storageAdapter.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
