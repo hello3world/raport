@@ -86,7 +86,14 @@ class ReportFormApp {
         });
         document.getElementById('start-new')?.addEventListener('click', () => {
             console.log('Начать новую форму...');
-            this.startNewForm();
+            // Show confirmation modal before starting new form
+            this.showModal(
+                'Подтверждение начала новой формы',
+                'Вы уверены, что хотите начать новую форму? Все несохраненные данные будут потеряны.',
+                () => {
+                    this.startNewForm();
+                }
+            );
         });
         document.getElementById('start-form')?.addEventListener('click', () => {
             console.log('Начать заполнение формы...');
