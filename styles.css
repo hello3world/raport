@@ -13,7 +13,7 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
 }
@@ -35,6 +35,82 @@ body {
 /* Принудительно скрываем неактивные экраны */
 .screen:not(.active) {
     display: none !important;
+}
+
+/* Главная страница с выбором форм */
+#main-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#main-screen h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+}
+
+.form-selection {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.form-selection p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #555;
+}
+
+.form-links {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-link {
+    display: block;
+    padding: 20px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.form-link:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Экран аутентификации */
+.auth-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin: 2rem auto;
+}
+
+.auth-form h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.auth-form p {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #666;
 }
 
 /* Загрузочный экран */
@@ -211,7 +287,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     margin: 0 auto;
-    max-width: 900px;
+    max-width: 1000px;
 }
 
 /* Основная форма */
@@ -228,47 +304,22 @@ body {
     box-sizing: border-box !important;
 }
 
-#main-form .form-step,
-#main-form .form-group,
-#main-form label,
-#main-form input,
-#main-form select,
-#main-form textarea {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+.form-section {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
 }
 
-#main-form input[type="radio"],
-#main-form input[type="checkbox"] {
-    display: inline-block !important;
+.form-section:last-child {
+    border-bottom: none;
 }
 
-#main-form .radio-group {
-    display: flex !important;
-    visibility: visible !important;
-}
-
-#main-form .radio-label {
-    display: flex !important;
-    visibility: visible !important;
-}
-
-.form-step {
-    display: none !important;
-    padding: 2rem;
-}
-
-.form-step.active {
-    display: block !important;
-    visibility: visible !important;
-    flex-direction: column !important;
-}
-
-.form-step h2 {
+.form-section h2 {
     color: #2c3e50;
     margin-bottom: 1.5rem;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #3498db;
 }
 
 .form-group {
@@ -316,6 +367,69 @@ body {
     display: block !important;
     visibility: visible !important;
     background-color: white !important;
+}
+
+/* Подгруппы для полей */
+.sub-group {
+    margin-bottom: 15px;
+}
+
+.sub-group label {
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+.sub-group input {
+    margin-left: 20px;
+    width: calc(100% - 20px);
+}
+
+/* Таблица аварийных ситуаций */
+.emergency-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.emergency-table th,
+.emergency-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.emergency-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.emergency-table input {
+    width: 100%;
+    border: none;
+    padding: 5px;
+}
+
+.emergency-table input:focus {
+    outline: none;
+    background-color: #f0f8ff;
+}
+
+#add-emergency {
+    margin-top: 10px;
+}
+
+/* Заголовок отчета в форме */
+.report-header-form {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border-bottom: 2px solid #2c3e50;
+}
+
+.report-header-form h1 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin: 0;
 }
 
 .radio-group {
@@ -432,7 +546,7 @@ body {
 #preview-screen {
     background: white;
     margin: 0 auto;
-    max-width: 900px;
+    max-width: 1000px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -443,6 +557,7 @@ body {
     font-size: 1.8rem;
     border-bottom: 2px solid #3498db;
     margin-bottom: 0;
+    text-align: center;
 }
 
 .preview-content {
@@ -458,6 +573,7 @@ body {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid #2c3e50;
+    page-break-after: avoid;
 }
 
 .report-title {
@@ -483,6 +599,7 @@ body {
     margin-bottom: 0.5rem;
     border-bottom: 1px solid #ddd;
     padding-bottom: 0.3rem;
+    page-break-after: avoid;
 }
 
 .report-field {
@@ -498,13 +615,14 @@ body {
 .field-label {
     font-weight: 600;
     color: #2c3e50;
-    min-width: 180px;
+    min-width: 250px;
     margin-right: 1rem;
 }
 
 .field-value {
     color: #333;
     flex: 1;
+    word-wrap: break-word;
 }
 
 .field-value.empty {
@@ -512,10 +630,70 @@ body {
     font-style: italic;
 }
 
+/* Таблица аварийных ситуаций в предпросмотре */
+.emergency-table-preview {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    table-layout: fixed;
+    page-break-inside: auto;
+}
+
+.emergency-table-preview th,
+.emergency-table-preview td {
+    border: 1px solid #000;
+    padding: 8px;
+    text-align: left;
+    word-wrap: break-word;
+}
+
+.emergency-table-preview th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.emergency-table-preview th:nth-child(1),
+.emergency-table-preview td:nth-child(1) {
+    width: 15%;
+}
+
+.emergency-table-preview th:nth-child(2),
+.emergency-table-preview td:nth-child(2) {
+    width: 25%;
+}
+
+.emergency-table-preview th:nth-child(3),
+.emergency-table-preview td:nth-child(3) {
+    width: 25%;
+}
+
+.emergency-table-preview th:nth-child(4),
+.emergency-table-preview td:nth-child(4) {
+    width: 25%;
+}
+
+.emergency-table-preview th:nth-child(5),
+.emergency-table-preview td:nth-child(5) {
+    width: 10%;
+}
+
+.emergency-table-preview tr {
+    page-break-inside: avoid;
+}
+
+.emergency-table-preview thead {
+    display: table-header-group;
+}
+
+.emergency-table-preview tbody {
+    page-break-inside: auto;
+}
+
 .report-signature {
     margin-top: 3rem;
     padding-top: 2rem;
     border-top: 1px solid #ddd;
+    page-break-before: avoid;
 }
 
 .signature-block {
@@ -680,6 +858,25 @@ body {
     .modal-footer .btn {
         width: 100%;
         margin: 0;
+    }
+    
+    .form-link {
+        padding: 15px;
+        font-size: 1rem;
+    }
+    
+    .field-label {
+        min-width: 150px;
+    }
+    
+    .report-field {
+        flex-direction: column;
+    }
+    
+    .field-label {
+        min-width: auto;
+        margin-right: 0;
+        margin-bottom: 5px;
     }
 }
 

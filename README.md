@@ -177,3 +177,8 @@ await window.storageAdapter.cleanupOldDrafts(30);
 **Версия**: 1.0  
 **Последнее обновление**: $(Get-Date)  
 **Совместимость**: Chrome 88+, Edge 88+, Firefox 85+, Safari 14+
+
+Теплоэлектроцентраль: login teplo_user / password teplo_pass
+Участок сточных вод: login stok_user / password stok_pass
+Паросиловое хозяйство: login paro_user / password paro_pass
+Электроремонтный цех: login elektro_user / password elektro_pass

@@ -49,6 +49,7 @@ class StorageAdapter {
                 if (!db.objectStoreNames.contains(this.storeName)) {
                     const store = db.createObjectStore(this.storeName, { keyPath: 'id' });
                     store.createIndex('status', 'status', { unique: false });
+                    store.createIndex('formType', 'formType', { unique: false });
                     store.createIndex('updatedAt', 'updatedAt', { unique: false });
                 }
             };

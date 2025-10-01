@@ -4,15 +4,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Заполнение формы - Суточный рапорт</title>
+    <title>Суточный рапорт - Выбор формы</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body>
     <div id="app">
+        <!-- Главная страница с выбором форм -->
+        <div id="main-screen" class="screen active">
+            <div class="container">
+                <h1>Формы суточных рапортов</h1>
+                <div class="form-selection">
+                    <p>Выберите форму отчета для заполнения:</p>
+                    <div class="form-links">
+                        <a href="#" class="form-link" data-form="teploelektracentral">
+                            1. ОТЧЁТ О РАБОТЕ ТЕПЛОЭЛЕКТРОЦЕНТРАЛИ ЗА СУТКИ
+                        </a>
+                        <a href="#" class="form-link" data-form="stokovye_vody">
+                            2. ОТЧЁТ О РАБОТЕ УЧАСТКА ПО ЗАБОРУ, ПОДГОТОВКЕ И ОЧИСТКЕ СТОЧНЫХ ВОД ЗА СУТКИ
+                        </a>
+                        <a href="#" class="form-link" data-form="parosilovoe_hozyaystvo">
+                            3. ОТЧЁТ О РАБОТЕ УЧАСТКА ПАРОСИЛОВОГО ХОЗЯЙСТВА ЗА СУТКИ
+                        </a>
+                        <a href="#" class="form-link" data-form="elektroremontnyi_ceh">
+                            4. ОТЧЁТ О РАБОТЕ ЭЛЕКТРОРЕМОНТНОГО ЦЕХА ЗА СУТКИ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран аутентификации -->
+        <div id="auth-screen" class="screen">
+            <div class="container">
+                <div class="auth-form">
+                    <h2 id="form-title">Аутентификация</h2>
+                    <p>Для доступа к форме введите учетные данные</p>
+                    <form id="authentication-form">
+                        <div class="form-group">
+                            <label for="username">Логин <span class="required">*</span></label>
+                            <input type="text" id="username" name="username" required>
+                            <div class="error-message" data-field="username"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Пароль <span class="required">*</span></label>
+                            <input type="password" id="password" name="password" required>
+                            <div class="error-message" data-field="password"></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="back-to-main" class="btn btn-secondary">Назад</button>
+                            <button type="submit" class="btn btn-primary">Войти</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Загрузочный экран -->
-        <div id="loading-screen" class="screen active">
+        <div id="loading-screen" class="screen">
             <div class="container">
                 <h1>Суточный рапорт</h1>
                 <div class="loading-content">
@@ -34,176 +84,169 @@
         <!-- Форма -->
         <div id="form-screen" class="screen">
             <div class="container">
-                <div class="progress-bar">
-                    <div class="progress-step active" data-step="1">
-                        <span class="step-number">1</span>
-                        <span class="step-title">Личные данные</span>
-                    </div>
-                    <div class="progress-step" data-step="2">
-                        <span class="step-number">2</span>
-                        <span class="step-title">Служебная информация</span>
-                    </div>
-                    <div class="progress-step" data-step="3">
-                        <span class="step-number">3</span>
-                        <span class="step-title">Дополнительно</span>
-                    </div>
-                    <div class="progress-step" data-step="4">
-                        <span class="step-number">4</span>
-                        <span class="step-title">Предпросмотр</span>
-                    </div>
-                </div>
-
                 <form id="main-form">
-                    <!-- Шаг 1: Личные данные -->
-                    <div class="form-step active" data-step="1">
-                        <h2>Шаг 1: Личные данные</h2>
-
-                        <div class="form-group">
-                            <label for="fullName">ФИО <span class="required">*</span></label>
-                            <input type="text" id="fullName" name="fullName" required>
-                            <div class="error-message" data-field="fullName"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="rank">Звание <span class="required">*</span></label>
-                            <select id="rank" name="rank" required>
-                                <option value="">Выберите звание</option>
-                                <option value="рядовой">Рядовой</option>
-                                <option value="ефрейтор">Ефрейтор</option>
-                                <option value="младший сержант">Младший сержант</option>
-                                <option value="сержант">Сержант</option>
-                                <option value="старший сержант">Старший сержант</option>
-                                <option value="старшина">Старшина</option>
-                                <option value="прапорщик">Прапорщик</option>
-                                <option value="старший прапорщик">Старший прапорщик</option>
-                                <option value="младший лейтенант">Младший лейтенант</option>
-                                <option value="лейтенант">Лейтенант</option>
-                                <option value="старший лейтенант">Старший лейтенант</option>
-                                <option value="капитан">Капитан</option>
-                                <option value="майор">Майор</option>
-                                <option value="подполковник">Подполковник</option>
-                                <option value="полковник">Полковник</option>
-                            </select>
-                            <div class="error-message" data-field="rank"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="position">Должность <span class="required">*</span></label>
-                            <input type="text" id="position" name="position" required>
-                            <div class="error-message" data-field="position"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="unit">Подразделение <span class="required">*</span></label>
-                            <input type="text" id="unit" name="unit" required>
-                            <div class="error-message" data-field="unit"></div>
-                        </div>
+                    <!-- Report Title -->
+                    <div class="report-header-form">
+                        <h1 id="form-report-title">Отчет о работе</h1>
                     </div>
 
-                    <!-- Шаг 2: Служебная информация -->
-                    <div class="form-step" data-step="2">
-                        <h2>Шаг 2: Служебная информация</h2>
+                    <!-- 1: Основные данные -->
+                    <div class="form-section" data-step="1">
+                        <h2>1: Основные данные</h2>
 
                         <div class="form-group">
-                            <label for="reportDate">Дата рапорта <span class="required">*</span></label>
-                            <input type="date" id="reportDate" name="reportDate" required>
+                            <label for="reportDate">Дата составления <span class="required">*</span></label>
+                            <input type="text" id="reportDate" name="reportDate" placeholder="___  ___  _____" required>
                             <div class="error-message" data-field="reportDate"></div>
                         </div>
 
                         <div class="form-group">
-                            <label for="dutyType">Тип службы <span class="required">*</span></label>
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="dutyType" value="караул" required>
-                                    <span>Караул</span>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="dutyType" value="дежурство" required>
-                                    <span>Дежурство</span>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="dutyType" value="наряд" required>
-                                    <span>Наряд</span>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="dutyType" value="патруль" required>
-                                    <span>Патруль</span>
-                                </label>
-                            </div>
-                            <div class="error-message" data-field="dutyType"></div>
+                            <label for="periodStart">Период: с 8-00 <span class="required">*</span></label>
+                            <input type="text" id="periodStart" name="periodStart" placeholder="___  ___  _____" required>
+                            <div class="error-message" data-field="periodStart"></div>
                         </div>
 
                         <div class="form-group">
-                            <label for="dutyStart">Время заступления</label>
-                            <input type="time" id="dutyStart" name="dutyStart">
+                            <label for="periodEnd">по 8-00 <span class="required">*</span></label>
+                            <input type="text" id="periodEnd" name="periodEnd" placeholder="___  ___  _____" required>
+                            <div class="error-message" data-field="periodEnd"></div>
                         </div>
 
                         <div class="form-group">
-                            <label for="dutyEnd">Время окончания</label>
-                            <input type="time" id="dutyEnd" name="dutyEnd">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="location">Место несения службы</label>
-                            <input type="text" id="location" name="location">
+                            <label for="shiftSupervisor">Начальник смены ТЭЦ <span class="required">*</span></label>
+                            <input type="text" id="shiftSupervisor" name="shiftSupervisor" placeholder="ФИО" required>
+                            <div class="error-message" data-field="shiftSupervisor"></div>
                         </div>
                     </div>
 
-                    <!-- Шаг 3: Дополнительная информация -->
-                    <div class="form-step" data-step="3">
-                        <h2>Шаг 3: Дополнительная информация</h2>
+                    <!-- 2: Показатели работы -->
+                    <div class="form-section" data-step="2">
+                        <h2>2: Показатели работы</h2>
 
                         <div class="form-group">
-                            <label for="incidents">Происшествия и особые отметки</label>
-                            <textarea id="incidents" name="incidents" rows="5"
-                                placeholder="Опишите все происшествия, нарушения, особые обстоятельства..."></textarea>
+                            <label>Выработка электроэнергии:</label>
+                            <div class="sub-group">
+                                <label for="reactor1">Ракт 1</label>
+                                <input type="text" id="reactor1" name="reactor1" placeholder="__________ МВт·ч">
+                            </div>
+                            <div class="sub-group">
+                                <label for="reactor2">Ракт 2</label>
+                                <input type="text" id="reactor2" name="reactor2" placeholder="__________ МВт·ч">
+                            </div>
+                            <div class="sub-group">
+                                <label for="reactorSum">Ракт сумма</label>
+                                <input type="text" id="reactorSum" name="reactorSum" placeholder="_________ МВт·ч">
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="equipment">Состояние оборудования и техники</label>
-                            <textarea id="equipment" name="equipment" rows="3"
-                                placeholder="Опишите состояние переданного оборудования, техники..."></textarea>
+                            <label for="gasMeter">Показания газового счетчика на 8-00</label>
+                            <input type="text" id="gasMeter" name="gasMeter" placeholder="__________ м3">
                         </div>
 
                         <div class="form-group">
-                            <label for="weather">Погодные условия</label>
-                            <select id="weather" name="weather">
-                                <option value="">Выберите погодные условия</option>
-                                <option value="ясно">Ясно</option>
-                                <option value="облачно">Облачно</option>
-                                <option value="дождь">Дождь</option>
-                                <option value="снег">Снег</option>
-                                <option value="туман">Туман</option>
-                                <option value="ветрено">Ветрено</option>
-                            </select>
+                            <label for="gasConsumption">Потребление газа за сутки</label>
+                            <input type="text" id="gasConsumption" name="gasConsumption" placeholder="__________ м3">
                         </div>
 
                         <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="noIncidents" name="noIncidents">
-                                Происшествий не было
-                            </label>
+                            <label>Производство пара:</label>
+                            <div class="sub-group">
+                                <label for="kgu">КГУ</label>
+                                <input type="text" id="kgu" name="kgu" placeholder="__________ т.">
+                            </div>
+                            <div class="sub-group">
+                                <label for="boiler1">Котельная №1, котел №1</label>
+                                <input type="text" id="boiler1" name="boiler1" placeholder="__________ т.">
+                            </div>
+                            <div class="sub-group">
+                                <label for="boiler2">Котельная №1, котел №2</label>
+                                <input type="text" id="boiler2" name="boiler2" placeholder="__________ т.">
+                            </div>
+                            <div class="sub-group">
+                                <label for="boiler3">Котельная №3</label>
+                                <input type="text" id="boiler3" name="boiler3" placeholder="__________ т.">
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="attachments">Приложения (фото, документы)</label>
-                            <input type="file" id="attachments" name="attachments" multiple
-                                accept="image/*,.pdf,.doc,.docx">
-                            <div class="file-list" id="file-list"></div>
+                            <label for="steamConsumption">Потребление пара: БДМ-1</label>
+                            <input type="text" id="steamConsumption" name="steamConsumption" placeholder="__________ т.">
                         </div>
 
                         <div class="form-group">
-                            <label for="additionalNotes">Дополнительные замечания</label>
-                            <textarea id="additionalNotes" name="additionalNotes" rows="4"
-                                placeholder="Любая дополнительная информация..."></textarea>
+                            <label>Расход топлива:</label>
+                            <div class="sub-group">
+                                <label for="woodChips">щепа</label>
+                                <input type="text" id="woodChips" name="woodChips" placeholder="__________ м3">
+                            </div>
+                            <div class="sub-group">
+                                <label for="bark">кора</label>
+                                <input type="text" id="bark" name="bark" placeholder="__________ м3">
+                            </div>
+                            <div class="sub-group">
+                                <label for="sawdust">опилки</label>
+                                <input type="text" id="sawdust" name="sawdust" placeholder="__________ м3">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="waterConsumption">Расход воды: Станция обезжелезивания</label>
+                            <input type="text" id="waterConsumption" name="waterConsumption" placeholder="__________ м3">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="waterLevel">Уровень воды: Станция обезжелезивания</label>
+                            <input type="text" id="waterLevel" name="waterLevel" placeholder="_____ %">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="waterReserve">Запасно-регулирующие резервуары водоснабжения</label>
+                            <input type="text" id="waterReserve" name="waterReserve" placeholder="_____ %">
+                        </div>
+                    </div>
+
+                    <!-- 3: Оборудование -->
+                    <div class="form-section" data-step="3">
+                        <h2>3: Режим работы оборудования</h2>
+
+                        <div class="form-group">
+                            <label>Аварийные ситуации:</label>
+                            <table class="emergency-table">
+                                <thead>
+                                    <tr>
+                                        <th>Время</th>
+                                        <th>Наименование оборудования</th>
+                                        <th>Описание</th>
+                                        <th>Принятые меры</th>
+                                        <th>Время восстановления</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="emergency-situations">
+                                    <tr>
+                                        <td><input type="text" name="emergencyTime[]" placeholder="__.__.___ __:__"></td>
+                                        <td><input type="text" name="emergencyEquipment[]" placeholder="Наименование"></td>
+                                        <td><input type="text" name="emergencyDescription[]" placeholder="Описание"></td>
+                                        <td><input type="text" name="emergencyActions[]" placeholder="Принятые меры"></td>
+                                        <td><input type="text" name="emergencyRecovery[]" placeholder="__.__.___ __:__"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" id="add-emergency" class="btn btn-outline">Добавить строку</button>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="equipmentDeviations">Отклонения в работе оборудования, замечания:</label>
+                            <textarea id="equipmentDeviations" name="equipmentDeviations" rows="5" placeholder="____________________________________________________________________
+____________________________________________________________________
+____________________________________________________________________"></textarea>
                         </div>
                     </div>
                 </form>
 
                 <div class="form-actions">
-                    <button type="button" id="prev-step" class="btn btn-secondary" style="display: none;">Назад</button>
                     <button type="button" id="save-draft" class="btn btn-outline">Сохранить черновик</button>
-                    <button type="button" id="next-step" class="btn btn-primary">Далее</button>
+                    <button type="button" id="preview-button" class="btn btn-primary">Предпросмотр</button>
                 </div>
 
                 <div class="save-status" id="save-status"></div>
@@ -213,7 +256,9 @@
         <!-- Предпросмотр -->
         <div id="preview-screen" class="screen">
             <div class="container">
-                <h2>Предпросмотр рапорта</h2>
+                <div id="preview-header">
+                    <!-- Report title will be inserted here by JavaScript -->
+                </div>
 
                 <div id="preview-content" class="preview-content">
                     <!-- Содержимое будет сгенерировано JavaScript -->
@@ -223,7 +268,6 @@
                     <button type="button" id="edit-form" class="btn btn-secondary">Редактировать</button>
                     <button type="button" id="save-final" class="btn btn-outline">Сохранить</button>
                     <button type="button" id="export-pdf" class="btn btn-primary">Экспорт в PDF</button>
-                    <button type="button" id="submit-form" class="btn btn-success">Отправить/Завершить</button>
                 </div>
             </div>
         </div>

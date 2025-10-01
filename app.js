@@ -1,7 +1,3 @@
-/**
- * Главное приложение для формы суточного рапорта
- */
-
 class ReportFormApp {
     constructor() {
         this.currentStep = 1;
@@ -10,6 +6,38 @@ class ReportFormApp {
         this.isDirty = false;
         this.autoSaveTimeout = null;
         this.currentDraftId = null;
+        this.selectedForm = null;
+        this.authenticated = false;
+        this.departments = {
+            'teploelektracentral': {
+                name: 'ТЕПЛОЭЛЕКТРОЦЕНТРАЛЬ',
+                users: {
+                    'teplo_user': 'teplo_pass',
+                    'admin': 'admin'
+                }
+            },
+            'stokovye_vody': {
+                name: 'УЧАСТОК СТОЧНЫХ ВОД',
+                users: {
+                    'stok_user': 'stok_pass',
+                    'admin': 'admin'
+                }
+            },
+            'parosilovoe_hozyaystvo': {
+                name: 'ПАРОСИЛОВОЕ ХОЗЯЙСТВО',
+                users: {
+                    'paro_user': 'paro_pass',
+                    'admin': 'admin'
+                }
+            },
+            'elektroremontnyi_ceh': {
+                name: 'ЭЛЕКТРОРЕМОНТНЫЙ ЦЕХ',
+                users: {
+                    'elektro_user': 'elektro_pass',
+                    'admin': 'admin'
+                }
+            }
+        };
 
         this.init();
     }
@@ -25,29 +53,32 @@ class ReportFormApp {
             console.error('Ошибка инициализации storage adapter:', error);
         }
 
-        // Устанавливаем текущую дату по умолчанию
-        const today = new Date().toISOString().split('T')[0];
-        const reportDateField = document.getElementById('reportDate');
-        if (reportDateField) {
-            reportDateField.value = today;
-        }
-
         // Инициализируем обработчики событий
         this.initEventListeners();
-
-        // Проверяем наличие сохраненных черновиков
-        try {
-            await this.checkForDrafts();
-        } catch (error) {
-            console.error('Ошибка проверки черновиков:', error);
-            // При ошибке показываем кнопку новой формы
-            this.showNoDraft();
-        }
 
         console.log('Приложение инициализировано');
     }
 
     initEventListeners() {
+        // Главная страница - выбор формы
+        document.querySelectorAll('.form-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const formType = e.target.getAttribute('data-form');
+                this.selectForm(formType);
+            });
+        });
+
+        // Аутентификация
+        document.getElementById('authentication-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.authenticate();
+        });
+        
+        document.getElementById('back-to-main')?.addEventListener('click', () => {
+            this.showScreen('main-screen');
+        });
+
         // Загрузочный экран
         document.getElementById('restore-draft')?.addEventListener('click', () => {
             console.log('Восстановление черновика...');
@@ -62,11 +93,8 @@ class ReportFormApp {
             this.startNewForm();
         });
 
-        // Навигация по шагам
-        document.getElementById('next-step')?.addEventListener('click', () => this.nextStep());
-        document.getElementById('prev-step')?.addEventListener('click', () => this.prevStep());
-
-        // Сохранение черновика
+        // Навигация по форме
+        document.getElementById('preview-button')?.addEventListener('click', () => this.showPreview());
         document.getElementById('save-draft')?.addEventListener('click', () => this.saveDraft());
 
         // Предпросмотр
@@ -86,6 +114,9 @@ class ReportFormApp {
         // Обработка файлов
         document.getElementById('attachments')?.addEventListener('change', (e) => this.handleFileSelection(e));
 
+        // Добавление строк в таблицу аварийных ситуаций
+        document.getElementById('add-emergency')?.addEventListener('click', () => this.addEmergencyRow());
+
         // Предотвращение потери данных при закрытии
         window.addEventListener('beforeunload', (e) => {
             if (this.isDirty) {
@@ -93,6 +124,42 @@ class ReportFormApp {
                 e.returnValue = 'У вас есть несохраненные изменения. Вы уверены, что хотите покинуть страницу?';
             }
         });
+    }
+
+    selectForm(formType) {
+        this.selectedForm = formType;
+        this.showScreen('auth-screen');
+        const formTitle = document.getElementById('form-title');
+        if (formTitle) {
+            formTitle.textContent = `Аутентификация - ${this.departments[formType].name}`;
+        }
+        
+        // Update form title in the form
+        const formReportTitle = document.getElementById('form-report-title');
+        if (formReportTitle) {
+            formReportTitle.textContent = `ОТЧЁТ О РАБОТЕ ${this.departments[formType].name} ЗА СУТКИ`;
+        }
+    }
+
+    authenticate() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorElements = document.querySelectorAll('.error-message');
+        errorElements.forEach(el => el.classList.remove('show'));
+
+        if (!username || !password) {
+            this.showFieldError(document.getElementById('username'), 'Заполните все поля');
+            return;
+        }
+
+        const department = this.departments[this.selectedForm];
+        if (department && department.users[username] && department.users[username] === password) {
+            this.authenticated = true;
+            // Проверяем наличие сохраненных черновиков
+            this.checkForDrafts();
+        } else {
+            this.showFieldError(document.getElementById('username'), 'Неверный логин или пароль');
+        }
     }
 
     initAutoSave() {
@@ -135,7 +202,7 @@ class ReportFormApp {
             console.log('Проверка черновиков...');
             const drafts = await window.storageAdapter.getAllItems();
             console.log('Найдено элементов:', drafts.length);
-            const activeDrafts = drafts.filter(draft => draft.status === 'draft');
+            const activeDrafts = drafts.filter(draft => draft.status === 'draft' && draft.formType === this.selectedForm);
             console.log('Активных черновиков:', activeDrafts.length);
 
             if (activeDrafts.length > 0) {
@@ -159,6 +226,7 @@ class ReportFormApp {
         document.getElementById('draft-date').textContent = draftDate;
         document.getElementById('draft-detection').style.display = 'block';
         this.latestDraftId = draft.id;
+        this.showScreen('loading-screen');
     }
 
     showNoDraft() {
@@ -170,6 +238,7 @@ class ReportFormApp {
         } else {
             console.error('Элемент no-draft не найден!');
         }
+        this.showScreen('loading-screen');
     }
 
     async restoreDraft() {
@@ -178,10 +247,8 @@ class ReportFormApp {
             if (draft) {
                 this.currentDraftId = this.latestDraftId;
                 this.formData = draft.form || {};
-                this.currentStep = draft.currentStep || 1;
                 this.populateForm();
                 this.showFormScreen();
-                this.updateProgressBar();
                 this.isDirty = false;
                 console.log('Черновик восстановлен');
             }
@@ -195,10 +262,8 @@ class ReportFormApp {
         console.log('Запуск новой формы...');
         this.currentDraftId = null;
         this.formData = {};
-        this.currentStep = 1;
         this.isDirty = false;
         this.showFormScreen();
-        this.updateProgressBar();
         console.log('Новая форма запущена');
     }
 
@@ -220,6 +285,23 @@ class ReportFormApp {
         // Восстанавливаем файлы
         if (this.formData.attachments) {
             this.displayFileList(this.formData.attachments);
+        }
+        
+        // Восстанавливаем аварийные ситуации
+        if (this.formData.emergencySituations && this.formData.emergencySituations.length > 0) {
+            const tbody = document.getElementById('emergency-situations');
+            tbody.innerHTML = '';
+            this.formData.emergencySituations.forEach(situation => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td><input type="text" name="emergencyTime[]" value="${situation.time || ''}" placeholder="__.__.___ __:__"></td>
+                    <td><input type="text" name="emergencyEquipment[]" value="${situation.equipment || ''}" placeholder="Наименование"></td>
+                    <td><input type="text" name="emergencyDescription[]" value="${situation.description || ''}" placeholder="Описание"></td>
+                    <td><input type="text" name="emergencyActions[]" value="${situation.actions || ''}" placeholder="Принятые меры"></td>
+                    <td><input type="text" name="emergencyRecovery[]" value="${situation.recovery || ''}" placeholder="__.__.___ __:__"></td>
+                `;
+                tbody.appendChild(newRow);
+            });
         }
     }
 
@@ -247,12 +329,28 @@ class ReportFormApp {
             data.attachments = this.formData.attachments;
         }
 
+        // Собираем данные из таблицы аварийных ситуаций
+        const emergencyRows = document.querySelectorAll('#emergency-situations tr');
+        const emergencyData = [];
+        emergencyRows.forEach(row => {
+            const inputs = row.querySelectorAll('input');
+            if (inputs.length === 5) {
+                emergencyData.push({
+                    time: inputs[0].value,
+                    equipment: inputs[1].value,
+                    description: inputs[2].value,
+                    actions: inputs[3].value,
+                    recovery: inputs[4].value
+                });
+            }
+        });
+        data.emergencySituations = emergencyData;
+
         return data;
     }
 
-    validateStep(step) {
-        const stepElement = document.querySelector(`[data-step="${step}"]`);
-        const requiredFields = stepElement.querySelectorAll('[required]');
+    validateForm() {
+        const requiredFields = document.querySelectorAll('#main-form [required]');
         let isValid = true;
 
         // Очищаем предыдущие ошибки
@@ -275,17 +373,6 @@ class ReportFormApp {
             }
         });
 
-        // Дополнительная валидация
-        if (step === 2) {
-            const dutyStart = document.getElementById('dutyStart').value;
-            const dutyEnd = document.getElementById('dutyEnd').value;
-
-            if (dutyStart && dutyEnd && dutyStart >= dutyEnd) {
-                this.showFieldError(document.getElementById('dutyEnd'), 'Время окончания должно быть позже времени заступления');
-                isValid = false;
-            }
-        }
-
         return isValid;
     }
 
@@ -300,163 +387,27 @@ class ReportFormApp {
         }
     }
 
-    async nextStep() {
-        if (!this.validateStep(this.currentStep)) {
+    showPreview() {
+        if (!this.validateForm()) {
             return;
         }
 
         this.formData = { ...this.formData, ...this.collectFormData() };
-
-        if (this.currentStep < this.maxSteps) {
-            this.currentStep++;
-            this.updateFormStep();
-        } else {
-            // Переход к предпросмотру
-            this.showPreview();
-        }
+        this.generatePreview();
+        this.showScreen('preview-screen');
     }
 
-    prevStep() {
-        if (this.currentStep > 1) {
-            this.formData = { ...this.formData, ...this.collectFormData() };
-            this.currentStep--;
-            this.updateFormStep();
-        }
-    }
-
-    updateFormStep() {
-        console.log(`Обновляем форму для шага ${this.currentStep}`);
-
-        // Скрываем все шаги
-        const formSteps = document.querySelectorAll('.form-step');
-        console.log(`Найдено шагов формы: ${formSteps.length}`);
-
-        formSteps.forEach((step, index) => {
-            step.classList.remove('active');
-            console.log(`Шаг ${index + 1} (${step.dataset.step}): скрыт`);
-        });
-
-        // Показываем текущий шаг
-        const currentStepElement = document.querySelector(`[data-step="${this.currentStep}"]`);
-        if (currentStepElement) {
-            currentStepElement.classList.add('active');
-            console.log(`Активирован шаг ${this.currentStep}`);
-
-            // Проверяем, что элемент действительно отображается
-            const computedStyle = window.getComputedStyle(currentStepElement);
-            console.log(`Computed display для шага ${this.currentStep}:`, computedStyle.display);
-
-            // Принудительно делаем шаг видимым
-            if (computedStyle.display === 'none') {
-                console.log('Принудительно делаем шаг видимым');
-                currentStepElement.style.display = 'block';
-            }
-
-            // Проверяем все форм-группы в текущем шаге
-            const formGroups = currentStepElement.querySelectorAll('.form-group');
-            console.log(`Найдено групп полей в шаге ${this.currentStep}: ${formGroups.length}`);
-
-            // Дополнительная диагностика если групп не найдено
-            if (formGroups.length === 0) {
-                console.log('Диагностика: проверяем содержимое шага');
-                console.log('Элемент шага ID:', currentStepElement.id);
-                console.log('Элемент шага классы:', currentStepElement.className);
-                console.log('Элемент шага data-step:', currentStepElement.dataset.step);
-                console.log('HTML содержимое шага (первые 500 символов):', currentStepElement.innerHTML.substring(0, 500));
-                console.log('Все элементы в шаге:', currentStepElement.children.length);
-
-                // Попробуем найти элементы по разным селекторам
-                const allDivs = currentStepElement.querySelectorAll('div');
-                const allInputs = currentStepElement.querySelectorAll('input, select, textarea');
-                const allLabels = currentStepElement.querySelectorAll('label');
-                const allFormGroupsByClass = currentStepElement.getElementsByClassName('form-group');
-                console.log('Всего div элементов:', allDivs.length);
-                console.log('Всего input/select/textarea элементов:', allInputs.length);
-                console.log('Всего label элементов:', allLabels.length);
-                console.log('form-group через getElementsByClassName:', allFormGroupsByClass.length);
-
-                // Принудительно делаем все найденные элементы видимыми
-                allInputs.forEach(input => {
-                    input.style.display = input.type === 'radio' || input.type === 'checkbox' ? 'inline-block' : 'block';
-                    input.style.visibility = 'visible';
-                });
-                allLabels.forEach(label => {
-                    label.style.display = 'block';
-                    label.style.visibility = 'visible';
-                });
-                allDivs.forEach(div => {
-                    if (div.classList.contains('form-group') || div.querySelector('input, select, textarea')) {
-                        div.style.display = 'block';
-                        div.style.visibility = 'visible';
-                    }
-                });
-            }
-
-            // Принудительно делаем все группы видимыми
-            formGroups.forEach((group, index) => {
-                group.style.display = 'block';
-                group.style.visibility = 'visible';
-                console.log(`Группа ${index + 1} сделана видимой`);
-
-                // Проверяем поля в группе
-                const inputs = group.querySelectorAll('input, select, textarea, label');
-                inputs.forEach(input => {
-                    if (input.type === 'radio' || input.type === 'checkbox') {
-                        input.style.display = 'inline-block';
-                    } else {
-                        input.style.display = 'block';
-                    }
-                    input.style.visibility = 'visible';
-                });
-            });
-
-            // Дополнительно принудительно отображаем все элементы в шаге
-            const allElements = currentStepElement.querySelectorAll('*');
-            console.log(`Принудительное отображение всех ${allElements.length} элементов в шаге ${this.currentStep}`);
-            allElements.forEach(el => {
-                if (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA' || el.tagName === 'LABEL' ||
-                    el.classList.contains('form-group') || el.classList.contains('radio-group') || el.classList.contains('radio-label')) {
-                    if (el.type === 'radio' || el.type === 'checkbox') {
-                        el.style.display = 'inline-block';
-                    } else if (el.classList.contains('radio-group')) {
-                        el.style.display = 'flex';
-                    } else {
-                        el.style.display = 'block';
-                    }
-                    el.style.visibility = 'visible';
-                    el.style.opacity = '1';
-                }
-            });
-        } else {
-            console.error(`Шаг с data-step="${this.currentStep}" не найден!`);
-            // Показываем все доступные шаги для отладки
-            document.querySelectorAll('[data-step]').forEach(el => {
-                console.log(`Доступный шаг: data-step="${el.dataset.step}", id="${el.id}", class="${el.className}"`);
-            });
-        }
-
-        // Обновляем навигацию
-        const prevBtn = document.getElementById('prev-step');
-        const nextBtn = document.getElementById('next-step');
-
-        if (prevBtn) prevBtn.style.display = this.currentStep > 1 ? 'block' : 'none';
-        if (nextBtn) nextBtn.textContent = this.currentStep < this.maxSteps ? 'Далее' : 'Предпросмотр';
-
-        this.updateProgressBar();
-        console.log(`Обновление формы завершено для шага ${this.currentStep}`);
-    }
-
-    updateProgressBar() {
-        document.querySelectorAll('.progress-step').forEach((step, index) => {
-            const stepNumber = index + 1;
-            step.classList.remove('active', 'completed');
-
-            if (stepNumber < this.currentStep) {
-                step.classList.add('completed');
-            } else if (stepNumber === this.currentStep) {
-                step.classList.add('active');
-            }
-        });
+    addEmergencyRow() {
+        const tbody = document.getElementById('emergency-situations');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td><input type="text" name="emergencyTime[]" placeholder="__.__.___ __:__"></td>
+            <td><input type="text" name="emergencyEquipment[]" placeholder="Наименование"></td>
+            <td><input type="text" name="emergencyDescription[]" placeholder="Описание"></td>
+            <td><input type="text" name="emergencyActions[]" placeholder="Принятые меры"></td>
+            <td><input type="text" name="emergencyRecovery[]" placeholder="__.__.___ __:__"></td>
+        `;
+        tbody.appendChild(newRow);
     }
 
     async handleFileSelection(event) {
@@ -527,9 +478,9 @@ class ReportFormApp {
             const draftData = {
                 id: this.currentDraftId,
                 status: 'draft',
+                formType: this.selectedForm,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
-                currentStep: this.currentStep,
                 form: this.formData
             };
 
@@ -568,112 +519,147 @@ class ReportFormApp {
         }
     }
 
-    showPreview() {
-        this.formData = { ...this.formData, ...this.collectFormData() };
-        this.generatePreview();
-        this.showScreen('preview-screen');
-    }
-
     generatePreview() {
+        const previewHeader = document.getElementById('preview-header');
         const previewContent = document.getElementById('preview-content');
-        const reportDate = new Date(this.formData.reportDate || new Date()).toLocaleDateString('ru-RU');
+        const department = this.departments[this.selectedForm];
+        
+        // Set the report title in the header
+        previewHeader.innerHTML = `
+            <div class="report-header">
+                <div class="report-title">ОТЧЁТ</div>
+                <div class="report-title">О РАБОТЕ ${department.name} ЗА СУТКИ</div>
+            </div>
+        `;
+        
+        // Форматируем даты для отображения
+        const reportDate = this.formData.reportDate || '___  ___  _____';
+        const periodStart = this.formData.periodStart || '___  ___  _____';
+        const periodEnd = this.formData.periodEnd || '___  ___  _____';
 
         previewContent.innerHTML = `
-            <div class="report-header">
-                <div class="report-title">СУТОЧНЫЙ РАПОРТ</div>
-                <div class="report-date">от ${reportDate}</div>
-            </div>
-
             <div class="report-section">
-                <h3>Личные данные</h3>
                 <div class="report-field">
-                    <span class="field-label">ФИО:</span>
-                    <span class="field-value">${this.formData.fullName || 'Не указано'}</span>
-                </div>
-                <div class="report-field">
-                    <span class="field-label">Звание:</span>
-                    <span class="field-value">${this.formData.rank || 'Не указано'}</span>
-                </div>
-                <div class="report-field">
-                    <span class="field-label">Должность:</span>
-                    <span class="field-value">${this.formData.position || 'Не указано'}</span>
-                </div>
-                <div class="report-field">
-                    <span class="field-label">Подразделение:</span>
-                    <span class="field-value">${this.formData.unit || 'Не указано'}</span>
-                </div>
-            </div>
-
-            <div class="report-section">
-                <h3>Служебная информация</h3>
-                <div class="report-field">
-                    <span class="field-label">Дата рапорта:</span>
+                    <span class="field-label">Дата составления:</span>
                     <span class="field-value">${reportDate}</span>
                 </div>
                 <div class="report-field">
-                    <span class="field-label">Тип службы:</span>
-                    <span class="field-value">${this.formData.dutyType || 'Не указано'}</span>
+                    <span class="field-label">Период: с 8-00</span>
+                    <span class="field-value">${periodStart}</span>
                 </div>
-                ${this.formData.dutyStart ? `
                 <div class="report-field">
-                    <span class="field-label">Время заступления:</span>
-                    <span class="field-value">${this.formData.dutyStart}</span>
+                    <span class="field-label">по 8-00</span>
+                    <span class="field-value">${periodEnd}</span>
                 </div>
-                ` : ''}
-                ${this.formData.dutyEnd ? `
                 <div class="report-field">
-                    <span class="field-label">Время окончания:</span>
-                    <span class="field-value">${this.formData.dutyEnd}</span>
+                    <span class="field-label">Начальник смены ТЭЦ:</span>
+                    <span class="field-value">${this.formData.shiftSupervisor || '_________________'}</span>
                 </div>
-                ` : ''}
-                ${this.formData.location ? `
-                <div class="report-field">
-                    <span class="field-label">Место несения службы:</span>
-                    <span class="field-value">${this.formData.location}</span>
-                </div>
-                ` : ''}
             </div>
 
             <div class="report-section">
-                <h3>Дополнительная информация</h3>
-                ${this.formData.incidents ? `
-                <div class="report-field vertical">
-                    <span class="field-label">Происшествия и особые отметки:</span>
-                    <span class="field-value">${this.formData.incidents}</span>
-                </div>
-                ` : ''}
-                ${this.formData.equipment ? `
-                <div class="report-field vertical">
-                    <span class="field-label">Состояние оборудования и техники:</span>
-                    <span class="field-value">${this.formData.equipment}</span>
-                </div>
-                ` : ''}
-                ${this.formData.weather ? `
+                <h3>Общие показатели работы ТЭЦ</h3>
                 <div class="report-field">
-                    <span class="field-label">Погодные условия:</span>
-                    <span class="field-value">${this.formData.weather}</span>
+                    <span class="field-label">Выработка электроэнергии:</span>
+                    <span class="field-value"></span>
                 </div>
-                ` : ''}
-                ${this.formData.noIncidents ? `
                 <div class="report-field">
-                    <span class="field-label">Происшествий не было:</span>
-                    <span class="field-value">Да</span>
+                    <span class="field-label" style="min-width: 100px; margin-left: 50px;">Ракт 1</span>
+                    <span class="field-value">${this.formData.reactor1 || '__________'} МВт·ч</span>
                 </div>
-                ` : ''}
-                ${this.formData.additionalNotes ? `
+                <div class="report-field">
+                    <span class="field-label" style="min-width: 100px; margin-left: 50px;">Ракт 2</span>
+                    <span class="field-value">${this.formData.reactor2 || '__________'} МВт·ч</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label" style="min-width: 100px; margin-left: 50px;">Ракт сумма</span>
+                    <span class="field-value">${this.formData.reactorSum || '_________'} МВт·ч</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Показания газового счетчика на 8-00</span>
+                    <span class="field-value">${this.formData.gasMeter || '__________'} м3</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Потребление газа за сутки</span>
+                    <span class="field-value">${this.formData.gasConsumption || '__________'} м3</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Производство пара:</span>
+                    <span class="field-value"></span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label" style="min-width: 200px; margin-left: 50px;">КГУ</span>
+                    <span class="field-value">${this.formData.kgu || '__________'} т.</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label" style="min-width: 200px; margin-left: 50px;">Котельная №1, котел №1</span>
+                    <span class="field-value">${this.formData.boiler1 || '__________'} т.</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label" style="min-width: 200px; margin-left: 50px;">Котельная №1, котел №2</span>
+                    <span class="field-value">${this.formData.boiler2 || '__________'} т.</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label" style="min-width: 200px; margin-left: 50px;">Котельная №3</span>
+                    <span class="field-value">${this.formData.boiler3 || '__________'} т.</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Потребление пара: БДМ-1</span>
+                    <span class="field-value">${this.formData.steamConsumption || '__________'} т.</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Расход топлива:</span>
+                    <span class="field-value"></span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label" style="min-width: 100px; margin-left: 50px;">щепа</span>
+                    <span class="field-value">${this.formData.woodChips || '__________'} м3</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label" style="min-width: 100px; margin-left: 50px;">кора</span>
+                    <span class="field-value">${this.formData.bark || '__________'} м3</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label" style="min-width: 100px; margin-left: 50px;">опилки</span>
+                    <span class="field-value">${this.formData.sawdust || '__________'} м3</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Расход воды: Станция обезжелезивания</span>
+                    <span class="field-value">${this.formData.waterConsumption || '__________'} м3</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Уровень воды: Станция обезжелезивания</span>
+                    <span class="field-value">${this.formData.waterLevel || '_____'} %</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Запасно-регулирующие резервуары водоснабжения</span>
+                    <span class="field-value">${this.formData.waterReserve || '_____'} %</span>
+                </div>
+            </div>
+
+            <div class="report-section">
+                <h3>Режим работы оборудования</h3>
                 <div class="report-field vertical">
-                    <span class="field-label">Дополнительные замечания:</span>
-                    <span class="field-value">${this.formData.additionalNotes}</span>
+                    <span class="field-label">Аварийные ситуации:</span>
+                    <table class="emergency-table-preview">
+                        <thead>
+                            <tr>
+                                <th>Время</th>
+                                <th>Наименование оборудования</th>
+                                <th>Описание</th>
+                                <th>Принятые меры</th>
+                                <th>Время восстановления</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${this.generateEmergencyTablePreview()}
+                        </tbody>
+                    </table>
                 </div>
-                ` : ''}
-                ${this.formData.attachments && this.formData.attachments.length > 0 ? `
                 <div class="report-field vertical">
-                    <span class="field-label">Приложения:</span>
-                    <span class="field-value">
-                        ${this.formData.attachments.map(file => file.name).join(', ')}
-                    </span>
+                    <span class="field-label">Отклонения в работе оборудования, замечания:</span>
+                    <span class="field-value">${this.formData.equipmentDeviations || ''}</span>
                 </div>
-                ` : ''}
             </div>
 
             <div class="report-signature">
@@ -689,6 +675,30 @@ class ReportFormApp {
         `;
     }
 
+    generateEmergencyTablePreview() {
+        if (!this.formData.emergencySituations || this.formData.emergencySituations.length === 0) {
+            return `
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            `;
+        }
+
+        return this.formData.emergencySituations.map(situation => `
+            <tr>
+                <td>${situation.time || ''}</td>
+                <td>${situation.equipment || ''}</td>
+                <td>${situation.description || ''}</td>
+                <td>${situation.actions || ''}</td>
+                <td>${situation.recovery || ''}</td>
+            </tr>
+        `).join('');
+    }
+
     editForm() {
         this.showScreen('form-screen');
     }
@@ -697,11 +707,27 @@ class ReportFormApp {
         try {
             const element = document.getElementById('preview-content');
             const opt = {
-                margin: [15, 15, 15, 15],
-                filename: `Суточный_рапорт_${new Date().toISOString().split('T')[0]}.pdf`,
+                margin: [10, 5, 10, 5], // Reduced margins: [top, right, bottom, left]
+                filename: `Отчет_${this.departments[this.selectedForm].name}_${new Date().toISOString().split('T')[0]}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait',
+                    compress: true
+                },
+                pagebreak: {
+                    mode: ['avoid-all', 'css', 'legacy'],
+                    before: '.before-page-break',
+                    after: '.after-page-break',
+                    avoid: '.avoid-page-break'
+                }
             };
 
             await html2pdf().set(opt).from(element).save();
@@ -722,10 +748,10 @@ class ReportFormApp {
                     const finalData = {
                         id: this.currentDraftId || window.storageAdapter.generateId(),
                         status: 'submitted',
+                        formType: this.selectedForm,
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                         submittedAt: new Date().toISOString(),
-                        currentStep: 4,
                         form: this.formData
                     };
 
@@ -736,9 +762,10 @@ class ReportFormApp {
 
                     // Очищаем форму и возвращаемся к началу
                     setTimeout(() => {
+                        this.selectedForm = null;
+                        this.authenticated = false;
                         this.startNewForm();
-                        this.showScreen('loading-screen');
-                        this.checkForDrafts();
+                        this.showScreen('main-screen');
                     }, 2000);
 
                 } catch (error) {
@@ -816,85 +843,7 @@ class ReportFormApp {
             console.error('Основная форма не найдена!');
         }
 
-        this.updateFormStep();
-
-        // Принудительно делаем все элементы формы видимыми
-        this.ensureFormVisibility();
-
         console.log('Экран формы отображён');
-    }
-
-    ensureFormVisibility() {
-        console.log('Принудительное обеспечение видимости всех элементов формы...');
-
-        // Сначала убеждаемся, что сама форма видима
-        const mainForm = document.getElementById('main-form');
-        if (mainForm) {
-            mainForm.style.display = 'block';
-            mainForm.style.visibility = 'visible';
-            mainForm.style.opacity = '1';
-            console.log('Основная форма принудительно отображена');
-        }
-
-        // Проходим по всем шагам формы
-        document.querySelectorAll('.form-step').forEach((step, stepIndex) => {
-            // Принудительно делаем шаг видимым если он активен
-            if (step.classList.contains('active')) {
-                step.style.display = 'block';
-                step.style.visibility = 'visible';
-                step.style.opacity = '1';
-                console.log(`Активный шаг ${stepIndex + 1} принудительно отображен`);
-            }
-
-            // Проверяем все группы в каждом шаге
-            const groups = step.querySelectorAll('.form-group');
-            console.log(`Шаг ${stepIndex + 1}: найдено ${groups.length} групп`);
-
-            groups.forEach((group, groupIndex) => {
-                // Принудительно делаем группу видимой
-                group.style.display = 'block';
-                group.style.visibility = 'visible';
-                group.style.opacity = '1';
-
-                // Проверяем все элементы в группе
-                const elements = group.querySelectorAll('label, input, select, textarea, .radio-group, .radio-label');
-                elements.forEach(element => {
-                    if (element.type === 'radio' || element.type === 'checkbox') {
-                        element.style.display = 'inline-block';
-                    } else if (element.classList.contains('radio-group')) {
-                        element.style.display = 'flex';
-                    } else {
-                        element.style.display = 'block';
-                    }
-                    element.style.visibility = 'visible';
-                    element.style.opacity = '1';
-                });
-
-                console.log(`  Группа ${groupIndex + 1}: обработано ${elements.length} элементов`);
-            });
-        });
-
-        // Дополнительная проверка: принудительно отображаем ВСЕ элементы формы
-        const allFormElements = document.querySelectorAll('#main-form *');
-        console.log(`Дополнительная обработка ${allFormElements.length} элементов формы`);
-        allFormElements.forEach(el => {
-            if (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA' ||
-                el.tagName === 'LABEL' || el.tagName === 'H2' || el.classList.contains('form-group') ||
-                el.classList.contains('radio-group') || el.classList.contains('radio-label')) {
-
-                if (el.type === 'radio' || el.type === 'checkbox') {
-                    el.style.display = 'inline-block';
-                } else if (el.classList.contains('radio-group')) {
-                    el.style.display = 'flex';
-                } else {
-                    el.style.display = 'block';
-                }
-                el.style.visibility = 'visible';
-                el.style.opacity = '1';
-            }
-        });
-
-        console.log('Обеспечение видимости завершено');
     }
 
     showModal(title, message, confirmCallback) {
@@ -948,10 +897,6 @@ class ReportFormApp {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM загружен, инициализируем приложение...');
 
-    // Проверяем наличие основных элементов
-    const startFormBtn = document.getElementById('start-form');
-    console.log('Кнопка start-form найдена:', !!startFormBtn);
-
     // Создаем приложение
     window.reportApp = new ReportFormApp();
 
@@ -961,30 +906,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (noDraftElement && noDraftElement.style.display === 'none') {
             console.log('Принудительно показываем кнопку начала формы');
             noDraftElement.style.display = 'block';
-        }
-
-        // Добавляем дополнительные обработчики как fallback
-        const startFormBtn = document.getElementById('start-form');
-        if (startFormBtn) {
-            startFormBtn.addEventListener('click', () => {
-                console.log('Fallback: клик по кнопке начать заполнение');
-                if (window.reportApp) {
-                    window.reportApp.startNewForm();
-                } else {
-                    // Прямое переключение на форму
-                    console.log('Прямое переключение на форму...');
-                    document.querySelectorAll('.screen').forEach(s => {
-                        s.style.display = 'none';
-                        s.classList.remove('active');
-                    });
-                    const formScreen = document.getElementById('form-screen');
-                    if (formScreen) {
-                        formScreen.style.display = 'block';
-                        formScreen.classList.add('active');
-                        console.log('Форма принудительно отображена');
-                    }
-                }
-            });
         }
     }, 2000);
 });
