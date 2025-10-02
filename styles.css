@@ -343,7 +343,7 @@ body {
 .form-group input,
 .form-group select,
 .form-group textarea {
-    width: 100%;
+    width: 50%;
     padding: 12px;
     border: 2px solid #ddd;
     border-radius: 6px;
@@ -352,6 +352,14 @@ body {
     background-color: white;
     display: block !important;
     visibility: visible !important;
+}
+
+#shiftSupervisor {
+    width: 70%;
+}
+
+#equipmentDeviations {
+    width: 100%;
 }
 
 .form-group input:focus,
@@ -377,7 +385,7 @@ body {
 }
 
 .input-with-unit input {
-    flex: 1;
+    flex: 0.5;
     margin: 0;
 }
 
@@ -398,7 +406,7 @@ body {
 }
 
 .sub-group .input-with-unit {
-    margin-left: 20px;
+    /* margin-left: 20px; */
 }
 
 /* Таблица аварийных ситуаций */
@@ -580,7 +588,7 @@ body {
 }
 
 .preview-content {
-    padding: 2rem;
+    padding: 1rem 2rem 2rem 2rem;
     background: white;
     min-height: 400px;
     line-height: 1.8;
@@ -799,8 +807,8 @@ body {
     }
 
     .preview-actions {
-        display: flex;
-        justify-content: space-between;
+        display: flex !important;
+        justify-content: space-between !important;
     }
 
     .btn {

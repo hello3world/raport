@@ -311,6 +311,19 @@ class ReportFormApp {
                             element.value = formattedDate;
                         }
                     }
+                } else if (element.type === 'datetime-local') {
+                    // Handle datetime-local inputs
+                    if (this.formData[key]) {
+                        // Convert dd.mm.yyyy hh:mm format to yyyy-mm-ddThh:mm for datetime-local inputs
+                        const dateTimeParts = this.formData[key].split(' ');
+                        if (dateTimeParts.length === 2) {
+                            const dateParts = dateTimeParts[0].split('.');
+                            if (dateParts.length === 3) {
+                                const formattedDateTime = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}T${dateTimeParts[1]}`;
+                                element.value = formattedDateTime;
+                            }
+                        }
+                    }
                 } else {
                     element.value = this.formData[key];
                 }
@@ -328,12 +341,36 @@ class ReportFormApp {
             tbody.innerHTML = '';
             this.formData.emergencySituations.forEach(situation => {
                 const newRow = document.createElement('tr');
+                // Handle datetime formatting for emergency situations
+                let timeValue = '';
+                let recoveryValue = '';
+
+                if (situation.time) {
+                    const timeParts = situation.time.split(' ');
+                    if (timeParts.length === 2) {
+                        const dateParts = timeParts[0].split('.');
+                        if (dateParts.length === 3) {
+                            timeValue = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}T${timeParts[1]}`;
+                        }
+                    }
+                }
+
+                if (situation.recovery) {
+                    const recoveryParts = situation.recovery.split(' ');
+                    if (recoveryParts.length === 2) {
+                        const dateParts = recoveryParts[0].split('.');
+                        if (dateParts.length === 3) {
+                            recoveryValue = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}T${recoveryParts[1]}`;
+                        }
+                    }
+                }
+
                 newRow.innerHTML = `
-                    <td><input type="text" name="emergencyTime[]" value="${situation.time || ''}" placeholder="__.__.___ __:__"></td>
-                    <td><input type="text" name="emergencyEquipment[]" value="${situation.equipment || ''}" placeholder="Наименование"></td>
-                    <td><input type="text" name="emergencyDescription[]" value="${situation.description || ''}" placeholder="Описание"></td>
-                    <td><input type="text" name="emergencyActions[]" value="${situation.actions || ''}" placeholder="Принятые меры"></td>
-                    <td><input type="text" name="emergencyRecovery[]" value="${situation.recovery || ''}" placeholder="__.__.___ __:__"></td>
+                    <td><input type="datetime-local" name="emergencyTime[]" value="${timeValue}"></td>
+                    <td><input type="text" name="emergencyEquipment[]" value="${situation.equipment || ''}"></td>
+                    <td><input type="text" name="emergencyDescription[]" value="${situation.description || ''}"></td>
+                    <td><input type="text" name="emergencyActions[]" value="${situation.actions || ''}"></td>
+                    <td><input type="datetime-local" name="emergencyRecovery[]" value="${recoveryValue}"></td>
                 `;
                 tbody.appendChild(newRow);
             });
@@ -362,6 +399,16 @@ class ReportFormApp {
                     } else {
                         data[name] = '';
                     }
+                } else if (element.type === 'datetime-local') {
+                    // Handle datetime-local inputs - convert yyyy-mm-ddThh:mm to dd.mm.yyyy hh:mm
+                    if (element.value) {
+                        const [datePart, timePart] = element.value.split('T');
+                        const [year, month, day] = datePart.split('-');
+                        const formattedDateTime = `${day}.${month}.${year} ${timePart}`;
+                        data[name] = formattedDateTime;
+                    } else {
+                        data[name] = '';
+                    }
                 } else if (element.type !== 'file') {
                     data[name] = element.value;
                 }
@@ -379,12 +426,28 @@ class ReportFormApp {
         emergencyRows.forEach(row => {
             const inputs = row.querySelectorAll('input');
             if (inputs.length === 5) {
+                // Handle datetime formatting for emergency situations
+                let timeValue = '';
+                let recoveryValue = '';
+
+                if (inputs[0].value) {
+                    const [datePart, timePart] = inputs[0].value.split('T');
+                    const [year, month, day] = datePart.split('-');
+                    timeValue = `${day}.${month}.${year} ${timePart}`;
+                }
+
+                if (inputs[4].value) {
+                    const [datePart, timePart] = inputs[4].value.split('T');
+                    const [year, month, day] = datePart.split('-');
+                    recoveryValue = `${day}.${month}.${year} ${timePart}`;
+                }
+
                 emergencyData.push({
-                    time: inputs[0].value,
+                    time: timeValue,
                     equipment: inputs[1].value,
                     description: inputs[2].value,
                     actions: inputs[3].value,
-                    recovery: inputs[4].value
+                    recovery: recoveryValue
                 });
             }
         });
@@ -445,11 +508,11 @@ class ReportFormApp {
         const tbody = document.getElementById('emergency-situations');
         const newRow = document.createElement('tr');
         newRow.innerHTML = `
-            <td><input type="text" name="emergencyTime[]" placeholder="__.__.___ __:__"></td>
-            <td><input type="text" name="emergencyEquipment[]" placeholder="Наименование"></td>
-            <td><input type="text" name="emergencyDescription[]" placeholder="Описание"></td>
-            <td><input type="text" name="emergencyActions[]" placeholder="Принятые меры"></td>
-            <td><input type="text" name="emergencyRecovery[]" placeholder="__.__.___ __:__"></td>
+            <td><input type="datetime-local" name="emergencyTime[]"></td>
+            <td><input type="text" name="emergencyEquipment[]"></td>
+            <td><input type="text" name="emergencyDescription[]"></td>
+            <td><input type="text" name="emergencyActions[]"></td>
+            <td><input type="datetime-local" name="emergencyRecovery[]"></td>
         `;
         tbody.appendChild(newRow);
     }

@@ -151,7 +151,7 @@
                         <div class="form-group">
                             <label for="gasMeter">Показания газового счетчика на 8-00</label>
                             <div class="input-with-unit">
-                                <input type="text" id="gasMeter" name="gasMeter" placeholder="__________">
+                                <input type="text" id="gasMeter" name="gasMeter">
                                 <span class="unit">м3</span>
                             </div>
                         </div>
@@ -159,7 +159,7 @@
                         <div class="form-group">
                             <label for="gasConsumption">Потребление газа за сутки</label>
                             <div class="input-with-unit">
-                                <input type="text" id="gasConsumption" name="gasConsumption" placeholder="__________">
+                                <input type="text" id="gasConsumption" name="gasConsumption">
                                 <span class="unit">м3</span>
                             </div>
                         </div>
@@ -169,28 +169,28 @@
                             <div class="sub-group">
                                 <label for="kgu">КГУ</label>
                                 <div class="input-with-unit">
-                                    <input type="text" id="kgu" name="kgu" placeholder="__________">
+                                    <input type="text" id="kgu" name="kgu">
                                     <span class="unit">т.</span>
                                 </div>
                             </div>
                             <div class="sub-group">
                                 <label for="boiler1">Котельная №1, котел №1</label>
                                 <div class="input-with-unit">
-                                    <input type="text" id="boiler1" name="boiler1" placeholder="__________">
+                                    <input type="text" id="boiler1" name="boiler1">
                                     <span class="unit">т.</span>
                                 </div>
                             </div>
                             <div class="sub-group">
                                 <label for="boiler2">Котельная №1, котел №2</label>
                                 <div class="input-with-unit">
-                                    <input type="text" id="boiler2" name="boiler2" placeholder="__________">
+                                    <input type="text" id="boiler2" name="boiler2">
                                     <span class="unit">т.</span>
                                 </div>
                             </div>
                             <div class="sub-group">
                                 <label for="boiler3">Котельная №3</label>
                                 <div class="input-with-unit">
-                                    <input type="text" id="boiler3" name="boiler3" placeholder="__________">
+                                    <input type="text" id="boiler3" name="boiler3">
                                     <span class="unit">т.</span>
                                 </div>
                             </div>
@@ -199,8 +199,7 @@
                         <div class="form-group">
                             <label for="steamConsumption">Потребление пара: БДМ-1</label>
                             <div class="input-with-unit">
-                                <input type="text" id="steamConsumption" name="steamConsumption"
-                                    placeholder="__________">
+                                <input type="text" id="steamConsumption" name="steamConsumption">
                                 <span class="unit">т.</span>
                             </div>
                         </div>
@@ -210,21 +209,21 @@
                             <div class="sub-group">
                                 <label for="woodChips">щепа</label>
                                 <div class="input-with-unit">
-                                    <input type="text" id="woodChips" name="woodChips" placeholder="__________">
+                                    <input type="text" id="woodChips" name="woodChips">
                                     <span class="unit">м3</span>
                                 </div>
                             </div>
                             <div class="sub-group">
                                 <label for="bark">кора</label>
                                 <div class="input-with-unit">
-                                    <input type="text" id="bark" name="bark" placeholder="__________">
+                                    <input type="text" id="bark" name="bark">
                                     <span class="unit">м3</span>
                                 </div>
                             </div>
                             <div class="sub-group">
                                 <label for="sawdust">опилки</label>
                                 <div class="input-with-unit">
-                                    <input type="text" id="sawdust" name="sawdust" placeholder="__________">
+                                    <input type="text" id="sawdust" name="sawdust">
                                     <span class="unit">м3</span>
                                 </div>
                             </div>
@@ -233,8 +232,7 @@
                         <div class="form-group">
                             <label for="waterConsumption">Расход воды: Станция обезжелезивания</label>
                             <div class="input-with-unit">
-                                <input type="text" id="waterConsumption" name="waterConsumption"
-                                    placeholder="__________">
+                                <input type="text" id="waterConsumption" name="waterConsumption">
                                 <span class="unit">м3</span>
                             </div>
                         </div>
@@ -242,7 +240,7 @@
                         <div class="form-group">
                             <label for="waterLevel">Уровень воды: Станция обезжелезивания</label>
                             <div class="input-with-unit">
-                                <input type="text" id="waterLevel" name="waterLevel" placeholder="_____">
+                                <input type="text" id="waterLevel" name="waterLevel">
                                 <span class="unit">%</span>
                             </div>
                         </div>
@@ -250,7 +248,7 @@
                         <div class="form-group">
                             <label for="waterReserve">Запасно-регулирующие резервуары водоснабжения</label>
                             <div class="input-with-unit">
-                                <input type="text" id="waterReserve" name="waterReserve" placeholder="_____">
+                                <input type="text" id="waterReserve" name="waterReserve">
                                 <span class="unit">%</span>
                             </div>
                         </div>
@@ -274,15 +272,14 @@
                                 </thead>
                                 <tbody id="emergency-situations">
                                     <tr>
-                                        <td><input type="text" name="emergencyTime[]" placeholder="__.__.___ __:__">
+                                        <td>
+                                            <input type="datetime-local" name="emergencyTime[]">
                                         </td>
-                                        <td><input type="text" name="emergencyEquipment[]" placeholder="Наименование">
-                                        </td>
-                                        <td><input type="text" name="emergencyDescription[]" placeholder="Описание">
-                                        </td>
-                                        <td><input type="text" name="emergencyActions[]" placeholder="Принятые меры">
-                                        </td>
-                                        <td><input type="text" name="emergencyRecovery[]" placeholder="__.__.___ __:__">
+                                        <td><input type="text" name="emergencyEquipment[]"></td>
+                                        <td><input type="text" name="emergencyDescription[]"></td>
+                                        <td><input type="text" name="emergencyActions[]"></td>
+                                        <td>
+                                            <input type="datetime-local" name="emergencyRecovery[]">
                                         </td>
                                     </tr>
                                 </tbody>
@@ -292,9 +289,7 @@
 
                         <div class="form-group">
                             <label for="equipmentDeviations">Отклонения в работе оборудования, замечания:</label>
-                            <textarea id="equipmentDeviations" name="equipmentDeviations" rows="5" placeholder="____________________________________________________________________
-____________________________________________________________________
-____________________________________________________________________"></textarea>
+                            <textarea id="equipmentDeviations" name="equipmentDeviations" rows="5"></textarea>
                         </div>
                     </div>
                 </form>
