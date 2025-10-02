@@ -647,19 +647,22 @@ body {
     font-style: italic;
 }
 
-/* Таблица аварийных ситуаций в предпросмотре */
+/* Emergency table in preview and PDF */
 .emergency-table-preview {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
     table-layout: fixed;
     page-break-inside: auto;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    line-height: 1.2;
 }
 
 .emergency-table-preview th,
 .emergency-table-preview td {
     border: 1px solid #000;
-    padding: 8px;
+    padding: 4px 6px;
     text-align: left;
     word-wrap: break-word;
 }
@@ -706,107 +709,39 @@ body {
     page-break-inside: auto;
 }
 
-.report-signature {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid #ddd;
-    page-break-before: avoid;
-}
-
-.signature-block {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
-}
-
-.signature-line {
-    flex: 1;
-    text-align: center;
-    margin: 0 2rem;
-}
-
-.signature-line::after {
-    content: '';
-    display: block;
-    border-bottom: 1px solid #333;
-    margin: 1rem 0 0.5rem;
-}
-
-.preview-actions {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    padding: 2rem;
-    background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
-    flex-wrap: wrap;
-}
-
-/* Модальные окна */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-overlay.active {
-    display: flex;
-}
-
-.modal {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow: auto;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.modal-header h3 {
-    margin: 0;
-    color: #2c3e50;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-body {
-    padding: 1.5rem;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 1.5rem;
-    border-top: 1px solid #dee2e6;
+/* PDF specific styles */
+@media print {
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 14px;
+        line-height: 1.2;
+    }
+    
+    .preview-content {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 14px;
+        line-height: 1.2;
+    }
+    
+    .report-header {
+        font-family: 'Times New Roman', Times, serif;
+    }
+    
+    .report-title {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 18px;
+    }
+    
+    .report-section h3 {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 16px;
+    }
+    
+    .field-label,
+    .field-value {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 14px;
+    }
 }
 
 /* Адаптивность */
@@ -1100,4 +1035,76 @@ body {
 .file-input {
     margin: 1rem 0;
     padding: 0.5rem;
+}
+
+/* Модальные окна */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #2c3e50;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 1.5rem;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+
 }

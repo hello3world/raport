@@ -118,7 +118,7 @@ class ReportFormApp {
         // Навигация по форме
         document.getElementById('preview-button')?.addEventListener('click', () => this.showPreview());
         document.getElementById('save-draft')?.addEventListener('click', () => this.saveDraft());
-        document.getElementById('back-to-reports')?.addEventListener('click', () => this.showRetrospective());
+        document.getElementById('back-to-reports')?.addEventListener('click', () => this.showScreen('loading-screen'));
 
         // Предпросмотр
         document.getElementById('edit-form')?.addEventListener('click', () => this.editForm());
@@ -738,7 +738,18 @@ class ReportFormApp {
 
     async exportToPDF() {
         try {
+            // Make sure the preview is up to date with current form data
+            this.formData = { ...this.formData, ...this.collectFormData() };
+            this.generatePreview();
+            
             const element = document.getElementById('preview-content');
+            const headerElement = document.getElementById('preview-header');
+            
+            // Create a wrapper element that includes both header and content
+            const wrapper = document.createElement('div');
+            wrapper.appendChild(headerElement.cloneNode(true));
+            wrapper.appendChild(element.cloneNode(true));
+            
             const opt = {
                 margin: [10, 5, 10, 5], // Reduced margins: [top, right, bottom, left]
                 filename: `Отчет_${this.departments[this.selectedForm].name}_${new Date().toISOString().split('T')[0]}.pdf`,
@@ -763,7 +774,7 @@ class ReportFormApp {
                 }
             };
 
-            await html2pdf().set(opt).from(element).save();
+            await html2pdf().set(opt).from(wrapper).save();
             console.log('PDF экспортирован успешно');
         } catch (error) {
             console.error('Ошибка экспорта PDF:', error);
