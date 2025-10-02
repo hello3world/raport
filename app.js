@@ -74,7 +74,7 @@ class ReportFormApp {
             e.preventDefault();
             this.authenticate();
         });
-        
+
         document.getElementById('back-to-main')?.addEventListener('click', () => {
             this.showScreen('main-screen');
         });
@@ -158,7 +158,7 @@ class ReportFormApp {
         if (formTitle) {
             formTitle.textContent = `Аутентификация - ${this.departments[formType].name}`;
         }
-        
+
         // Update form title in the form
         const formReportTitle = document.getElementById('form-report-title');
         if (formReportTitle) {
@@ -321,7 +321,7 @@ class ReportFormApp {
         if (this.formData.attachments) {
             this.displayFileList(this.formData.attachments);
         }
-        
+
         // Восстанавливаем аварийные ситуации
         if (this.formData.emergencySituations && this.formData.emergencySituations.length > 0) {
             const tbody = document.getElementById('emergency-situations');
@@ -567,7 +567,7 @@ class ReportFormApp {
         const previewHeader = document.getElementById('preview-header');
         const previewContent = document.getElementById('preview-content');
         const department = this.departments[this.selectedForm];
-        
+
         // Set the report title in the header
         previewHeader.innerHTML = `
             <div class="report-header">
@@ -575,7 +575,7 @@ class ReportFormApp {
                 <div class="report-title">О РАБОТЕ ${department.name} ЗА СУТКИ</div>
             </div>
         `;
-        
+
         // Форматируем даты для отображения
         const reportDate = this.formData.reportDate || '___  ___  _____';
         const periodStart = this.formData.periodStart || '___  ___  _____';
@@ -741,28 +741,28 @@ class ReportFormApp {
             // Make sure the preview is up to date with current form data
             this.formData = { ...this.formData, ...this.collectFormData() };
             this.generatePreview();
-            
+
             const element = document.getElementById('preview-content');
             const headerElement = document.getElementById('preview-header');
-            
+
             // Create a wrapper element that includes both header and content
             const wrapper = document.createElement('div');
             wrapper.appendChild(headerElement.cloneNode(true));
             wrapper.appendChild(element.cloneNode(true));
-            
+
             const opt = {
                 margin: [10, 5, 10, 5], // Reduced margins: [top, right, bottom, left]
                 filename: `Отчет_${this.departments[this.selectedForm].name}_${new Date().toISOString().split('T')[0]}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
+                html2canvas: {
+                    scale: 2,
                     useCORS: true,
                     scrollX: 0,
                     scrollY: 0
                 },
-                jsPDF: { 
-                    unit: 'mm', 
-                    format: 'a4', 
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
                     orientation: 'portrait',
                     compress: true
                 },
@@ -784,7 +784,7 @@ class ReportFormApp {
 
     // Generate unique ID (UUID)
     generateUUID() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
@@ -811,11 +811,11 @@ class ReportFormApp {
             // Collect current form data
             const currentData = this.collectFormData();
             this.formData = { ...this.formData, ...currentData };
-            
+
             // Create report data structure
             // For now, we'll use version 1. In the future, we'll implement version checking
             const reportData = this.createReportData(1);
-            
+
             // Generate filename with timestamp
             const now = new Date();
             const year = now.getFullYear();
@@ -824,13 +824,13 @@ class ReportFormApp {
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
-            
+
             const filename = `report_${year}-${month}-${date}_${hours}-${minutes}-${seconds}.json`;
             const folderPath = `Отчеты/${year}-${month}`;
-            
+
             // Create JSON content
             const jsonContent = JSON.stringify(reportData, null, 2);
-            
+
             // Try to use File System Access API first (for local server environment)
             if ('showSaveFilePicker' in window) {
                 await this.saveReportWithFileSystemAPI(filename, jsonContent, year, month);
@@ -838,12 +838,12 @@ class ReportFormApp {
                 // Fallback to traditional download method
                 await this.saveReportWithDownload(filename, jsonContent);
             }
-            
+
             console.log('Отчет сохранен как JSON файл:', filename);
-            
+
             // Clear localStorage after saving
             await this.clearLocalStorageAfterSave();
-            
+
             this.showMessage('Отчет успешно сохранен!', 'success');
         } catch (error) {
             console.error('Ошибка сохранения отчета:', error);
@@ -856,7 +856,7 @@ class ReportFormApp {
         try {
             // Create suggested file name with folder structure simulation
             const suggestedName = `Отчеты/${year}-${month}/${filename}`;
-            
+
             // Show save file picker
             const fileHandle = await window.showSaveFilePicker({
                 suggestedName: filename,
@@ -867,13 +867,13 @@ class ReportFormApp {
                     }
                 }]
             });
-            
+
             // Create a FileSystemWritableFileStream to write to
             const writable = await fileHandle.createWritable();
-            
+
             // Write the contents of the file to the stream
             await writable.write(jsonContent);
-            
+
             // Close the file and write the contents to disk
             await writable.close();
         } catch (error) {
@@ -881,7 +881,7 @@ class ReportFormApp {
             if (error.name === 'AbortError') {
                 throw error;
             }
-            
+
             // For other errors, fall back to traditional download method
             console.warn('File System Access API недоступен, используем традиционный метод загрузки:', error);
             await this.saveReportWithDownload(filename, jsonContent);
@@ -893,13 +893,13 @@ class ReportFormApp {
         // Create blob and download
         const blob = new Blob([jsonContent], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
-        
+
         const a = document.createElement('a');
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
         a.click();
-        
+
         // Clean up
         setTimeout(() => {
             document.body.removeChild(a);
@@ -1089,7 +1089,7 @@ class ReportFormApp {
     async loadSavedReports() {
         try {
             const reportsList = document.getElementById('reports-list');
-            
+
             // Try to use File System Access API first (for local server environment)
             if ('showDirectoryPicker' in window) {
                 reportsList.innerHTML = `
@@ -1099,7 +1099,7 @@ class ReportFormApp {
                         <div id="reports-display"></div>
                     </div>
                 `;
-                
+
                 // Add event listener for browse button
                 document.getElementById('browse-reports-btn')?.addEventListener('click', async () => {
                     await this.browseReportsDirectory();
@@ -1114,12 +1114,12 @@ class ReportFormApp {
                     </div>
                     <div id="reports-display"></div>
                 `;
-                
+
                 // Add event listeners for file input and load button
                 document.getElementById('load-report-btn')?.addEventListener('click', () => {
                     this.loadSelectedReport();
                 });
-                
+
                 document.getElementById('report-file-input')?.addEventListener('change', (event) => {
                     this.handleReportFileSelection(event);
                 });
@@ -1138,7 +1138,7 @@ class ReportFormApp {
             const dirHandle = await window.showDirectoryPicker({
                 mode: 'read'
             });
-            
+
             // Display reports from the selected directory
             await this.displayReportsFromDirectory(dirHandle);
         } catch (error) {
@@ -1146,7 +1146,7 @@ class ReportFormApp {
             if (error.name === 'AbortError') {
                 return;
             }
-            
+
             console.error('Ошибка выбора папки:', error);
             this.showMessage('Ошибка выбора папки. Попробуйте еще раз.', 'error');
         }
@@ -1157,27 +1157,27 @@ class ReportFormApp {
         try {
             const reportsDisplay = document.getElementById('reports-display');
             reportsDisplay.innerHTML = '<p>Поиск отчетов...</p>';
-            
+
             const reports = [];
-            
+
             // Recursively search for JSON files in the directory
             await this.searchReportsInDirectory(dirHandle, reports);
-            
+
             if (reports.length === 0) {
                 reportsDisplay.innerHTML = '<p>В выбранной папке не найдено отчетов.</p>';
                 return;
             }
-            
+
             // Sort reports by date (newest first)
             reports.sort((a, b) => {
                 try {
-                    return new Date(b.metadata.last_modified || b.metadata.date_created) - 
-                           new Date(a.metadata.last_modified || a.metadata.date_created);
+                    return new Date(b.metadata.last_modified || b.metadata.date_created) -
+                        new Date(a.metadata.last_modified || a.metadata.date_created);
                 } catch (error) {
                     return 0;
                 }
             });
-            
+
             // Display reports
             this.renderReportsList(reports, reportsDisplay);
         } catch (error) {
@@ -1197,12 +1197,12 @@ class ReportFormApp {
                         // Get file and read content
                         const file = await entry.getFile();
                         const content = await file.text();
-                        
+
                         // Parse and validate JSON
                         const reportData = JSON.parse(content);
-                        
+
                         // Check if it's a valid report
-                        if (reportData.metadata && reportData.data && 
+                        if (reportData.metadata && reportData.data &&
                             reportData.metadata.report_id && reportData.metadata.date_created) {
                             reports.push({
                                 name: entry.name,
@@ -1232,9 +1232,9 @@ class ReportFormApp {
             container.innerHTML = '<p>Отчеты не найдены.</p>';
             return;
         }
-        
+
         let reportsHTML = '<div class="reports-grid">';
-        
+
         reports.forEach((report, index) => {
             // Format the date properly
             let formattedDate = 'Неизвестная дата';
@@ -1246,7 +1246,7 @@ class ReportFormApp {
             } catch (dateError) {
                 console.warn('Ошибка форматирования даты:', dateError);
             }
-            
+
             reportsHTML += `
                 <div class="report-item" data-index="${index}">
                     <div class="report-info">
@@ -1259,10 +1259,10 @@ class ReportFormApp {
                 </div>
             `;
         });
-        
+
         reportsHTML += '</div>';
         container.innerHTML = reportsHTML;
-        
+
         // Add event listeners for load buttons
         document.querySelectorAll('.load-report-btn').forEach(button => {
             button.addEventListener('click', (event) => {
@@ -1279,16 +1279,16 @@ class ReportFormApp {
             if (!report || !report.data) {
                 throw new Error('Некорректные данные отчета');
             }
-            
+
             // Set form data
             this.formData = report.data;
-            
+
             // Populate form with data
             this.populateForm();
-            
+
             // Show form screen
             this.showFormScreen();
-            
+
             this.showMessage('Отчет успешно загружен для редактирования', 'success');
         } catch (error) {
             console.error('Ошибка загрузки отчета:', error);
@@ -1361,13 +1361,13 @@ class ReportFormApp {
                 }],
                 multiple: false
             });
-            
+
             // Get file
             const file = await fileHandle.getFile();
-            
+
             // Read file content
             const content = await file.text();
-            
+
             // Load report from JSON
             await this.loadReportFromJSON(content);
         } catch (error) {
@@ -1375,7 +1375,7 @@ class ReportFormApp {
             if (error.name === 'AbortError') {
                 return;
             }
-            
+
             console.error('Ошибка выбора файла:', error);
             this.showMessage('Ошибка выбора файла. Попробуйте еще раз.', 'error');
         }
@@ -1385,25 +1385,25 @@ class ReportFormApp {
     async loadReportFromJSON(jsonData) {
         try {
             const reportData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
-            
+
             // Validate report structure inline
-            if (!reportData || 
-                !reportData.metadata || 
+            if (!reportData ||
+                !reportData.metadata ||
                 !reportData.data ||
-                !reportData.metadata.report_id || 
+                !reportData.metadata.report_id ||
                 !reportData.metadata.date_created) {
                 throw new Error('Некорректная структура файла отчета');
             }
-            
+
             // Set form data
             this.formData = reportData.data;
-            
+
             // Populate form with data
             this.populateForm();
-            
+
             // Show form screen
             this.showFormScreen();
-            
+
             this.showMessage('Отчет успешно загружен для редактирования', 'success');
         } catch (error) {
             console.error('Ошибка загрузки отчета:', error);

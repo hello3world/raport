@@ -716,27 +716,27 @@ body {
         font-size: 14px;
         line-height: 1.2;
     }
-    
+
     .preview-content {
         font-family: 'Times New Roman', Times, serif;
         font-size: 14px;
         line-height: 1.2;
     }
-    
+
     .report-header {
         font-family: 'Times New Roman', Times, serif;
     }
-    
+
     .report-title {
         font-family: 'Times New Roman', Times, serif;
         font-size: 18px;
     }
-    
+
     .report-section h3 {
         font-family: 'Times New Roman', Times, serif;
         font-size: 16px;
     }
-    
+
     .field-label,
     .field-value {
         font-family: 'Times New Roman', Times, serif;
@@ -811,20 +811,20 @@ body {
         width: 100%;
         margin: 0;
     }
-    
+
     .form-link {
         padding: 15px;
         font-size: 1rem;
     }
-    
+
     .field-label {
         min-width: 150px;
     }
-    
+
     .report-field {
         flex-direction: column;
     }
-    
+
     .field-label {
         min-width: auto;
         margin-right: 0;
@@ -1105,6 +1105,4 @@ body {
 }
 
 /* Адаптивность */
-@media (max-width: 768px) {
-
-}
+@media (max-width: 768px) {}
