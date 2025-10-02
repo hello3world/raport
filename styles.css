@@ -566,6 +566,8 @@ body {
     max-width: 1000px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
 }
 
 #preview-screen h2 {
@@ -582,47 +584,59 @@ body {
     background: white;
     min-height: 400px;
     line-height: 1.8;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
 }
 
 /* Стили для печати и PDF */
 .report-header {
     text-align: center;
-    margin-bottom: 2rem;
+    /* margin-bottom: 2rem; */
     padding-bottom: 1rem;
-    border-bottom: 2px solid #2c3e50;
+    /* border-bottom: 2px solid #2c3e50; */
     page-break-after: avoid;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
 }
 
 .report-title {
     font-size: 1.5rem;
     font-weight: bold;
     color: #2c3e50;
-    margin-bottom: 0.5rem;
+    /* margin-bottom: 0.5rem; */
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
 }
 
 .report-date {
     color: #666;
     font-size: 1rem;
+    font-family: 'Times New Roman', Times, serif;
 }
 
 .report-section {
     margin-bottom: 1.5rem;
     page-break-inside: avoid;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
 }
 
 .report-section h3 {
     color: #2c3e50;
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
-    border-bottom: 1px solid #ddd;
     padding-bottom: 0.3rem;
     page-break-after: avoid;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
 }
 
 .report-field {
     margin-bottom: 0.8rem;
     display: flex;
     align-items: flex-start;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
 }
 
 .report-field.vertical {
@@ -634,12 +648,16 @@ body {
     color: #2c3e50;
     min-width: 250px;
     margin-right: 1rem;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
 }
 
 .field-value {
     color: #333;
     flex: 1;
     word-wrap: break-word;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
 }
 
 .field-value.empty {
@@ -781,7 +799,8 @@ body {
     }
 
     .preview-actions {
-        flex-direction: column;
+        display: flex;
+        justify-content: space-between;
     }
 
     .btn {
