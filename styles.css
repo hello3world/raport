@@ -369,6 +369,24 @@ body {
     background-color: white !important;
 }
 
+/* Input with unit styling */
+.input-with-unit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.input-with-unit input {
+    flex: 1;
+    margin: 0;
+}
+
+.unit {
+    font-weight: 500;
+    color: #2c3e50;
+    white-space: nowrap;
+}
+
 /* Подгруппы для полей */
 .sub-group {
     margin-bottom: 15px;
@@ -379,9 +397,8 @@ body {
     margin-bottom: 5px;
 }
 
-.sub-group input {
+.sub-group .input-with-unit {
     margin-left: 20px;
-    width: calc(100% - 20px);
 }
 
 /* Таблица аварийных ситуаций */
@@ -1010,6 +1027,21 @@ body {
     min-height: 400px;
 }
 
+.browse-reports-section {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
 .report-item {
     display: flex;
     justify-content: space-between;
@@ -1040,13 +1072,21 @@ body {
     font-size: 0.9rem;
 }
 
-.retrospective-actions {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    padding: 2rem;
-    background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
+.report-id {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.report-version {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 3px;
+}
+
+.load-report-btn {
+    margin-left: 10px;
+    white-space: nowrap;
 }
 
 .file-upload-section {
