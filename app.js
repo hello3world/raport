@@ -96,8 +96,8 @@ class ReportFormApp {
             );
         });
         document.getElementById('start-form')?.addEventListener('click', () => {
-            console.log('Открытие ретроспективы...');
-            this.showRetrospective();
+            console.log('Начало заполнения отчета...');
+            this.startNewForm();
         });
 
         // Add event listener for back button in retrospective screen
@@ -908,6 +908,11 @@ class ReportFormApp {
             await this.clearLocalStorageAfterSave();
 
             this.showMessage('Отчет успешно сохранен!', 'success');
+            
+            // Navigate to the loading screen after successful save
+            setTimeout(() => {
+                this.showScreen('loading-screen');
+            }, 2000);
         } catch (error) {
             console.error('Ошибка сохранения отчета:', error);
             this.showMessage('Ошибка сохранения отчета. Попробуйте еще раз.', 'error');
