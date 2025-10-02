@@ -75,7 +75,7 @@
                         </div>
                     </div>
                     <div id="no-draft" class="no-draft" style="display: none;">
-                        <button id="start-form" class="btn btn-primary">Начать заполнение</button>
+                        <button id="start-form" class="btn btn-primary">Ретроспектива</button>
                     </div>
                 </div>
             </div>
@@ -268,6 +268,26 @@ ____________________________________________________________________"></textarea
                     <button type="button" id="edit-form" class="btn btn-secondary">Редактировать</button>
                     <button type="button" id="save-final" class="btn btn-outline">Сохранить</button>
                     <button type="button" id="export-pdf" class="btn btn-primary">Экспорт в PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ретроспектива -->
+        <div id="retrospective-screen" class="screen">
+            <div class="container">
+                <h2>Ретроспектива отчетов</h2>
+                <div class="retrospective-content">
+                    <div class="file-upload-section">
+                        <p>Выберите файл отчета в формате JSON для редактирования:</p>
+                        <input type="file" id="report-file-input" accept=".json" class="file-input">
+                        <button id="load-report-btn" class="btn btn-primary">Загрузить отчет</button>
+                    </div>
+                    <div id="reports-list">
+                        <!-- Список отчетов будет сгенерирован JavaScript -->
+                    </div>
+                </div>
+                <div class="retrospective-actions">
+                    <button type="button" id="back-to-loading" class="btn btn-secondary">Назад</button>
                 </div>
             </div>
         </div>

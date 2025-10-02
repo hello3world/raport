@@ -96,8 +96,23 @@ class ReportFormApp {
             );
         });
         document.getElementById('start-form')?.addEventListener('click', () => {
-            console.log('Начать заполнение формы...');
-            this.startNewForm();
+            console.log('Открытие ретроспективы...');
+            this.showRetrospective();
+        });
+
+        // Add event listener for back button in retrospective screen
+        document.getElementById('back-to-loading')?.addEventListener('click', () => {
+            this.showScreen('loading-screen');
+        });
+
+        // Add event listeners for report loading functionality
+        document.getElementById('load-report-btn')?.addEventListener('click', () => {
+            this.loadSelectedReport();
+        });
+
+        // Add event listener for file input change
+        document.getElementById('report-file-input')?.addEventListener('change', (event) => {
+            this.handleReportFileSelection(event);
         });
 
         // Навигация по форме
@@ -106,9 +121,11 @@ class ReportFormApp {
 
         // Предпросмотр
         document.getElementById('edit-form')?.addEventListener('click', () => this.editForm());
-        document.getElementById('save-final')?.addEventListener('click', () => this.saveDraft());
+        document.getElementById('save-final')?.addEventListener('click', () => this.saveReportAsJSON());
         document.getElementById('export-pdf')?.addEventListener('click', () => this.exportToPDF());
         document.getElementById('submit-form')?.addEventListener('click', () => this.submitForm());
+
+        document.getElementById('retrospective-button')?.addEventListener('click', () => this.showRetrospective());
 
         // Модальные окна
         document.querySelector('.modal-close')?.addEventListener('click', () => this.hideModal());
@@ -745,6 +762,98 @@ class ReportFormApp {
         }
     }
 
+    // Generate unique ID (UUID)
+    generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    // Create report data structure according to requirements
+    createReportData(version = 1) {
+        const now = new Date();
+        const reportData = {
+            metadata: {
+                date_created: now.toISOString(),
+                last_modified: now.toISOString(),
+                report_id: this.generateUUID(),
+                version: version
+            },
+            data: this.formData
+        };
+        return reportData;
+    }
+
+    // Save report as JSON file
+    async saveReportAsJSON() {
+        try {
+            // Collect current form data
+            const currentData = this.collectFormData();
+            this.formData = { ...this.formData, ...currentData };
+            
+            // Create report data structure
+            // For now, we'll use version 1. In the future, we'll implement version checking
+            const reportData = this.createReportData(1);
+            
+            // Generate filename with timestamp
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const filename = `report_${year}-${month}-${date}_${hours}-${minutes}-${seconds}.json`;
+            const folderPath = `Отчеты/${year}-${month}`;
+            
+            // Create JSON content
+            const jsonContent = JSON.stringify(reportData, null, 2);
+            
+            // Create blob and download
+            const blob = new Blob([jsonContent], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            console.log('Отчет сохранен как JSON файл:', filename);
+            
+            // Clear localStorage after saving
+            await this.clearLocalStorageAfterSave();
+            
+            this.showMessage('Отчет успешно сохранен!', 'success');
+        } catch (error) {
+            console.error('Ошибка сохранения отчета:', error);
+            this.showMessage('Ошибка сохранения отчета. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Clear localStorage after saving report
+    async clearLocalStorageAfterSave() {
+        try {
+            if (this.currentDraftId) {
+                await window.storageAdapter.removeItem(this.currentDraftId);
+                this.currentDraftId = null;
+            }
+            this.formData = {};
+            this.isDirty = false;
+            console.log('LocalStorage очищен после сохранения отчета');
+        } catch (error) {
+            console.error('Ошибка очистки localStorage:', error);
+        }
+    }
+
     async submitForm() {
         this.showModal(
             'Подтверждение отправки',
@@ -897,6 +1006,106 @@ class ReportFormApp {
         setTimeout(() => {
             notification.remove();
         }, 5000);
+    }
+
+    // New method for handling retrospective functionality
+    async showRetrospective() {
+        console.log('Открытие ретроспективы...');
+        // Show the retrospective screen
+        this.showScreen('retrospective-screen');
+        // Load and display saved reports
+        await this.loadSavedReports();
+    }
+
+    // Load and display saved reports
+    async loadSavedReports() {
+        try {
+            // For now, we'll show a message that this functionality is not yet implemented
+            // In the future, we'll implement actual file browsing
+            const reportsList = document.getElementById('reports-list');
+            reportsList.innerHTML = `
+                <div class="no-reports-message">
+                    <p>Функциональность просмотра сохраненных отчетов будет реализована в следующем обновлении.</p>
+                    <p>Пока что вы можете сохранять отчеты в формате JSON и открывать их вручную.</p>
+                </div>
+            `;
+        } catch (error) {
+            console.error('Ошибка загрузки отчетов:', error);
+            const reportsList = document.getElementById('reports-list');
+            reportsList.innerHTML = `<p>Ошибка загрузки отчетов. Попробуйте еще раз.</p>`;
+        }
+    }
+
+    // Handle report file selection
+    handleReportFileSelection(event) {
+        const fileInput = event.target;
+        if (fileInput.files.length > 0) {
+            const fileName = fileInput.files[0].name;
+            console.log('Выбран файл:', fileName);
+            // Enable the load button
+            const loadButton = document.getElementById('load-report-btn');
+            if (loadButton) {
+                loadButton.disabled = false;
+            }
+        }
+    }
+
+    // Load selected report file
+    async loadSelectedReport() {
+        const fileInput = document.getElementById('report-file-input');
+        if (!fileInput || fileInput.files.length === 0) {
+            this.showMessage('Пожалуйста, выберите файл отчета', 'error');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        if (!file.name.endsWith('.json')) {
+            this.showMessage('Пожалуйста, выберите файл в формате JSON', 'error');
+            return;
+        }
+
+        try {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const jsonData = e.target.result;
+                    this.loadReportFromJSON(jsonData);
+                } catch (error) {
+                    console.error('Ошибка чтения файла:', error);
+                    this.showMessage('Ошибка чтения файла. Проверьте файл и попробуйте еще раз.', 'error');
+                }
+            };
+            reader.readAsText(file);
+        } catch (error) {
+            console.error('Ошибка загрузки файла:', error);
+            this.showMessage('Ошибка загрузки файла. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Load report data from JSON and populate form
+    async loadReportFromJSON(jsonData) {
+        try {
+            const reportData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+            
+            // Validate report structure
+            if (!reportData.metadata || !reportData.data) {
+                throw new Error('Некорректная структура файла отчета');
+            }
+            
+            // Set form data
+            this.formData = reportData.data;
+            
+            // Populate form with data
+            this.populateForm();
+            
+            // Show form screen
+            this.showFormScreen();
+            
+            this.showMessage('Отчет успешно загружен для редактирования', 'success');
+        } catch (error) {
+            console.error('Ошибка загрузки отчета:', error);
+            this.showMessage('Ошибка загрузки отчета. Проверьте файл и попробуйте еще раз.', 'error');
+        }
     }
 }
 

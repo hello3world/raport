@@ -985,3 +985,79 @@ body {
     white-space: nowrap;
     border: 0;
 }
+
+/* Стили для ретроспективы */
+#retrospective-screen {
+    background: white;
+    margin: 0 auto;
+    max-width: 1000px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#retrospective-screen h2 {
+    padding: 2rem 2rem 1rem;
+    color: #2c3e50;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #3498db;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.retrospective-content {
+    padding: 2rem;
+    background: white;
+    min-height: 400px;
+}
+
+.report-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+}
+
+.report-item:hover {
+    background-color: #e9ecef;
+    cursor: pointer;
+}
+
+.report-info {
+    flex: 1;
+}
+
+.report-date {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.report-filename {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.retrospective-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.file-upload-section {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.file-input {
+    margin: 1rem 0;
+    padding: 0.5rem;
+}
