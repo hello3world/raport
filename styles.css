@@ -399,6 +399,25 @@ body {
     white-space: nowrap;
 }
 
+/* Time selection styling */
+.time-selection {
+    display: flex;
+    gap: 15px;
+    margin-top: 8px;
+}
+
+.time-selection label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.time-selection input[type="radio"] {
+    margin-right: 5px;
+    width: auto;
+}
+
 /* Подгруппы для полей */
 .sub-group {
     margin-bottom: 15px;
@@ -670,6 +689,12 @@ body {
     word-wrap: break-word;
     font-family: 'Times New Roman', Times, serif;
     font-size: 14px;
+}
+
+.field-value.equipment-deviations {
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-width: 100%;
 }
 
 .field-value.empty {

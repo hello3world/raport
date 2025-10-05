@@ -118,7 +118,7 @@ class ReportFormApp {
         // Навигация по форме
         document.getElementById('preview-button')?.addEventListener('click', () => this.showPreview());
         document.getElementById('save-draft')?.addEventListener('click', () => this.saveDraft());
-        document.getElementById('back-to-reports')?.addEventListener('click', () => this.showScreen('loading-screen'));
+        document.getElementById('back-to-reports')?.addEventListener('click', () => this.showScreen('main-screen'));
 
         // Предпросмотр
         document.getElementById('edit-form')?.addEventListener('click', () => this.editForm());
@@ -248,14 +248,54 @@ class ReportFormApp {
 
     showDraftDetection(draft) {
         const draftDate = new Date(draft.updatedAt).toLocaleString('ru-RU');
-        document.getElementById('draft-date').textContent = draftDate;
-        document.getElementById('draft-detection').style.display = 'block';
+        
+        // Create draft detection element dynamically
+        const draftContainer = document.getElementById('draft-container');
+        draftContainer.innerHTML = `
+            <div id="draft-detection" class="draft-options">
+                <p class="draft-found">Найден незавершенный черновик от <span id="draft-date">${draftDate}</span></p>
+                <div class="button-group">
+                    <button id="restore-draft" class="btn btn-primary">Восстановить черновик</button>
+                    <button id="start-new" class="btn btn-secondary">Начать новый</button>
+                </div>
+            </div>
+        `;
+        
+        // Add event listeners to the newly created buttons
+        document.getElementById('restore-draft').addEventListener('click', () => {
+            console.log('Восстановление черновика...');
+            this.restoreDraft();
+        });
+        
+        document.getElementById('start-new').addEventListener('click', () => {
+            console.log('Начать новую форму...');
+            // Show confirmation modal before starting new form
+            this.showModal(
+                'Подтверждение начала новой формы',
+                'Вы уверены, что хотите начать новую форму? Все несохраненные данные будут потеряны.',
+                () => {
+                    this.startNewForm();
+                }
+            );
+        });
+
+        // Hide the 'Заполнить отчет' button when a draft is found
+        const startFormButton = document.getElementById('start-form');
+        if (startFormButton) {
+            startFormButton.style.display = 'none';
+        }
+
         this.latestDraftId = draft.id;
         this.showScreen('loading-screen');
     }
 
     showNoDraft() {
         console.log('Показываем кнопку новой формы');
+        
+        // Clear any existing draft detection element
+        const draftContainer = document.getElementById('draft-container');
+        draftContainer.innerHTML = '';
+        
         const noDraftElement = document.getElementById('no-draft');
         if (noDraftElement) {
             noDraftElement.style.display = 'block';
@@ -263,6 +303,13 @@ class ReportFormApp {
         } else {
             console.error('Элемент no-draft не найден!');
         }
+
+        // Show the 'Заполнить отчет' button when no draft is found
+        const startFormButton = document.getElementById('start-form');
+        if (startFormButton) {
+            startFormButton.style.display = 'inline-block';
+        }
+
         this.showScreen('loading-screen');
     }
 
@@ -366,11 +413,11 @@ class ReportFormApp {
                 }
 
                 newRow.innerHTML = `
-                    <td><input type="datetime-local" name="emergencyTime[]" value="${timeValue}"></td>
+                    <td><input type="text" name="emergencyTime[]" value="${situation.time || ''}"></td>
                     <td><input type="text" name="emergencyEquipment[]" value="${situation.equipment || ''}"></td>
                     <td><input type="text" name="emergencyDescription[]" value="${situation.description || ''}"></td>
                     <td><input type="text" name="emergencyActions[]" value="${situation.actions || ''}"></td>
-                    <td><input type="datetime-local" name="emergencyRecovery[]" value="${recoveryValue}"></td>
+                    <td><input type="text" name="emergencyRecovery[]" value="${situation.recovery || ''}"></td>
                 `;
                 tbody.appendChild(newRow);
             });
@@ -426,28 +473,12 @@ class ReportFormApp {
         emergencyRows.forEach(row => {
             const inputs = row.querySelectorAll('input');
             if (inputs.length === 5) {
-                // Handle datetime formatting for emergency situations
-                let timeValue = '';
-                let recoveryValue = '';
-
-                if (inputs[0].value) {
-                    const [datePart, timePart] = inputs[0].value.split('T');
-                    const [year, month, day] = datePart.split('-');
-                    timeValue = `${day}.${month}.${year} ${timePart}`;
-                }
-
-                if (inputs[4].value) {
-                    const [datePart, timePart] = inputs[4].value.split('T');
-                    const [year, month, day] = datePart.split('-');
-                    recoveryValue = `${day}.${month}.${year} ${timePart}`;
-                }
-
                 emergencyData.push({
-                    time: timeValue,
+                    time: inputs[0].value,
                     equipment: inputs[1].value,
                     description: inputs[2].value,
                     actions: inputs[3].value,
-                    recovery: recoveryValue
+                    recovery: inputs[4].value
                 });
             }
         });
@@ -508,11 +539,11 @@ class ReportFormApp {
         const tbody = document.getElementById('emergency-situations');
         const newRow = document.createElement('tr');
         newRow.innerHTML = `
-            <td><input type="datetime-local" name="emergencyTime[]"></td>
+            <td><input type="text" name="emergencyTime[]"></td>
             <td><input type="text" name="emergencyEquipment[]"></td>
             <td><input type="text" name="emergencyDescription[]"></td>
             <td><input type="text" name="emergencyActions[]"></td>
-            <td><input type="datetime-local" name="emergencyRecovery[]"></td>
+            <td><input type="text" name="emergencyRecovery[]"></td>
         `;
         tbody.appendChild(newRow);
     }
@@ -651,11 +682,11 @@ class ReportFormApp {
                     <span class="field-value">${reportDate}</span>
                 </div>
                 <div class="report-field">
-                    <span class="field-label">Период: с 8-00</span>
+                    <span class="field-label">Период: с ${this.formData.startTime || '8-00'}</span>
                     <span class="field-value">${periodStart}</span>
                 </div>
                 <div class="report-field">
-                    <span class="field-label">по 8-00</span>
+                    <span class="field-label">по ${this.formData.endTime || '8-00'}</span>
                     <span class="field-value">${periodEnd}</span>
                 </div>
                 <div class="report-field">
@@ -765,7 +796,7 @@ class ReportFormApp {
                 </div>
                 <div class="report-field vertical">
                     <span class="field-label">Отклонения в работе оборудования, замечания:</span>
-                    <span class="field-value">${this.formData.equipmentDeviations || ''}</span>
+                    <span class="field-value equipment-deviations">${this.formData.equipmentDeviations || ''}</span>
                 </div>
             </div>
         `;
@@ -908,7 +939,7 @@ class ReportFormApp {
             await this.clearLocalStorageAfterSave();
 
             this.showMessage('Отчет успешно сохранен!', 'success');
-            
+
             // Navigate to the loading screen after successful save
             setTimeout(() => {
                 this.showScreen('loading-screen');

@@ -67,13 +67,7 @@
                 <h1>Суточный рапорт</h1>
                 <div class="loading-content">
                     <p>Проверка сохраненных черновиков...</p>
-                    <div id="draft-detection" class="draft-options" style="display: none;">
-                        <p class="draft-found">Найден незавершенный черновик от <span id="draft-date"></span></p>
-                        <div class="button-group">
-                            <button id="restore-draft" class="btn btn-primary">Восстановить черновик</button>
-                            <button id="start-new" class="btn btn-secondary">Начать новый</button>
-                        </div>
-                    </div>
+                    <div id="draft-container"></div>
                     <div id="no-draft" class="no-draft" style="display: none;">
                         <div class="button-group">
                             <button id="start-form" class="btn btn-primary">Заполнить отчет</button>
@@ -104,14 +98,34 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="periodStart">Период: с 8-00 <span class="required">*</span></label>
+                            <label for="periodStart">Период: с <span class="required">*</span></label>
                             <input type="date" id="periodStart" name="periodStart" required>
+                            <div class="time-selection">
+                                <label>
+                                    <input type="radio" name="startTime" value="08-00" checked>
+                                    08-00
+                                </label>
+                                <label>
+                                    <input type="radio" name="startTime" value="20-00">
+                                    20-00
+                                </label>
+                            </div>
                             <div class="error-message" data-field="periodStart"></div>
                         </div>
 
                         <div class="form-group">
-                            <label for="periodEnd">по 8-00 <span class="required">*</span></label>
+                            <label for="periodEnd">по <span class="required">*</span></label>
                             <input type="date" id="periodEnd" name="periodEnd" required>
+                            <div class="time-selection">
+                                <label>
+                                    <input type="radio" name="endTime" value="08-00" checked>
+                                    08-00
+                                </label>
+                                <label>
+                                    <input type="radio" name="endTime" value="20-00">
+                                    20-00
+                                </label>
+                            </div>
                             <div class="error-message" data-field="periodEnd"></div>
                         </div>
 
@@ -276,13 +290,13 @@
                                 <tbody id="emergency-situations">
                                     <tr>
                                         <td>
-                                            <input type="datetime-local" name="emergencyTime[]">
+                                            <input type="text" name="emergencyTime[]">
                                         </td>
                                         <td><input type="text" name="emergencyEquipment[]"></td>
                                         <td><input type="text" name="emergencyDescription[]"></td>
                                         <td><input type="text" name="emergencyActions[]"></td>
                                         <td>
-                                            <input type="datetime-local" name="emergencyRecovery[]">
+                                            <input type="text" name="emergencyRecovery[]">
                                         </td>
                                     </tr>
                                 </tbody>
@@ -331,7 +345,8 @@
             <div class="container">
                 <h2>Ретроспектива отчетов</h2>
                 <div class="retrospective-content">
-                    <div class="file-upload-section">
+                    <!-- Временно скрытая секция загрузки файлов - не удалять -->
+                    <div class="file-upload-section" style="display: none;">
                         <p>Выберите файл отчета в формате JSON для редактирования:</p>
                         <input type="file" id="report-file-input" accept=".json" class="file-input">
                         <button id="load-report-btn" class="btn btn-primary">Загрузить отчет</button>
