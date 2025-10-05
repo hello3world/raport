@@ -248,7 +248,7 @@ class ReportFormApp {
 
     showDraftDetection(draft) {
         const draftDate = new Date(draft.updatedAt).toLocaleString('ru-RU');
-        
+
         // Create draft detection element dynamically
         const draftContainer = document.getElementById('draft-container');
         draftContainer.innerHTML = `
@@ -260,13 +260,13 @@ class ReportFormApp {
                 </div>
             </div>
         `;
-        
+
         // Add event listeners to the newly created buttons
         document.getElementById('restore-draft').addEventListener('click', () => {
             console.log('Восстановление черновика...');
             this.restoreDraft();
         });
-        
+
         document.getElementById('start-new').addEventListener('click', () => {
             console.log('Начать новую форму...');
             // Show confirmation modal before starting new form
@@ -291,11 +291,11 @@ class ReportFormApp {
 
     showNoDraft() {
         console.log('Показываем кнопку новой формы');
-        
+
         // Clear any existing draft detection element
         const draftContainer = document.getElementById('draft-container');
         draftContainer.innerHTML = '';
-        
+
         const noDraftElement = document.getElementById('no-draft');
         if (noDraftElement) {
             noDraftElement.style.display = 'block';
