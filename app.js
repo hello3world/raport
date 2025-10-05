@@ -942,7 +942,7 @@ class ReportFormApp {
 
             // Navigate to the loading screen after successful save
             setTimeout(() => {
-                this.showScreen('loading-screen');
+                this.showScreen('main-screen');
             }, 2000);
         } catch (error) {
             console.error('Ошибка сохранения отчета:', error);
