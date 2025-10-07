@@ -308,7 +308,7 @@ body {
 .form-section {
     margin-bottom: 2rem;
     padding: 1rem;
-    border-bottom: 1px solid #eee;
+    /* border-bottom: 1px solid #eee; */
 }
 
 .form-section:last-child {
@@ -444,7 +444,6 @@ body {
 
 .emergency-table th,
 .emergency-table td {
-    border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
 }
@@ -472,7 +471,6 @@ body {
 /* Заголовок отчета в форме */
 .report-header-form {
     text-align: center;
-    margin-bottom: 2rem;
     padding: 1rem;
     /* border-bottom: 2px solid #2c3e50; */
 }
@@ -917,7 +915,7 @@ body {
         flex-direction: column;
     }
 
-     .report-field .vertical {
+    .report-field .vertical {
         margin-top: 15px;
     }
 
@@ -1300,7 +1298,6 @@ body {
     background: white;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     max-width: 100%;
     overflow-x: auto;
 }
@@ -1326,7 +1323,6 @@ body {
     font-size: 20px;
     color: #333;
     margin-bottom: 15px;
-    border-bottom: 1px solid #eee;
     padding-bottom: 5px;
 }
 
@@ -1385,4 +1381,10 @@ body {
     /* Preserve line breaks in equipment deviations */
     word-wrap: break-word;
     min-height: 50px;
+}
+
+#reportDate,
+#periodStart,
+#periodEnd {
+    font-family: Arial, Helvetica, sans-serif;
 }
