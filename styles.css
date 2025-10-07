@@ -738,7 +738,7 @@ body {
 
 .emergency-table-preview th:nth-child(2),
 .emergency-table-preview td:nth-child(2) {
-    width: 25%;
+    width: 20%;
 }
 
 .emergency-table-preview th:nth-child(3),
@@ -753,7 +753,7 @@ body {
 
 .emergency-table-preview th:nth-child(5),
 .emergency-table-preview td:nth-child(5) {
-    width: 10%;
+    width: 15%;
 }
 
 .emergency-table-preview tr {
@@ -917,6 +917,10 @@ body {
         flex-direction: column;
     }
 
+     .report-field .vertical {
+        margin-top: 15px;
+    }
+
     .field-label {
         min-width: auto;
         margin-right: 0;
@@ -1036,7 +1040,6 @@ body {
     margin: 0 auto;
     max-width: 1000px;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 #retrospective-screen h2 {
@@ -1209,9 +1212,74 @@ body {
     border-top: 1px solid #dee2e6;
 }
 
-/* Textarea popup modal */
+/* Emergency table inputs */
+#emergency-situations input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: pre-wrap;
+    /* Preserve whitespace and line breaks */
+    word-wrap: break-word;
+    /* Break long words */
+    overflow: hidden;
+    /* Prevent scrolling within the cell */
+}
+
+/* Textarea popup styles */
+#textarea-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+#textarea-modal-overlay.active {
+    display: flex;
+}
+
 #textarea-modal-overlay .modal {
-    max-width: 600px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#textarea-modal-overlay .modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#textarea-modal-overlay .modal-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+#textarea-modal-overlay .modal-body {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+#textarea-modal-overlay .modal-footer {
+    padding: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
 }
 
 #textarea-popup {
@@ -1220,10 +1288,101 @@ body {
     font-family: Arial, sans-serif;
     font-size: 16px;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 4px;
     resize: vertical;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
-/* Адаптивность */
-@media (max-width: 768px) {}
+/* Preview styles */
+#preview-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.report-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+}
+
+.report-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.report-section {
+    margin-bottom: 30px;
+}
+
+.report-section h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.report-field {
+    display: flex;
+    margin-bottom: 10px;
+    align-items: flex-start;
+}
+
+.report-field .field-label {
+    min-width: 300px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.report-field .field-value {
+    flex: 1;
+    white-space: pre-wrap;
+    /* Preserve line breaks in preview */
+    word-wrap: break-word;
+}
+
+.report-field.vertical {
+    flex-direction: column;
+}
+
+.report-field.vertical .field-label {
+    min-width: unset;
+    margin-bottom: 10px;
+}
+
+.emergency-table-preview {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.emergency-table-preview th,
+.emergency-table-preview td {
+    border: 1px solid #000;
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+    white-space: pre-wrap;
+    /* Preserve line breaks in table cells */
+    word-wrap: break-word;
+}
+
+.emergency-table-preview th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.equipment-deviations {
+    white-space: pre-wrap;
+    /* Preserve line breaks in equipment deviations */
+    word-wrap: break-word;
+    min-height: 50px;
+}

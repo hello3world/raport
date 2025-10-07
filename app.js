@@ -318,7 +318,7 @@ class ReportFormApp {
             console.error('Элемент no-draft не найден!');
         }
 
-        // Show the 'Заполнить отчет' button when no draft is found
+        // Show the 'Заполнить отчет' кнопку когда нет черновика
         const startFormButton = document.getElementById('start-form');
         if (startFormButton) {
             startFormButton.style.display = 'inline-block';
@@ -426,14 +426,33 @@ class ReportFormApp {
                     }
                 }
 
+                // Escape newlines for proper storage in input values
+                const equipmentValue = situation.equipment ? situation.equipment.replace(/\n/g, '\\n') : '';
+                const descriptionValue = situation.description ? situation.description.replace(/\n/g, '\\n') : '';
+                const actionsValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
+
                 newRow.innerHTML = `
                     <td><input type="text" name="emergencyTime[]" value="${situation.time || ''}"></td>
-                    <td><input type="text" name="emergencyEquipment[]" value="${situation.equipment || ''}"></td>
-                    <td><input type="text" name="emergencyDescription[]" value="${situation.description || ''}"></td>
-                    <td><input type="text" name="emergencyActions[]" value="${situation.actions || ''}"></td>
+                    <td><input type="text" name="emergencyEquipment[]" value=""></td>
+                    <td><input type="text" name="emergencyDescription[]" value=""></td>
+                    <td><input type="text" name="emergencyActions[]" value=""></td>
                     <td><input type="text" name="emergencyRecovery[]" value="${situation.recovery || ''}"></td>
                 `;
                 tbody.appendChild(newRow);
+                
+                // Set the dataset.value for multiline text fields
+                const inputs = newRow.querySelectorAll('input');
+                inputs[1].dataset.value = equipmentValue;
+                inputs[1].value = situation.equipment ? situation.equipment.replace(/\n/g, ' ') : '';
+                inputs[2].dataset.value = descriptionValue;
+                inputs[2].value = situation.description ? situation.description.replace(/\n/g, ' ') : '';
+                inputs[3].dataset.value = actionsValue;
+                inputs[3].value = situation.actions ? situation.actions.replace(/\n/g, ' ') : '';
+                
+                // Apply white-space styling to preserve line breaks in the restored inputs
+                inputs.forEach(input => {
+                    input.style.whiteSpace = 'pre-wrap';
+                });
             });
         }
     }
@@ -487,11 +506,16 @@ class ReportFormApp {
         emergencyRows.forEach(row => {
             const inputs = row.querySelectorAll('input');
             if (inputs.length === 5) {
+                // Use dataset.value if available, otherwise use the input value
+                const equipmentValue = inputs[1].dataset.value ? inputs[1].dataset.value : inputs[1].value;
+                const descriptionValue = inputs[2].dataset.value ? inputs[2].dataset.value : inputs[2].value;
+                const actionsValue = inputs[3].dataset.value ? inputs[3].dataset.value : inputs[3].value;
+                
                 emergencyData.push({
                     time: inputs[0].value,
-                    equipment: inputs[1].value,
-                    description: inputs[2].value,
-                    actions: inputs[3].value,
+                    equipment: equipmentValue.replace(/\\n/g, '\n'), // Convert escaped newlines back to actual newlines
+                    description: descriptionValue.replace(/\\n/g, '\n'),
+                    actions: actionsValue.replace(/\\n/g, '\n'),
                     recovery: inputs[4].value
                 });
             }
@@ -560,6 +584,12 @@ class ReportFormApp {
             <td><input type="text" name="emergencyRecovery[]"></td>
         `;
         tbody.appendChild(newRow);
+        
+        // Apply white-space styling to preserve line breaks in the new inputs
+        const inputs = newRow.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.style.whiteSpace = 'pre-wrap';
+        });
     }
 
     deleteEmergencyRow() {
@@ -616,7 +646,7 @@ class ReportFormApp {
                         <button class="modal-close">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <textarea id="textarea-popup" style="width: 100%; height: 200px; font-family: Arial, sans-serif; font-size: 16px;"></textarea>
+                        <textarea id="textarea-popup" style="width: 100%; height: 200px; font-family: Arial, sans-serif; font-size: 16px; white-space: pre-wrap;"></textarea>
                     </div>
                     <div class="modal-footer">
                         <button id="textarea-cancel" class="btn btn-secondary">Отмена</button>
@@ -629,15 +659,29 @@ class ReportFormApp {
             // Add event listeners for modal
             modalOverlay.querySelector('.modal-close').addEventListener('click', () => this.hideTextareaModal());
             modalOverlay.querySelector('#textarea-cancel').addEventListener('click', () => this.hideTextareaModal());
-            modalOverlay.querySelector('#textarea-save').addEventListener('click', () => this.saveTextareaContent(inputElement));
         }
 
         // Set the textarea value to the input value
         const textarea = modalOverlay.querySelector('#textarea-popup');
-        textarea.value = inputElement.value;
+        // Convert escaped newlines back to actual newlines for display in textarea
+        let displayValue = inputElement.value;
+        if (inputElement.dataset.value) {
+            displayValue = inputElement.dataset.value.replace(/\\n/g, '\n');
+        } else {
+            displayValue = inputElement.value.replace(/\\n/g, '\n');
+        }
+        textarea.value = displayValue;
 
         // Store reference to the input element
         this.currentEditingInput = inputElement;
+
+        // Update the save button event listener with the current input element
+        const saveButton = modalOverlay.querySelector('#textarea-save');
+        // Remove any existing event listener
+        const newSaveButton = saveButton.cloneNode(true);
+        saveButton.parentNode.replaceChild(newSaveButton, saveButton);
+        // Add new event listener with current input element
+        newSaveButton.addEventListener('click', () => this.saveTextareaContent(this.currentEditingInput));
 
         // Show the modal
         modalOverlay.classList.add('active');
@@ -655,8 +699,22 @@ class ReportFormApp {
         const modalOverlay = document.getElementById('textarea-modal-overlay');
         const textarea = modalOverlay.querySelector('#textarea-popup');
 
-        // Update the input value with textarea content
-        inputElement.value = textarea.value;
+        // Check if inputElement is valid
+        if (!inputElement) {
+            console.error('No input element provided to save content to');
+            this.hideTextareaModal();
+            return;
+        }
+
+        // Store the actual value with escaped newlines in a data attribute
+        const escapedValue = textarea.value.replace(/\n/g, '\\n');
+        inputElement.dataset.value = escapedValue;
+        
+        // For display purposes, show a simplified version in the input field
+        inputElement.value = textarea.value.replace(/\n/g, ' ');
+
+        // Also update the display to show line breaks properly
+        inputElement.style.whiteSpace = 'pre-wrap';
 
         // Mark form as dirty
         this.isDirty = true;
@@ -934,11 +992,11 @@ class ReportFormApp {
 
         return this.formData.emergencySituations.map(situation => `
             <tr>
-                <td>${situation.time || ''}</td>
-                <td>${situation.equipment || ''}</td>
-                <td>${situation.description || ''}</td>
-                <td>${situation.actions || ''}</td>
-                <td>${situation.recovery || ''}</td>
+                <td style="white-space: pre-wrap;">${situation.time || ''}</td>
+                <td style="white-space: pre-wrap;">${situation.equipment || ''}</td>
+                <td style="white-space: pre-wrap;">${situation.description || ''}</td>
+                <td style="white-space: pre-wrap;">${situation.actions || ''}</td>
+                <td style="white-space: pre-wrap;">${situation.recovery || ''}</td>
             </tr>
         `).join('');
     }
@@ -1096,17 +1154,20 @@ class ReportFormApp {
                                 font-family: 'Times New Roman', Times, serif;
                                 font-size: 16px;
                                 line-height: 1.2;
+                                margin: 20px;
                             }
                             table {
                                 border-collapse: collapse;
                                 width: 100%;
+                                table-layout: fixed;
+                                word-wrap: break-word;
                             }
                             th, td {
                                 border: 1px solid #000;
                                 padding: 4px 6px;
                                 text-align: left;
-                                word-wrap: break-word;
                                 vertical-align: top;
+                                word-wrap: break-word;
                             }
                             th {
                                 background-color: #f2f2f2;
@@ -1120,6 +1181,26 @@ class ReportFormApp {
                                 font-family: 'Times New Roman', Times, serif;
                                 font-size: 16px;
                                 line-height: 1.2;
+                                word-wrap: break-word;
+                            }
+                            .emergency-table-preview th,
+                            .emergency-table-preview td {
+                                border: 1px solid #000;
+                                padding: 4px 6px;
+                                text-align: left;
+                                vertical-align: top;
+                                word-wrap: break-word;
+                            }
+                            .report-section {
+                                margin-bottom: 20px;
+                                page-break-inside: avoid;
+                            }
+                            .report-field {
+                                margin-bottom: 8px;
+                                page-break-inside: avoid;
+                            }
+                            h3 {
+                                page-break-after: avoid;
                             }
                         </style>
                     </head>
