@@ -624,9 +624,7 @@ body {
 /* Стили для печати и PDF */
 .report-header {
     text-align: center;
-    /* margin-bottom: 2rem; */
-    padding-bottom: 1rem;
-    /* border-bottom: 2px solid #2c3e50; */
+
     page-break-after: avoid;
     font-family: 'Times New Roman', Times, serif;
     font-size: 16px;
@@ -1304,7 +1302,6 @@ body {
 
 .report-header {
     text-align: center;
-    padding-bottom: 20px;
 }
 
 .report-title {
