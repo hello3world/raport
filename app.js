@@ -124,6 +124,7 @@ class ReportFormApp {
         document.getElementById('edit-form')?.addEventListener('click', () => this.editForm());
         document.getElementById('save-final')?.addEventListener('click', () => this.saveReportAsJSON());
         document.getElementById('export-pdf')?.addEventListener('click', () => this.exportToPDF());
+        document.getElementById('export-word')?.addEventListener('click', () => this.exportToWord());
         document.getElementById('submit-form')?.addEventListener('click', () => this.submitForm());
 
         document.getElementById('retrospective-button')?.addEventListener('click', () => this.showRetrospective());
@@ -141,6 +142,19 @@ class ReportFormApp {
 
         // Добавление строк в таблицу аварийных ситуаций
         document.getElementById('add-emergency')?.addEventListener('click', () => this.addEmergencyRow());
+        // Удаление строк из таблицы аварийных ситуаций
+        document.getElementById('delete-emergency')?.addEventListener('click', () => this.deleteEmergencyRow());
+
+        // Add event listener for emergency table cells
+        document.getElementById('emergency-situations')?.addEventListener('click', (e) => {
+            const target = e.target;
+            if (target.tagName === 'INPUT' && 
+                (target.name === 'emergencyEquipment[]' || 
+                 target.name === 'emergencyDescription[]' || 
+                 target.name === 'emergencyActions[]')) {
+                this.showTextareaPopup(target);
+            }
+        });
 
         // Предотвращение потери данных при закрытии
         window.addEventListener('beforeunload', (e) => {
@@ -548,6 +562,110 @@ class ReportFormApp {
         tbody.appendChild(newRow);
     }
 
+    deleteEmergencyRow() {
+        const tbody = document.getElementById('emergency-situations');
+        const rows = tbody.querySelectorAll('tr');
+        
+        // Check if there are rows to delete
+        if (rows.length === 0) {
+            this.showMessage('Нет строк для удаления', 'info');
+            return;
+        }
+        
+        // Check if the last row has any content
+        const lastRow = rows[rows.length - 1];
+        const inputs = lastRow.querySelectorAll('input');
+        let hasContent = false;
+        
+        inputs.forEach(input => {
+            if (input.value.trim() !== '') {
+                hasContent = true;
+            }
+        });
+        
+        // If the row has content, show confirmation dialog
+        if (hasContent) {
+            this.showModal(
+                'Подтверждение удаления',
+                'В строке есть данные. Вы уверены, что хотите удалить эту строку?',
+                () => {
+                    tbody.removeChild(lastRow);
+                    this.isDirty = true;
+                    this.scheduleAutoSave();
+                }
+            );
+        } else {
+            // If the row is empty, just delete it
+            tbody.removeChild(lastRow);
+            this.isDirty = true;
+            this.scheduleAutoSave();
+        }
+    }
+
+    showTextareaPopup(inputElement) {
+        // Create modal overlay if it doesn't exist
+        let modalOverlay = document.getElementById('textarea-modal-overlay');
+        if (!modalOverlay) {
+            modalOverlay = document.createElement('div');
+            modalOverlay.id = 'textarea-modal-overlay';
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.innerHTML = `
+                <div class="modal" style="max-width: 600px;">
+                    <div class="modal-header">
+                        <h3>Редактирование</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea id="textarea-popup" style="width: 100%; height: 200px; font-family: Arial, sans-serif; font-size: 16px;"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="textarea-cancel" class="btn btn-secondary">Отмена</button>
+                        <button id="textarea-save" class="btn btn-primary">Сохранить</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modalOverlay);
+
+            // Add event listeners for modal
+            modalOverlay.querySelector('.modal-close').addEventListener('click', () => this.hideTextareaModal());
+            modalOverlay.querySelector('#textarea-cancel').addEventListener('click', () => this.hideTextareaModal());
+            modalOverlay.querySelector('#textarea-save').addEventListener('click', () => this.saveTextareaContent(inputElement));
+        }
+
+        // Set the textarea value to the input value
+        const textarea = modalOverlay.querySelector('#textarea-popup');
+        textarea.value = inputElement.value;
+
+        // Store reference to the input element
+        this.currentEditingInput = inputElement;
+
+        // Show the modal
+        modalOverlay.classList.add('active');
+    }
+
+    hideTextareaModal() {
+        const modalOverlay = document.getElementById('textarea-modal-overlay');
+        if (modalOverlay) {
+            modalOverlay.classList.remove('active');
+        }
+        this.currentEditingInput = null;
+    }
+
+    saveTextareaContent(inputElement) {
+        const modalOverlay = document.getElementById('textarea-modal-overlay');
+        const textarea = modalOverlay.querySelector('#textarea-popup');
+        
+        // Update the input value with textarea content
+        inputElement.value = textarea.value;
+        
+        // Mark form as dirty
+        this.isDirty = true;
+        this.scheduleAutoSave();
+        
+        // Hide the modal
+        this.hideTextareaModal();
+    }
+
     async handleFileSelection(event) {
         const files = Array.from(event.target.files);
 
@@ -665,8 +783,7 @@ class ReportFormApp {
         // Set the report title in the header
         previewHeader.innerHTML = `
             <div class="report-header">
-                <div class="report-title">ОТЧЁТ</div>
-                <div class="report-title">О РАБОТЕ ${department.name} ЗА СУТКИ</div>
+                <div class="report-title">ОТЧЁТ О РАБОТЕ ${department.name} ЗА СУТКИ</div>
             </div>
         `;
 
@@ -844,9 +961,17 @@ class ReportFormApp {
             wrapper.appendChild(headerElement.cloneNode(true));
             wrapper.appendChild(element.cloneNode(true));
 
+            // Generate filename with timestamp
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+
+            const filename = `Отчет_${this.departments[this.selectedForm].name}_${year}-${month}-${date}.pdf`;
+
             const opt = {
                 margin: [10, 5, 10, 5], // Reduced margins: [top, right, bottom, left]
-                filename: `Отчет_${this.departments[this.selectedForm].name}_${new Date().toISOString().split('T')[0]}.pdf`,
+                filename: filename,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: {
                     scale: 2,
@@ -868,12 +993,168 @@ class ReportFormApp {
                 }
             };
 
-            await html2pdf().set(opt).from(wrapper).save();
+            // Try to use File System Access API first (for local server environment)
+            if ('showSaveFilePicker' in window) {
+                await this.exportPDFWithFileSystemAPI(wrapper, opt, filename);
+            } else {
+                // Fallback to traditional method
+                await html2pdf().set(opt).from(wrapper).save();
+            }
+
             console.log('PDF экспортирован успешно');
         } catch (error) {
             console.error('Ошибка экспорта PDF:', error);
             this.showMessage('Ошибка экспорта в PDF. Попробуйте еще раз.', 'error');
         }
+    }
+
+    // Export PDF using File System Access API
+    async exportPDFWithFileSystemAPI(wrapper, opt, filename) {
+        try {
+            // Generate PDF as blob
+            const pdfBlob = await html2pdf().set(opt).from(wrapper).outputPdf('blob');
+
+            // Show save file picker
+            const fileHandle = await window.showSaveFilePicker({
+                suggestedName: filename,
+                types: [{
+                    description: 'PDF файлы отчетов',
+                    accept: {
+                        'application/pdf': ['.pdf']
+                    }
+                }]
+            });
+
+            // Create a FileSystemWritableFileStream to write to
+            const writable = await fileHandle.createWritable();
+
+            // Write the contents of the file to the stream
+            await writable.write(pdfBlob);
+
+            // Close the file and write the contents to disk
+            await writable.close();
+        } catch (error) {
+            // If user cancelled the save dialog, re-throw the error
+            if (error.name === 'AbortError') {
+                throw error;
+            }
+
+            // For other errors, fall back to traditional method
+            console.warn('File System Access API недоступен, используем традиционный метод экспорта:', error);
+            await html2pdf().set(opt).from(wrapper).save();
+        }
+    }
+
+    // Export to Word functionality
+    async exportToWord() {
+        try {
+            // Make sure the preview is up to date with current form data
+            this.formData = { ...this.formData, ...this.collectFormData() };
+            this.generatePreview();
+
+            const element = document.getElementById('preview-content');
+            const headerElement = document.getElementById('preview-header');
+
+            // Create a wrapper element that includes both header and content
+            const wrapper = document.createElement('div');
+            wrapper.appendChild(headerElement.cloneNode(true));
+            wrapper.appendChild(element.cloneNode(true));
+
+            // Generate filename with timestamp
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+
+            const filename = `Отчет_${this.departments[this.selectedForm].name}_${year}-${month}-${date}.doc`;
+
+            // Get HTML content
+            const htmlContent = wrapper.innerHTML;
+
+            // Create a simple Word document structure
+            const wordContent = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+                      xmlns:w='urn:schemas-microsoft-com:office:word' 
+                      xmlns='http://www.w3.org/TR/REC-html40'>
+                    <head>
+                        <meta charset='utf-8'>
+                        <title>Отчет</title>
+                    </head>
+                    <body>
+                        ${htmlContent}
+                    </body>
+                </html>
+            `;
+
+            // Try to use File System Access API first (for local server environment)
+            if ('showSaveFilePicker' in window) {
+                await this.exportWordWithFileSystemAPI(wordContent, filename);
+            } else {
+                // Fallback to traditional download method
+                await this.exportWordWithDownload(wordContent, filename);
+            }
+
+            console.log('Word документ экспортирован успешно');
+        } catch (error) {
+            console.error('Ошибка экспорта Word:', error);
+            this.showMessage('Ошибка экспорта в Word. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Export Word using File System Access API
+    async exportWordWithFileSystemAPI(content, filename) {
+        try {
+            // Create blob
+            const blob = new Blob([content], { type: 'application/msword' });
+
+            // Show save file picker
+            const fileHandle = await window.showSaveFilePicker({
+                suggestedName: filename,
+                types: [{
+                    description: 'Word документы',
+                    accept: {
+                        'application/msword': ['.doc']
+                    }
+                }]
+            });
+
+            // Create a FileSystemWritableFileStream to write to
+            const writable = await fileHandle.createWritable();
+
+            // Write the contents of the file to the stream
+            await writable.write(blob);
+
+            // Close the file and write the contents to disk
+            await writable.close();
+        } catch (error) {
+            // If user cancelled the save dialog, re-throw the error
+            if (error.name === 'AbortError') {
+                throw error;
+            }
+
+            // For other errors, fall back to traditional method
+            console.warn('File System Access API недоступен, используем традиционный метод экспорта:', error);
+            await this.exportWordWithDownload(content, filename);
+        }
+    }
+
+    // Export Word using traditional download method (fallback)
+    async exportWordWithDownload(content, filename) {
+        // Create blob and download
+        const blob = new Blob([content], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
     }
 
     // Generate unique ID (UUID)
