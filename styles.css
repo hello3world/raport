@@ -446,6 +446,7 @@ body {
 .emergency-table td {
     padding: 8px;
     text-align: left;
+    border: 1px solid #ddd;
 }
 
 .emergency-table th {
@@ -1214,7 +1215,6 @@ body {
 #emergency-situations input[type="text"] {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ddd;
     border-radius: 0px;
     font-size: 14px;
     white-space: pre-wrap;
