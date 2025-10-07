@@ -148,10 +148,10 @@ class ReportFormApp {
         // Add event listener for emergency table cells
         document.getElementById('emergency-situations')?.addEventListener('click', (e) => {
             const target = e.target;
-            if (target.tagName === 'INPUT' && 
-                (target.name === 'emergencyEquipment[]' || 
-                 target.name === 'emergencyDescription[]' || 
-                 target.name === 'emergencyActions[]')) {
+            if (target.tagName === 'INPUT' &&
+                (target.name === 'emergencyEquipment[]' ||
+                    target.name === 'emergencyDescription[]' ||
+                    target.name === 'emergencyActions[]')) {
                 this.showTextareaPopup(target);
             }
         });
@@ -565,24 +565,24 @@ class ReportFormApp {
     deleteEmergencyRow() {
         const tbody = document.getElementById('emergency-situations');
         const rows = tbody.querySelectorAll('tr');
-        
+
         // Check if there are rows to delete
         if (rows.length === 0) {
             this.showMessage('Нет строк для удаления', 'info');
             return;
         }
-        
+
         // Check if the last row has any content
         const lastRow = rows[rows.length - 1];
         const inputs = lastRow.querySelectorAll('input');
         let hasContent = false;
-        
+
         inputs.forEach(input => {
             if (input.value.trim() !== '') {
                 hasContent = true;
             }
         });
-        
+
         // If the row has content, show confirmation dialog
         if (hasContent) {
             this.showModal(
@@ -654,14 +654,14 @@ class ReportFormApp {
     saveTextareaContent(inputElement) {
         const modalOverlay = document.getElementById('textarea-modal-overlay');
         const textarea = modalOverlay.querySelector('#textarea-popup');
-        
+
         // Update the input value with textarea content
         inputElement.value = textarea.value;
-        
+
         // Mark form as dirty
         this.isDirty = true;
         this.scheduleAutoSave();
-        
+
         // Hide the modal
         this.hideTextareaModal();
     }
@@ -990,6 +990,18 @@ class ReportFormApp {
                     before: '.before-page-break',
                     after: '.after-page-break',
                     avoid: '.avoid-page-break'
+                },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait',
+                    compress: true
                 }
             };
 
@@ -1071,7 +1083,7 @@ class ReportFormApp {
             // Get HTML content
             const htmlContent = wrapper.innerHTML;
 
-            // Create a simple Word document structure
+            // Create a proper Word document structure with correct encoding and styles
             const wordContent = `
                 <html xmlns:o='urn:schemas-microsoft-com:office:office' 
                       xmlns:w='urn:schemas-microsoft-com:office:word' 
@@ -1079,6 +1091,37 @@ class ReportFormApp {
                     <head>
                         <meta charset='utf-8'>
                         <title>Отчет</title>
+                        <style>
+                            body {
+                                font-family: 'Times New Roman', Times, serif;
+                                font-size: 16px;
+                                line-height: 1.2;
+                            }
+                            table {
+                                border-collapse: collapse;
+                                width: 100%;
+                            }
+                            th, td {
+                                border: 1px solid #000;
+                                padding: 4px 6px;
+                                text-align: left;
+                                word-wrap: break-word;
+                                vertical-align: top;
+                            }
+                            th {
+                                background-color: #f2f2f2;
+                                font-weight: bold;
+                            }
+                            .emergency-table-preview {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 10px;
+                                table-layout: fixed;
+                                font-family: 'Times New Roman', Times, serif;
+                                font-size: 16px;
+                                line-height: 1.2;
+                            }
+                        </style>
                     </head>
                     <body>
                         ${htmlContent}
@@ -1629,12 +1672,8 @@ class ReportFormApp {
 
             reportsHTML += `
                 <div class="report-item" data-index="${index}">
-                    <div class="report-info">
-                        <div class="report-date">${formattedDate}</div>
-                        <div class="report-filename">${report.name}</div>
-                        <div class="report-id">ID: ${report.metadata.report_id || 'Неизвестный ID'}</div>
-                        <div class="report-version">Версия: ${report.metadata.version || '1'}</div>
-                    </div>
+                    <div class="report-date">${formattedDate}</div>
+                    <div class="report-filename">${report.name}</div>
                     <button class="btn btn-outline load-report-btn" data-index="${index}">Загрузить</button>
                 </div>
             `;

@@ -761,6 +761,14 @@ body {
     vertical-align: top;
 }
 
+.emergency-table-preview td {
+    page-break-inside: avoid;
+}
+
+.emergency-table-preview {
+    page-break-inside: avoid;
+}
+
 .emergency-table-preview thead {
     display: table-header-group;
 }
@@ -800,12 +808,30 @@ body {
     .report-section h3 {
         font-family: 'Times New Roman', Times, serif;
         font-size: 16px;
+        page-break-after: avoid;
     }
 
     .field-label,
     .field-value {
         font-family: 'Times New Roman', Times, serif;
         font-size: 16px;
+    }
+
+    .emergency-table-preview {
+        page-break-inside: auto;
+    }
+
+    .emergency-table-preview thead {
+        display: table-header-group;
+        page-break-after: avoid;
+    }
+
+    .emergency-table-preview tr {
+        page-break-inside: avoid;
+    }
+
+    .emergency-table-preview td {
+        page-break-inside: avoid;
     }
 }
 
@@ -845,7 +871,7 @@ body {
         gap: 15px;
     }
 
-    .preview-actions {
+    #preview-screen .preview-actions {
         display: flex !important;
         justify-content: space-between !important;
     }
@@ -1029,29 +1055,40 @@ body {
 }
 
 .browse-reports-section {
-    margin-bottom: 2rem;
+    margin: 1rem 0 2rem 0;
     padding: 1rem;
     border: 1px dashed #ccc;
     border-radius: 5px;
     text-align: center;
 }
 
-.reports-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
+#browse-reports-btn {
+    margin-top: 14px;
+    margin-bottom: 14px;
 }
+
+.reports-grid {}
 
 .report-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    padding: 10px 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
     margin-bottom: 10px;
     background-color: #f8f9fa;
+}
+
+.report-item>.report-date,
+.report-item>.report-filename {
+    /* flex: 1; */
+    margin-right: 10px;
+}
+
+.report-item>.load-report-btn {
+    flex: 0 0 auto;
+    margin: 0;
 }
 
 .report-item:hover {
@@ -1066,11 +1103,13 @@ body {
 .report-date {
     font-weight: bold;
     color: #2c3e50;
+    margin-right: 15px;
 }
 
 .report-filename {
     color: #666;
     font-size: 0.9rem;
+    flex: 1;
 }
 
 .report-id {
