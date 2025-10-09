@@ -189,7 +189,8 @@ class ReportFormApp {
             'teploelektracentral-section',
             'stokovye_vody-section',
             'parosilovoe_hozyaystvo-section',
-            'elektroremontnyi_ceh-section'
+            'elektroremontnyi_ceh-section',
+            'teploelektracentral-shift-supervisor'
         ];
 
         sections.forEach(sectionId => {
@@ -204,6 +205,7 @@ class ReportFormApp {
         switch (formType) {
             case 'teploelektracentral':
                 sectionToShow = 'teploelektracentral-section';
+                document.getElementById('teploelektracentral-shift-supervisor').style.display = 'block';
                 break;
             case 'stokovye_vody':
                 sectionToShow = 'stokovye_vody-section';
@@ -286,7 +288,7 @@ class ReportFormApp {
 
         // Collect common fields
         const commonFields = [
-            'reportDate', 'periodStart', 'periodEnd', 'shiftSupervisor',
+            'reportDate', 'periodStart', 'periodEnd',
             'startTime', 'endTime'
         ];
 
@@ -303,6 +305,14 @@ class ReportFormApp {
                 }
             }
         });
+
+        // Collect shift supervisor only for теплоэлектроцентраль form
+        if (this.selectedForm === 'teploelektracentral') {
+            const shiftSupervisor = document.getElementById('shiftSupervisor');
+            if (shiftSupervisor) {
+                formData.shiftSupervisor = shiftSupervisor.value;
+            }
+        }
 
         // Collect form-specific fields based on selected form type
         switch (this.selectedForm) {
@@ -1130,11 +1140,11 @@ class ReportFormApp {
                     <span class="field-value">${this.formData.eveningSuspended || '_____'} мг/л</span>
                 </div>
                 <div class="report-field">
-                    <span class="field-label">Объём обезвоженных осадков, (800 - 2000)</span>
+                    <span class="field-label">Объём обезвоженных осадков, (08:00 - 20:00)</span>
                     <span class="field-value">${this.formData.sedimentDay || '_____'} т.</span>
                 </div>
                 <div class="report-field">
-                    <span class="field-label">Объём обезвоженных осадков, (2000 - 800)</span>
+                    <span class="field-label">Объём обезвоженных осадков, (20:00 - 08:00)</span>
                     <span class="field-value">${this.formData.sedimentNight || '_____'} т.</span>
                 </div>
                 
