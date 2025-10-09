@@ -378,6 +378,11 @@ body {
     width: 100%;
 }
 
+#parosilovoe_hozyaystvo-section,
+#elektroremontnyi_ceh-section {
+    margin-bottom: 0;
+}
+
 #authentication-form .form-group input {
     width: 100%;
 }
@@ -683,7 +688,7 @@ body {
 }
 
 .field-label {
-    font-weight: 600;
+    /* font-weight: 600; */
     color: #2c3e50;
     min-width: 250px;
     margin-right: 1rem;
@@ -963,7 +968,7 @@ body {
 
     .report-section {
         page-break-inside: avoid;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
     }
 
     .report-header {
@@ -1323,9 +1328,9 @@ body {
 }
 
 .report-section h3 {
-    font-size: 20px;
+    font-size: 16px;
     color: #333;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     padding-bottom: 5px;
 }
 
@@ -1337,7 +1342,7 @@ body {
 
 .report-field .field-label {
     min-width: 300px;
-    font-weight: bold;
+    /* font-weight: bold; */
     margin-right: 10px;
 }
 
