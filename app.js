@@ -2055,10 +2055,16 @@ class ReportFormApp {
                 console.warn('Ошибка форматирования даты:', dateError);
             }
 
+            // Remove .json extension from filename for display
+            let displayName = report.name;
+            if (displayName.endsWith('.json')) {
+                displayName = displayName.substring(0, displayName.length - 5);
+            }
+
             reportsHTML += `
                 <div class="report-item" data-index="${index}">
                     <div class="report-date">${formattedDate}</div>
-                    <div class="report-filename">${report.name}</div>
+                    <div class="report-filename">${displayName}</div>
                     <button class="btn btn-outline load-report-btn" data-index="${index}">Загрузить</button>
                 </div>
             `;
