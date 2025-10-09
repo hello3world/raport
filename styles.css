@@ -431,10 +431,6 @@ body {
     margin-bottom: 5px;
 }
 
-.sub-group .input-with-unit {
-    /* margin-left: 20px; */
-}
-
 /* Таблица аварийных ситуаций */
 .emergency-table {
     width: 100%;
@@ -1066,8 +1062,6 @@ body {
     margin-top: 14px;
     margin-bottom: 14px;
 }
-
-.reports-grid {}
 
 .report-item {
     display: flex;

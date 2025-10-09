@@ -137,7 +137,7 @@
                     </div>
 
                     <!-- 2. Показатели работы -->
-                    <div class="form-section" data-step="2">
+                    <div class="form-section" data-step="2" id="teploelektracentral-section">
                         <h2>2. Показатели работы</h2>
 
                         <div class="form-group">
@@ -271,6 +271,92 @@
                         </div>
                     </div>
 
+                    <!-- 2. Показатели работы - Участок сточных вод -->
+                    <div class="form-section" data-step="2" id="stokovye_vody-section" style="display: none;">
+                        <h2>2. Показатели работы</h2>
+
+                        <div class="form-group">
+                            <label>Объём взвешенных веществ:</label>
+                            <div class="sub-group">
+                                <label for="morningSuspended">утро</label>
+                                <div class="input-with-unit">
+                                    <input type="text" id="morningSuspended" name="morningSuspended">
+                                    <span class="unit">мг/л</span>
+                                </div>
+                            </div>
+                            <div class="sub-group">
+                                <label for="daySuspended">день</label>
+                                <div class="input-with-unit">
+                                    <input type="text" id="daySuspended" name="daySuspended">
+                                    <span class="unit">мг/л</span>
+                                </div>
+                            </div>
+                            <div class="sub-group">
+                                <label for="eveningSuspended">вечер</label>
+                                <div class="input-with-unit">
+                                    <input type="text" id="eveningSuspended" name="eveningSuspended">
+                                    <span class="unit">мг/л</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Объём обезвоженных осадков:</label>
+                            <div class="sub-group">
+                                <label for="sedimentDay">08:00 - 20:00</label>
+                                <div class="input-with-unit">
+                                    <input type="text" id="sedimentDay" name="sedimentDay">
+                                    <span class="unit">т.</span>
+                                </div>
+                            </div>
+                            <div class="sub-group">
+                                <label for="sedimentNight">20:00 - 08:00</label>
+                                <div class="input-with-unit">
+                                    <input type="text" id="sedimentNight" name="sedimentNight">
+                                    <span class="unit">т.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Показатели технической воды:</label>
+                            <div class="sub-group">
+                                <label for="waterHardness">жесткость</label>
+                                <div class="input-with-unit">
+                                    <input type="text" id="waterHardness" name="waterHardness">
+                                </div>
+                            </div>
+                            <div class="sub-group">
+                                <label for="waterTurbidity">мутность</label>
+                                <div class="input-with-unit">
+                                    <input type="text" id="waterTurbidity" name="waterTurbidity">
+                                </div>
+                            </div>
+                            <div class="sub-group">
+                                <label for="waterColor">цветность</label>
+                                <div class="input-with-unit">
+                                    <input type="text" id="waterColor" name="waterColor">
+                                </div>
+                            </div>
+                            <div class="sub-group">
+                                <label for="waterTemperature">температура</label>
+                                <div class="input-with-unit">
+                                    <input type="text" id="waterTemperature" name="waterTemperature">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Показатели работы - Паросиловое хозяйство -->
+                    <div class="form-section" data-step="2" id="parosilovoe_hozyaystvo-section" style="display: none;">
+                        <!-- This section will be empty as per requirements -->
+                    </div>
+
+                    <!-- 2. Показатели работы - Электроремонтный цех -->
+                    <div class="form-section" data-step="2" id="elektroremontnyi_ceh-section" style="display: none;">
+                        <!-- This section will be empty as per requirements -->
+                    </div>
+
                     <!-- 3: Оборудование -->
                     <div class="form-section" data-step="3">
                         <h2>3. Режим работы оборудования</h2>
@@ -333,7 +419,8 @@
                     <!-- Содержимое будет сгенерировано JavaScript -->
                 </div>
 
-                <div class="preview-actions" style="display: flex !important; justify-content: space-between !important;">
+                <div class="preview-actions"
+                    style="display: flex !important; justify-content: space-between !important;">
                     <button type="button" id="edit-form" class="btn btn-secondary">Редактировать</button>
                     <button type="button" id="save-final" class="btn btn-outline">Сохранить</button>
                     <button type="button" id="export-pdf" class="btn btn-primary">Экспорт в PDF</button>

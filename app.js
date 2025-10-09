@@ -10,28 +10,28 @@ class ReportFormApp {
         this.authenticated = false;
         this.departments = {
             'teploelektracentral': {
-                name: 'ТЕПЛОЭЛЕКТРОЦЕНТРАЛЬ',
+                name: 'ТЕПЛОЭЛЕКТРОЦЕНТРАЛИ',
                 users: {
                     'teplo_user': 'teplo_pass',
                     'admin': 'admin'
                 }
             },
             'stokovye_vody': {
-                name: 'УЧАСТОК СТОЧНЫХ ВОД',
+                name: 'УЧАСТКА СТОЧНЫХ ВОД',
                 users: {
                     'stok_user': 'stok_pass',
                     'admin': 'admin'
                 }
             },
             'parosilovoe_hozyaystvo': {
-                name: 'ПАРОСИЛОВОЕ ХОЗЯЙСТВО',
+                name: 'УЧАСТКА ПАРОСИЛОВОГО ХОЗЯЙСТВА',
                 users: {
                     'paro_user': 'paro_pass',
                     'admin': 'admin'
                 }
             },
             'elektroremontnyi_ceh': {
-                name: 'ЭЛЕКТРОРЕМОНТНЫЙ ЦЕХ',
+                name: 'ЭЛЕКТРОРЕМОНТНОГО ЦЕХА',
                 users: {
                     'elektro_user': 'elektro_pass',
                     'admin': 'admin'
@@ -178,6 +178,48 @@ class ReportFormApp {
         if (formReportTitle) {
             formReportTitle.textContent = `ОТЧЁТ О РАБОТЕ ${this.departments[formType].name} ЗА СУТКИ`;
         }
+
+        // Show/hide form sections based on form type
+        this.updateFormSections(formType);
+    }
+
+    updateFormSections(formType) {
+        // Hide all specialized sections
+        const sections = [
+            'teploelektracentral-section',
+            'stokovye_vody-section',
+            'parosilovoe_hozyaystvo-section',
+            'elektroremontnyi_ceh-section'
+        ];
+
+        sections.forEach(sectionId => {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.style.display = 'none';
+            }
+        });
+
+        // Show the appropriate section based on form type
+        let sectionToShow = '';
+        switch (formType) {
+            case 'teploelektracentral':
+                sectionToShow = 'teploelektracentral-section';
+                break;
+            case 'stokovye_vody':
+                sectionToShow = 'stokovye_vody-section';
+                break;
+            case 'parosilovoe_hozyaystvo':
+                sectionToShow = 'parosilovoe_hozyaystvo-section';
+                break;
+            case 'elektroremontnyi_ceh':
+                sectionToShow = 'elektroremontnyi_ceh-section';
+                break;
+        }
+
+        const section = document.getElementById(sectionToShow);
+        if (section) {
+            section.style.display = 'block';
+        }
     }
 
     authenticate() {
@@ -233,6 +275,172 @@ class ReportFormApp {
         } catch (error) {
             console.error('Ошибка автосохранения:', error);
             this.showSaveStatus('error');
+        }
+    }
+
+    collectFormData() {
+        const formData = {};
+        const form = document.getElementById('main-form');
+
+        if (!form) return formData;
+
+        // Collect common fields
+        const commonFields = [
+            'reportDate', 'periodStart', 'periodEnd', 'shiftSupervisor',
+            'startTime', 'endTime'
+        ];
+
+        commonFields.forEach(fieldName => {
+            const element = document.getElementById(fieldName);
+            if (element) {
+                if (element.type === 'radio') {
+                    const checkedRadio = document.querySelector(`input[name="${fieldName}"]:checked`);
+                    if (checkedRadio) {
+                        formData[fieldName] = checkedRadio.value;
+                    }
+                } else {
+                    formData[fieldName] = element.value;
+                }
+            }
+        });
+
+        // Collect form-specific fields based on selected form type
+        switch (this.selectedForm) {
+            case 'teploelektracentral':
+                this.collectTeploelektracentralData(formData);
+                break;
+            case 'stokovye_vody':
+                this.collectStokovyeVodyData(formData);
+                break;
+            case 'parosilovoe_hozyaystvo':
+                // No specific fields for this form
+                break;
+            case 'elektroremontnyi_ceh':
+                // No specific fields for this form
+                break;
+        }
+
+        // Collect emergency situations
+        const emergencyRows = document.querySelectorAll('#emergency-situations tr');
+        formData.emergencySituations = [];
+
+        emergencyRows.forEach(row => {
+            const timeInput = row.querySelector('input[name="emergencyTime[]"]');
+            const equipmentInput = row.querySelector('input[name="emergencyEquipment[]"]');
+            const descriptionInput = row.querySelector('input[name="emergencyDescription[]"]');
+            const actionsInput = row.querySelector('input[name="emergencyActions[]"]');
+            const recoveryInput = row.querySelector('input[name="emergencyRecovery[]"]');
+
+            if (timeInput || equipmentInput || descriptionInput || actionsInput || recoveryInput) {
+                formData.emergencySituations.push({
+                    time: timeInput ? timeInput.value : '',
+                    equipment: equipmentInput ? equipmentInput.value : '',
+                    description: descriptionInput ? descriptionInput.value : '',
+                    actions: actionsInput ? actionsInput.value : '',
+                    recovery: recoveryInput ? recoveryInput.value : ''
+                });
+            }
+        });
+
+        // Collect equipment deviations
+        const equipmentDeviations = document.getElementById('equipmentDeviations');
+        if (equipmentDeviations) {
+            formData.equipmentDeviations = equipmentDeviations.value;
+        }
+
+        return formData;
+    }
+
+    collectTeploelektracentralData(formData) {
+        const fields = [
+            'reactor1', 'reactor2', 'reactorSum', 'gasMeter', 'gasConsumption',
+            'kgu', 'boiler1', 'boiler2', 'boiler3', 'steamConsumption',
+            'woodChips', 'bark', 'sawdust', 'waterConsumption', 'waterLevel', 'waterReserve'
+        ];
+
+        fields.forEach(fieldName => {
+            const element = document.getElementById(fieldName);
+            if (element) {
+                formData[fieldName] = element.value;
+            }
+        });
+    }
+
+    collectStokovyeVodyData(formData) {
+        const fields = [
+            'morningSuspended', 'daySuspended', 'eveningSuspended',
+            'sedimentDay', 'sedimentNight',
+            'waterHardness', 'waterTurbidity', 'waterColor', 'waterTemperature'
+        ];
+
+        fields.forEach(fieldName => {
+            const element = document.getElementById(fieldName);
+            if (element) {
+                formData[fieldName] = element.value;
+            }
+        });
+    }
+
+    populateForm() {
+        Object.keys(this.formData).forEach(key => {
+            const element = document.getElementById(key) || document.querySelector(`[name="${key}"]`);
+            if (element) {
+                if (element.type === 'radio') {
+                    const radio = document.querySelector(`[name="${key}"][value="${this.formData[key]}"]`);
+                    if (radio) radio.checked = true;
+                } else if (element.type === 'checkbox') {
+                    element.checked = this.formData[key];
+                } else if (element.type === 'date') {
+                    // Handle date inputs
+                    if (this.formData[key]) {
+                        // Convert dd.mm.yyyy format to yyyy-mm-dd for date inputs
+                        const dateParts = this.formData[key].split('.');
+                        if (dateParts.length === 3) {
+                            const formattedDate = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}`;
+                            element.value = formattedDate;
+                        }
+                    }
+                } else if (element.type === 'datetime-local') {
+                    // Handle datetime-local inputs
+                    if (this.formData[key]) {
+                        // Convert dd.mm.yyyy hh:mm format to yyyy-mm-ddThh:mm for datetime-local inputs
+                        const dateTimeParts = this.formData[key].split(' ');
+                        if (dateTimeParts.length === 2) {
+                            const dateParts = dateTimeParts[0].split('.');
+                            if (dateParts.length === 3) {
+                                const formattedDateTime = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}T${dateTimeParts[1]}`;
+                                element.value = formattedDateTime;
+                            }
+                        }
+                    }
+                } else {
+                    element.value = this.formData[key];
+                }
+            }
+        });
+
+        // Восстанавливаем файлы
+        if (this.formData.attachments) {
+            this.displayFileList(this.formData.attachments);
+        }
+
+        // Восстанавливаем аварийные ситуации
+        if (this.formData.emergencySituations && this.formData.emergencySituations.length > 0) {
+            const tbody = document.getElementById('emergency-situations');
+            if (tbody) {
+                // Clear existing rows except the first one
+                tbody.innerHTML = '';
+
+                // Add rows for each emergency situation
+                this.formData.emergencySituations.forEach((situation, index) => {
+                    this.addEmergencyRow(situation);
+                });
+            }
+        }
+
+        // Show/hide form sections based on form type
+        if (this.selectedForm) {
+            this.updateFormSections(this.selectedForm);
         }
     }
 
@@ -353,110 +561,6 @@ class ReportFormApp {
         console.log('Новая форма запущена');
     }
 
-    populateForm() {
-        Object.keys(this.formData).forEach(key => {
-            const element = document.getElementById(key) || document.querySelector(`[name="${key}"]`);
-            if (element) {
-                if (element.type === 'radio') {
-                    const radio = document.querySelector(`[name="${key}"][value="${this.formData[key]}"]`);
-                    if (radio) radio.checked = true;
-                } else if (element.type === 'checkbox') {
-                    element.checked = this.formData[key];
-                } else if (element.type === 'date') {
-                    // Handle date inputs
-                    if (this.formData[key]) {
-                        // Convert dd.mm.yyyy format to yyyy-mm-dd for date inputs
-                        const dateParts = this.formData[key].split('.');
-                        if (dateParts.length === 3) {
-                            const formattedDate = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}`;
-                            element.value = formattedDate;
-                        }
-                    }
-                } else if (element.type === 'datetime-local') {
-                    // Handle datetime-local inputs
-                    if (this.formData[key]) {
-                        // Convert dd.mm.yyyy hh:mm format to yyyy-mm-ddThh:mm for datetime-local inputs
-                        const dateTimeParts = this.formData[key].split(' ');
-                        if (dateTimeParts.length === 2) {
-                            const dateParts = dateTimeParts[0].split('.');
-                            if (dateParts.length === 3) {
-                                const formattedDateTime = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}T${dateTimeParts[1]}`;
-                                element.value = formattedDateTime;
-                            }
-                        }
-                    }
-                } else {
-                    element.value = this.formData[key];
-                }
-            }
-        });
-
-        // Восстанавливаем файлы
-        if (this.formData.attachments) {
-            this.displayFileList(this.formData.attachments);
-        }
-
-        // Восстанавливаем аварийные ситуации
-        if (this.formData.emergencySituations && this.formData.emergencySituations.length > 0) {
-            const tbody = document.getElementById('emergency-situations');
-            tbody.innerHTML = '';
-            this.formData.emergencySituations.forEach(situation => {
-                const newRow = document.createElement('tr');
-                // Handle datetime formatting for emergency situations
-                let timeValue = '';
-                let recoveryValue = '';
-
-                if (situation.time) {
-                    const timeParts = situation.time.split(' ');
-                    if (timeParts.length === 2) {
-                        const dateParts = timeParts[0].split('.');
-                        if (dateParts.length === 3) {
-                            timeValue = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}T${timeParts[1]}`;
-                        }
-                    }
-                }
-
-                if (situation.recovery) {
-                    const recoveryParts = situation.recovery.split(' ');
-                    if (recoveryParts.length === 2) {
-                        const dateParts = recoveryParts[0].split('.');
-                        if (dateParts.length === 3) {
-                            recoveryValue = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}T${recoveryParts[1]}`;
-                        }
-                    }
-                }
-
-                // Escape newlines for proper storage in input values
-                const equipmentValue = situation.equipment ? situation.equipment.replace(/\n/g, '\\n') : '';
-                const descriptionValue = situation.description ? situation.description.replace(/\n/g, '\\n') : '';
-                const actionsValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
-
-                newRow.innerHTML = `
-                    <td><input type="text" name="emergencyTime[]" value="${situation.time || ''}"></td>
-                    <td><input type="text" name="emergencyEquipment[]" value=""></td>
-                    <td><input type="text" name="emergencyDescription[]" value=""></td>
-                    <td><input type="text" name="emergencyActions[]" value=""></td>
-                    <td><input type="text" name="emergencyRecovery[]" value="${situation.recovery || ''}"></td>
-                `;
-                tbody.appendChild(newRow);
-                
-                // Set the dataset.value for multiline text fields
-                const inputs = newRow.querySelectorAll('input');
-                inputs[1].dataset.value = equipmentValue;
-                inputs[1].value = situation.equipment ? situation.equipment.replace(/\n/g, ' ') : '';
-                inputs[2].dataset.value = descriptionValue;
-                inputs[2].value = situation.description ? situation.description.replace(/\n/g, ' ') : '';
-                inputs[3].dataset.value = actionsValue;
-                inputs[3].value = situation.actions ? situation.actions.replace(/\n/g, ' ') : '';
-                
-                // Apply white-space styling to preserve line breaks in the restored inputs
-                inputs.forEach(input => {
-                    input.style.whiteSpace = 'pre-wrap';
-                });
-            });
-        }
-    }
-
     collectFormData() {
         const formElements = document.querySelectorAll('#main-form input, #main-form select, #main-form textarea');
         const data = {};
@@ -510,7 +614,7 @@ class ReportFormApp {
                 const equipmentValue = inputs[1].dataset.value ? inputs[1].dataset.value : inputs[1].value;
                 const descriptionValue = inputs[2].dataset.value ? inputs[2].dataset.value : inputs[2].value;
                 const actionsValue = inputs[3].dataset.value ? inputs[3].dataset.value : inputs[3].value;
-                
+
                 emergencyData.push({
                     time: inputs[0].value,
                     equipment: equipmentValue.replace(/\\n/g, '\n'), // Convert escaped newlines back to actual newlines
@@ -584,7 +688,7 @@ class ReportFormApp {
             <td><input type="text" name="emergencyRecovery[]"></td>
         `;
         tbody.appendChild(newRow);
-        
+
         // Apply white-space styling to preserve line breaks in the new inputs
         const inputs = newRow.querySelectorAll('input');
         inputs.forEach(input => {
@@ -709,7 +813,7 @@ class ReportFormApp {
         // Store the actual value with escaped newlines in a data attribute
         const escapedValue = textarea.value.replace(/\n/g, '\\n');
         inputElement.dataset.value = escapedValue;
-        
+
         // For display purposes, show a simplified version in the input field
         inputElement.value = textarea.value.replace(/\n/g, ' ');
 
@@ -850,6 +954,24 @@ class ReportFormApp {
         const periodStart = this.formData.periodStart || '___  ___  _____';
         const periodEnd = this.formData.periodEnd || '___  ___  _____';
 
+        // Generate preview content based on form type
+        switch (this.selectedForm) {
+            case 'teploelektracentral':
+                this.generateTeploelektracentralPreview(previewContent, reportDate, periodStart, periodEnd);
+                break;
+            case 'stokovye_vody':
+                this.generateStokovyeVodyPreview(previewContent, reportDate, periodStart, periodEnd);
+                break;
+            case 'parosilovoe_hozyaystvo':
+                this.generateParosilovoeHozyaystvoPreview(previewContent, reportDate, periodStart, periodEnd);
+                break;
+            case 'elektroremontnyi_ceh':
+                this.generateElektroremontnyiCehPreview(previewContent, reportDate, periodStart, periodEnd);
+                break;
+        }
+    }
+
+    generateTeploelektracentralPreview(previewContent, reportDate, periodStart, periodEnd) {
         previewContent.innerHTML = `
             <div class="report-section">
                 <div class="report-field">
@@ -947,6 +1069,178 @@ class ReportFormApp {
                 <div class="report-field">
                     <span class="field-label">Запасно-регулирующие резервуары водоснабжения</span>
                     <span class="field-value">${this.formData.waterReserve || '_____'} %</span>
+                </div>
+            </div>
+
+            <div class="report-section">
+                <h3>Режим работы оборудования</h3>
+                <div class="report-field vertical">
+                    <span class="field-label">Аварийные ситуации:</span>
+                    <table class="emergency-table-preview">
+                        <thead>
+                            <tr>
+                                <th>Время</th>
+                                <th>Наименование оборудования</th>
+                                <th>Описание</th>
+                                <th>Принятые меры</th>
+                                <th>Время восстановления</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${this.generateEmergencyTablePreview()}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="report-field vertical">
+                    <span class="field-label">Отклонения в работе оборудования, замечания:</span>
+                    <span class="field-value equipment-deviations">${this.formData.equipmentDeviations || ''}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    generateStokovyeVodyPreview(previewContent, reportDate, periodStart, periodEnd) {
+        previewContent.innerHTML = `
+            <div class="report-section">
+                <div class="report-field">
+                    <span class="field-label">Дата составления:</span>
+                    <span class="field-value">${reportDate}</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Период: с ${this.formData.startTime || '8-00'}</span>
+                    <span class="field-value">${periodStart}</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">по ${this.formData.endTime || '8-00'}</span>
+                    <span class="field-value">${periodEnd}</span>
+                </div>
+            </div>
+
+            <div class="report-section">
+                <div class="report-field">
+                    <span class="field-label">Объём взвешенных веществ, (утро)</span>
+                    <span class="field-value">${this.formData.morningSuspended || '_____'} мг/л</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Объём взвешенных веществ, (день)</span>
+                    <span class="field-value">${this.formData.daySuspended || '_____'} мг/л</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Объём взвешенных веществ, (вечер)</span>
+                    <span class="field-value">${this.formData.eveningSuspended || '_____'} мг/л</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Объём обезвоженных осадков, (800 - 2000)</span>
+                    <span class="field-value">${this.formData.sedimentDay || '_____'} т.</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Объём обезвоженных осадков, (2000 - 800)</span>
+                    <span class="field-value">${this.formData.sedimentNight || '_____'} т.</span>
+                </div>
+                
+                <div class="report-field">
+                    <span class="field-label">Показатели технической воды: жесткость</span>
+                    <span class="field-value">${this.formData.waterHardness || '_____'}</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">мутность</span>
+                    <span class="field-value">${this.formData.waterTurbidity || '_____'}</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">цветность</span>
+                    <span class="field-value">${this.formData.waterColor || '_____'}</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">температура</span>
+                    <span class="field-value">${this.formData.waterTemperature || '_____'}</span>
+                </div>
+            </div>
+
+            <div class="report-section">
+                <h3>Режим работы оборудования</h3>
+                <div class="report-field vertical">
+                    <span class="field-label">Аварийные ситуации:</span>
+                    <table class="emergency-table-preview">
+                        <thead>
+                            <tr>
+                                <th>Время</th>
+                                <th>Наименование оборудования</th>
+                                <th>Описание</th>
+                                <th>Принятые меры</th>
+                                <th>Время восстановления</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${this.generateEmergencyTablePreview()}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="report-field vertical">
+                    <span class="field-label">Отклонения в работе оборудования, замечания:</span>
+                    <span class="field-value equipment-deviations">${this.formData.equipmentDeviations || ''}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    generateParosilovoeHozyaystvoPreview(previewContent, reportDate, periodStart, periodEnd) {
+        previewContent.innerHTML = `
+            <div class="report-section">
+                <div class="report-field">
+                    <span class="field-label">Дата составления:</span>
+                    <span class="field-value">${reportDate}</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Период: с ${this.formData.startTime || '8-00'}</span>
+                    <span class="field-value">${periodStart}</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">по ${this.formData.endTime || '8-00'}</span>
+                    <span class="field-value">${periodEnd}</span>
+                </div>
+            </div>
+
+            <div class="report-section">
+                <h3>Режим работы оборудования</h3>
+                <div class="report-field vertical">
+                    <span class="field-label">Аварийные ситуации:</span>
+                    <table class="emergency-table-preview">
+                        <thead>
+                            <tr>
+                                <th>Время</th>
+                                <th>Наименование оборудования</th>
+                                <th>Описание</th>
+                                <th>Принятые меры</th>
+                                <th>Время восстановления</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${this.generateEmergencyTablePreview()}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="report-field vertical">
+                    <span class="field-label">Отклонения в работе оборудования, замечания:</span>
+                    <span class="field-value equipment-deviations">${this.formData.equipmentDeviations || ''}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    generateElektroremontnyiCehPreview(previewContent, reportDate, periodStart, periodEnd) {
+        previewContent.innerHTML = `
+            <div class="report-section">
+                <div class="report-field">
+                    <span class="field-label">Дата составления:</span>
+                    <span class="field-value">${reportDate}</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">Период: с ${this.formData.startTime || '8-00'}</span>
+                    <span class="field-value">${periodStart}</span>
+                </div>
+                <div class="report-field">
+                    <span class="field-label">по ${this.formData.endTime || '8-00'}</span>
+                    <span class="field-value">${periodEnd}</span>
                 </div>
             </div>
 
