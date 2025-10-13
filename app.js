@@ -87,6 +87,11 @@ class ReportFormApp {
             this.showScreen('main-screen');
         });
 
+        // Back button for loading screen
+        document.getElementById('back-to-main-loading')?.addEventListener('click', () => {
+            this.showScreen('main-screen');
+        });
+
         // Back buttons for full report screens
         document.getElementById('back-to-main-full-report')?.addEventListener('click', () => {
             this.showScreen('main-screen');
@@ -454,7 +459,24 @@ class ReportFormApp {
             console.log('Проверка черновиков...');
             const drafts = await window.storageAdapter.getAllItems();
             console.log('Найдено элементов:', drafts.length);
-            const activeDrafts = drafts.filter(draft => draft.status === 'draft' && draft.formType === this.selectedForm);
+
+            // Define postfixes for different form types
+            const formPostfixes = {
+                'teploelektracentral': '_tec',
+                'stokovye_vody': '_zsv',
+                'parosilovoe_hozyaystvo': '_pcx',
+                'elektroremontnyi_ceh': '_erc'
+            };
+
+            // Get the postfix for the current form type
+            const currentPostfix = formPostfixes[this.selectedForm] || '';
+
+            // Filter drafts by status, formType, and postfix
+            const activeDrafts = drafts.filter(draft =>
+                draft.status === 'draft' &&
+                draft.formType === this.selectedForm &&
+                (!currentPostfix || (draft.id && draft.id.includes(currentPostfix)))
+            );
             console.log('Активных черновиков:', activeDrafts.length);
 
             if (activeDrafts.length > 0) {
@@ -1397,7 +1419,7 @@ class ReportFormApp {
                     </div>
                 `;
         }
-        
+
         return html;
     }
 
@@ -1521,36 +1543,36 @@ class ReportFormApp {
             // Create suggested file name with folder structure simulation
             const suggestedName = "Отчеты / " + year + "-" + month + "/" + filename;
 
-        // Show save file picker
-        const fileHandle = await window.showSaveFilePicker({
-            suggestedName: filename,
-            types: [{
-                description: 'JSON файлы отчетов',
-                accept: {
-                    'application/json': ['.json']
-                }
-            }]
-        });
+            // Show save file picker
+            const fileHandle = await window.showSaveFilePicker({
+                suggestedName: filename,
+                types: [{
+                    description: 'JSON файлы отчетов',
+                    accept: {
+                        'application/json': ['.json']
+                    }
+                }]
+            });
 
-        // Create a FileSystemWritableFileStream to write to
-        const writable = await fileHandle.createWritable();
+            // Create a FileSystemWritableFileStream to write to
+            const writable = await fileHandle.createWritable();
 
-        // Write the contents of the file to the stream
-        await writable.write(content);
+            // Write the contents of the file to the stream
+            await writable.write(content);
 
-        // Close the file and write the contents to disk
-        await writable.close();
-    } catch(error) {
-        // If user cancelled the save dialog, re-throw the error
-        if (error.name === 'AbortError') {
-            throw error;
+            // Close the file and write the contents to disk
+            await writable.close();
+        } catch (error) {
+            // If user cancelled the save dialog, re-throw the error
+            if (error.name === 'AbortError') {
+                throw error;
+            }
+
+            // For other errors, fall back to traditional download method
+            console.warn('File System Access API недоступен, используем традиционный метод загрузки:', error);
+            await this.saveReportWithDownload(filename, content);
         }
-
-        // For other errors, fall back to traditional download method
-        console.warn('File System Access API недоступен, используем традиционный метод загрузки:', error);
-        await this.saveReportWithDownload(filename, content);
     }
-}
 
     // Export full report to PDF
     async exportFullReportToPDF(reportsByDepartment) {
@@ -2435,243 +2457,243 @@ class ReportFormApp {
     async saveReportWithFileSystemAPI(filename, jsonContent, year, month) {
         try {
             // Create suggested file name with folder structure simulation
-            const suggestedName = `Отчеты / ${ year } -${ month }/${filename}`;
+            const suggestedName = `Отчеты / ${year} -${month}/${filename}`;
 
-        // Show save file picker
-        const fileHandle = await window.showSaveFilePicker({
-            suggestedName: filename,
-            types: [{
-                description: 'JSON файлы отчетов',
-                accept: {
-                    'application/json': ['.json']
-                }
-            }]
-        });
+            // Show save file picker
+            const fileHandle = await window.showSaveFilePicker({
+                suggestedName: filename,
+                types: [{
+                    description: 'JSON файлы отчетов',
+                    accept: {
+                        'application/json': ['.json']
+                    }
+                }]
+            });
 
-        // Create a FileSystemWritableFileStream to write to
-        const writable = await fileHandle.createWritable();
+            // Create a FileSystemWritableFileStream to write to
+            const writable = await fileHandle.createWritable();
 
-        // Write the contents of the file to the stream
-        await writable.write(jsonContent);
+            // Write the contents of the file to the stream
+            await writable.write(jsonContent);
 
-        // Close the file and write the contents to disk
-        await writable.close();
-    } catch(error) {
-        // If user cancelled the save dialog, re-throw the error
-        if (error.name === 'AbortError') {
-            throw error;
+            // Close the file and write the contents to disk
+            await writable.close();
+        } catch (error) {
+            // If user cancelled the save dialog, re-throw the error
+            if (error.name === 'AbortError') {
+                throw error;
+            }
+
+            // For other errors, fall back to traditional download method
+            console.warn('File System Access API недоступен, используем традиционный метод загрузки:', error);
+            await this.saveReportWithDownload(filename, jsonContent);
         }
-
-        // For other errors, fall back to traditional download method
-        console.warn('File System Access API недоступен, используем традиционный метод загрузки:', error);
-        await this.saveReportWithDownload(filename, jsonContent);
     }
-}
 
     // Save report using traditional download method (fallback)
     async saveReportWithDownload(filename, jsonContent) {
-    // Create blob and download
-    const blob = new Blob([jsonContent], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+        // Create blob and download
+        const blob = new Blob([jsonContent], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
 
-    // Clean up
-    setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }, 100);
-}
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+    }
 
     // Clear localStorage after saving report
     async clearLocalStorageAfterSave() {
-    try {
-        if (this.currentDraftId) {
-            await window.storageAdapter.removeItem(this.currentDraftId);
-            this.currentDraftId = null;
-        }
-
-        // Remove all draft entries with the same postfix as the saved report
-        if (this.selectedForm) {
-            // Define postfixes for different form types
-            const formPostfixes = {
-                'teploelektracentral': '_tec',
-                'stokovye_vody': '_zsv',
-                'parosilovoe_hozyaystvo': '_pcx',
-                'elektroremontnyi_ceh': '_erc'
-            };
-
-            // Get the postfix for the current form type
-            const postfix = formPostfixes[this.selectedForm] || '';
-
-            // Get all items from storage adapter
-            const allItems = await window.storageAdapter.getAllItems();
-
-            // Filter and remove items with matching postfix
-            for (const item of allItems) {
-                if (item.id && item.id.startsWith('draft' + postfix + '-')) {
-                    await window.storageAdapter.removeItem(item.id);
-                }
+        try {
+            if (this.currentDraftId) {
+                await window.storageAdapter.removeItem(this.currentDraftId);
+                this.currentDraftId = null;
             }
-        }
 
-        this.formData = {};
-        this.isDirty = false;
-        console.log('LocalStorage очищен после сохранения отчета');
-    } catch (error) {
-        console.error('Ошибка очистки localStorage:', error);
-    }
-}
-
-    async submitForm() {
-    this.showModal(
-        'Подтверждение отправки',
-        'Вы уверены, что хотите отправить рапорт? После отправки редактирование будет невозможно.',
-        async () => {
-            try {
-                // Сохраняем как завершенный документ
-                const finalData = {
-                    id: this.currentDraftId || window.storageAdapter.generateId(),
-                    status: 'submitted',
-                    formType: this.selectedForm,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    submittedAt: new Date().toISOString(),
-                    form: this.formData
+            // Remove all draft entries with the same postfix as the saved report
+            if (this.selectedForm) {
+                // Define postfixes for different form types
+                const formPostfixes = {
+                    'teploelektracentral': '_tec',
+                    'stokovye_vody': '_zsv',
+                    'parosilovoe_hozyaystvo': '_pcx',
+                    'elektroremontnyi_ceh': '_erc'
                 };
 
-                await window.storageAdapter.setItem(finalData.id, finalData);
-                this.isDirty = false;
+                // Get the postfix for the current form type
+                const postfix = formPostfixes[this.selectedForm] || '';
 
-                this.showMessage('Рапорт успешно отправлен!', 'success');
+                // Get all items from storage adapter
+                const allItems = await window.storageAdapter.getAllItems();
 
-                // Очищаем форму и возвращаемся к началу
-                setTimeout(() => {
-                    this.selectedForm = null;
-                    this.authenticated = false;
-                    this.startNewForm();
-                    this.showScreen('main-screen');
-                }, 2000);
-
-            } catch (error) {
-                console.error('Ошибка отправки рапорта:', error);
-                this.showMessage('Ошибка отправки рапорта. Попробуйте еще раз.', 'error');
+                // Filter and remove items with matching postfix
+                for (const item of allItems) {
+                    if (item.id && item.id.startsWith('draft' + postfix + '-')) {
+                        await window.storageAdapter.removeItem(item.id);
+                    }
+                }
             }
+
+            this.formData = {};
+            this.isDirty = false;
+            console.log('LocalStorage очищен после сохранения отчета');
+        } catch (error) {
+            console.error('Ошибка очистки localStorage:', error);
         }
-    );
-}
+    }
 
-showScreen(screenId) {
-    console.log(`Переключение на экран: ${screenId}`);
-    console.log(`Current formOpenedFrom value:`, this.formOpenedFrom);
-    const screens = document.querySelectorAll('.screen');
-    console.log(`Найдено экранов: ${screens.length}`);
+    async submitForm() {
+        this.showModal(
+            'Подтверждение отправки',
+            'Вы уверены, что хотите отправить рапорт? После отправки редактирование будет невозможно.',
+            async () => {
+                try {
+                    // Сохраняем как завершенный документ
+                    const finalData = {
+                        id: this.currentDraftId || window.storageAdapter.generateId(),
+                        status: 'submitted',
+                        formType: this.selectedForm,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        submittedAt: new Date().toISOString(),
+                        form: this.formData
+                    };
 
-    screens.forEach(screen => {
-        console.log(`Скрываем экран: ${screen.id}`);
-        screen.classList.remove('active');
-        // Принудительно скрываем
-        screen.style.display = 'none';
-    });
+                    await window.storageAdapter.setItem(finalData.id, finalData);
+                    this.isDirty = false;
 
-    const targetScreen = document.getElementById(screenId);
-    if (targetScreen) {
-        console.log(`Показываем экран: ${screenId}`);
-        targetScreen.classList.add('active');
-        console.log(`Экран ${screenId} теперь имеет классы:`, targetScreen.className);
+                    this.showMessage('Рапорт успешно отправлен!', 'success');
 
-        // Дополнительная диагностика CSS
-        const computedStyle = window.getComputedStyle(targetScreen);
-        console.log(`Computed display style для ${screenId}:`, computedStyle.display);
-        console.log(`Computed visibility для ${screenId}:`, computedStyle.visibility);
+                    // Очищаем форму и возвращаемся к началу
+                    setTimeout(() => {
+                        this.selectedForm = null;
+                        this.authenticated = false;
+                        this.startNewForm();
+                        this.showScreen('main-screen');
+                    }, 2000);
 
-        // Принудительная установка стиля как fallback
-        targetScreen.style.display = 'block';
-        targetScreen.style.visibility = 'visible';
-        console.log(`Принудительно установлены стили для ${screenId}`);
+                } catch (error) {
+                    console.error('Ошибка отправки рапорта:', error);
+                    this.showMessage('Ошибка отправки рапорта. Попробуйте еще раз.', 'error');
+                }
+            }
+        );
+    }
 
-        // Проверяем состояние всех экранов
-        setTimeout(() => {
-            document.querySelectorAll('.screen').forEach(s => {
-                const computed = window.getComputedStyle(s);
-                console.log(`Экран ${s.id}: classes=${s.className}, display=${computed.display}, visibility=${computed.visibility}`);
-            });
-        }, 100);
+    showScreen(screenId) {
+        console.log(`Переключение на экран: ${screenId}`);
+        console.log(`Current formOpenedFrom value:`, this.formOpenedFrom);
+        const screens = document.querySelectorAll('.screen');
+        console.log(`Найдено экранов: ${screens.length}`);
 
-        // Reset formOpenedFrom when navigating away from form screen to other screens
-        if (screenId !== 'form-screen') {
-            console.log(`Resetting formOpenedFrom to null because navigating to: ${screenId}`);
-            this.formOpenedFrom = null;
+        screens.forEach(screen => {
+            console.log(`Скрываем экран: ${screen.id}`);
+            screen.classList.remove('active');
+            // Принудительно скрываем
+            screen.style.display = 'none';
+        });
+
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            console.log(`Показываем экран: ${screenId}`);
+            targetScreen.classList.add('active');
+            console.log(`Экран ${screenId} теперь имеет классы:`, targetScreen.className);
+
+            // Дополнительная диагностика CSS
+            const computedStyle = window.getComputedStyle(targetScreen);
+            console.log(`Computed display style для ${screenId}:`, computedStyle.display);
+            console.log(`Computed visibility для ${screenId}:`, computedStyle.visibility);
+
+            // Принудительная установка стиля как fallback
+            targetScreen.style.display = 'block';
+            targetScreen.style.visibility = 'visible';
+            console.log(`Принудительно установлены стили для ${screenId}`);
+
+            // Проверяем состояние всех экранов
+            setTimeout(() => {
+                document.querySelectorAll('.screen').forEach(s => {
+                    const computed = window.getComputedStyle(s);
+                    console.log(`Экран ${s.id}: classes=${s.className}, display=${computed.display}, visibility=${computed.visibility}`);
+                });
+            }, 100);
+
+            // Reset formOpenedFrom when navigating away from form screen to other screens
+            if (screenId !== 'form-screen') {
+                console.log(`Resetting formOpenedFrom to null because navigating to: ${screenId}`);
+                this.formOpenedFrom = null;
+            } else {
+                console.log(`Not resetting formOpenedFrom because navigating to form screen`);
+            }
         } else {
-            console.log(`Not resetting formOpenedFrom because navigating to form screen`);
+            console.error(`Экран с ID ${screenId} не найден!`);
         }
-    } else {
-        console.error(`Экран с ID ${screenId} не найден!`);
-    }
-}
-
-showFormScreen() {
-    console.log('Показываем экран формы...');
-    console.log('Current formOpenedFrom before showScreen:', this.formOpenedFrom);
-    this.showScreen('form-screen');
-    console.log('Current formOpenedFrom after showScreen:', this.formOpenedFrom);
-
-    // Проверяем основную форму
-    const mainForm = document.getElementById('main-form');
-    if (mainForm) {
-        console.log('Основная форма найдена');
-        const formStyle = window.getComputedStyle(mainForm);
-        console.log('Стили основной формы:');
-        console.log('  display:', formStyle.display);
-        console.log('  visibility:', formStyle.visibility);
-        console.log('  opacity:', formStyle.opacity);
-        console.log('  width:', formStyle.width);
-        console.log('  height:', formStyle.height);
-
-        // Принудительно делаем форму видимой
-        mainForm.style.display = 'block';
-        mainForm.style.visibility = 'visible';
-        mainForm.style.opacity = '1';
-        mainForm.style.width = '100%';
-        mainForm.style.position = 'relative';
-        console.log('Основная форма принудительно сделана видимой');
-    } else {
-        console.error('Основная форма не найдена!');
     }
 
-    console.log('Экран формы отображён');
-}
+    showFormScreen() {
+        console.log('Показываем экран формы...');
+        console.log('Current formOpenedFrom before showScreen:', this.formOpenedFrom);
+        this.showScreen('form-screen');
+        console.log('Current formOpenedFrom after showScreen:', this.formOpenedFrom);
 
-showModal(title, message, confirmCallback) {
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-message').textContent = message;
-    document.getElementById('modal-overlay').classList.add('active');
+        // Проверяем основную форму
+        const mainForm = document.getElementById('main-form');
+        if (mainForm) {
+            console.log('Основная форма найдена');
+            const formStyle = window.getComputedStyle(mainForm);
+            console.log('Стили основной формы:');
+            console.log('  display:', formStyle.display);
+            console.log('  visibility:', formStyle.visibility);
+            console.log('  opacity:', formStyle.opacity);
+            console.log('  width:', formStyle.width);
+            console.log('  height:', formStyle.height);
 
-    this.modalConfirmCallback = confirmCallback;
-}
+            // Принудительно делаем форму видимой
+            mainForm.style.display = 'block';
+            mainForm.style.visibility = 'visible';
+            mainForm.style.opacity = '1';
+            mainForm.style.width = '100%';
+            mainForm.style.position = 'relative';
+            console.log('Основная форма принудительно сделана видимой');
+        } else {
+            console.error('Основная форма не найдена!');
+        }
 
-hideModal() {
-    document.getElementById('modal-overlay').classList.remove('active');
-    this.modalConfirmCallback = null;
-}
-
-confirmModalAction() {
-    if (this.modalConfirmCallback) {
-        this.modalConfirmCallback();
+        console.log('Экран формы отображён');
     }
-    this.hideModal();
-}
 
-showMessage(message, type = 'info') {
-    // Создаем временное уведомление
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    notification.style.cssText = `
+    showModal(title, message, confirmCallback) {
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-message').textContent = message;
+        document.getElementById('modal-overlay').classList.add('active');
+
+        this.modalConfirmCallback = confirmCallback;
+    }
+
+    hideModal() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        this.modalConfirmCallback = null;
+    }
+
+    confirmModalAction() {
+        if (this.modalConfirmCallback) {
+            this.modalConfirmCallback();
+        }
+        this.hideModal();
+    }
+
+    showMessage(message, type = 'info') {
+        // Создаем временное уведомление
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
             position: fixed;
             top: 20px;
             right: 20px;
@@ -2685,21 +2707,21 @@ showMessage(message, type = 'info') {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         `;
 
-    document.body.appendChild(notification);
+        document.body.appendChild(notification);
 
-    setTimeout(() => {
-        notification.remove();
-    }, 5000);
-}
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
 
     // New method for handling retrospective functionality
     async showRetrospective() {
-    console.log('Открытие ретроспективы...');
-    // Show the retrospective screen
-    this.showScreen('retrospective-screen');
-    // Load and display saved reports
-    await this.loadSavedReports();
-}
+        console.log('Открытие ретроспективы...');
+        // Show the retrospective screen
+        this.showScreen('retrospective-screen');
+        // Load and display saved reports
+        await this.loadSavedReports();
+    }
 
     // Load and display saved reports
     async loadSavedReports() {
@@ -2708,11 +2730,11 @@ showMessage(message, type = 'info') {
 
             // Try to use File System Access API first (for local server environment)
             if ('showDirectoryPicker' in window) {
-                reportsList.innerHTML = 
+                reportsList.innerHTML =
                     '<div class="browse-reports-section">' +
-                        '<p>Выберите папку с отчетами для просмотра сохраненных отчетов:</p>' +
-                        '<button id="browse-reports-btn" class="btn btn-primary">Выбрать папку с отчетами</button>' +
-                        '<div id="reports-display"></div>' +
+                    '<p>Выберите папку с отчетами для просмотра сохраненных отчетов:</p>' +
+                    '<button id="browse-reports-btn" class="btn btn-primary">Выбрать папку с отчетами</button>' +
+                    '<div id="reports-display"></div>' +
                     '</div>';
 
                 // Add event listener for browse button
@@ -2721,11 +2743,11 @@ showMessage(message, type = 'info') {
                 });
             } else {
                 // Fallback to file input method
-                reportsList.innerHTML = 
+                reportsList.innerHTML =
                     '<div class="file-upload-section">' +
-                        '<p>Выберите файл отчета в формате JSON для редактирования:</p>' +
-                        '<input type="file" id="report-file-input" accept=".json" class="file-input">' +
-                        '<button id="load-report-btn" class="btn btn-primary">Загрузить отчет</button>' +
+                    '<p>Выберите файл отчета в формате JSON для редактирования:</p>' +
+                    '<input type="file" id="report-file-input" accept=".json" class="file-input">' +
+                    '<button id="load-report-btn" class="btn btn-primary">Загрузить отчет</button>' +
                     '</div>' +
                     '<div id="reports-display"></div>';
 
@@ -2747,428 +2769,102 @@ showMessage(message, type = 'info') {
 
     // Browse reports directory using File System Access API
     async browseReportsDirectory() {
-    try {
-        // Show directory picker
-        const dirHandle = await window.showDirectoryPicker({
-            mode: 'read'
-        });
+        try {
+            // Show directory picker
+            const dirHandle = await window.showDirectoryPicker({
+                mode: 'read'
+            });
 
-        // Display reports from the selected directory
-        await this.displayReportsFromDirectory(dirHandle);
-    } catch (error) {
-        // If user cancelled the dialog, do nothing
-        if (error.name === 'AbortError') {
-            return;
+            // Display reports from the selected directory
+            await this.displayReportsFromDirectory(dirHandle);
+        } catch (error) {
+            // If user cancelled the dialog, do nothing
+            if (error.name === 'AbortError') {
+                return;
+            }
+
+            console.error('Ошибка выбора папки:', error);
+            this.showMessage('Ошибка выбора папки. Попробуйте еще раз.', 'error');
         }
-
-        console.error('Ошибка выбора папки:', error);
-        this.showMessage('Ошибка выбора папки. Попробуйте еще раз.', 'error');
     }
-}
 
     // Display reports from a directory
     async displayReportsFromDirectory(dirHandle) {
-    try {
-        const reportsDisplay = document.getElementById('reports-display');
-        reportsDisplay.innerHTML = '<p>Поиск отчетов...</p>';
+        try {
+            const reportsDisplay = document.getElementById('reports-display');
+            reportsDisplay.innerHTML = '<p>Поиск отчетов...</p>';
 
-        const reports = [];
+            const reports = [];
 
-        // Recursively search for JSON files in the directory
-        await this.searchReportsInDirectory(dirHandle, reports);
+            // Recursively search for JSON files in the directory
+            await this.searchReportsInDirectory(dirHandle, reports);
 
-        if (reports.length === 0) {
-            reportsDisplay.innerHTML = '<p>В выбранной папке не найдено отчетов.</p>';
-            return;
-        }
-
-        // Sort reports by date (newest first)
-        reports.sort((a, b) => {
-            try {
-                return new Date(b.metadata.last_modified || b.metadata.date_created) -
-                    new Date(a.metadata.last_modified || a.metadata.date_created);
-            } catch (error) {
-                return 0;
+            if (reports.length === 0) {
+                reportsDisplay.innerHTML = '<p>В выбранной папке не найдено отчетов.</p>';
+                return;
             }
-        });
 
-        // Display reports
-        this.renderReportsList(reports, reportsDisplay);
-    } catch (error) {
-        console.error('Ошибка отображения отчетов:', error);
-        const reportsDisplay = document.getElementById('reports-display');
-        reportsDisplay.innerHTML = '<p>Ошибка загрузки отчетов. Попробуйте еще раз.</p>';
+            // Sort reports by date (newest first)
+            reports.sort((a, b) => {
+                try {
+                    return new Date(b.metadata.last_modified || b.metadata.date_created) -
+                        new Date(a.metadata.last_modified || a.metadata.date_created);
+                } catch (error) {
+                    return 0;
+                }
+            });
+
+            // Display reports
+            this.renderReportsList(reports, reportsDisplay);
+        } catch (error) {
+            console.error('Ошибка отображения отчетов:', error);
+            const reportsDisplay = document.getElementById('reports-display');
+            reportsDisplay.innerHTML = '<p>Ошибка загрузки отчетов. Попробуйте еще раз.</p>';
+        }
     }
-}
 
     // Recursively search for reports in a directory
     async searchReportsInDirectory(dirHandle, reports) {
-    try {
-        // Simple for-await loop
-        for await (const entry of dirHandle.values()) {
-            if (entry.kind === 'file' && entry.name.endsWith('.json')) {
-                try {
-                    // Get file and read content
-                    const file = await entry.getFile();
-                    const content = await file.text();
+        try {
+            // Simple for-await loop
+            for await (const entry of dirHandle.values()) {
+                if (entry.kind === 'file' && entry.name.endsWith('.json')) {
+                    try {
+                        // Get file and read content
+                        const file = await entry.getFile();
+                        const content = await file.text();
 
-                    // Parse and validate JSON
-                    const reportData = JSON.parse(content);
+                        // Parse and validate JSON
+                        const reportData = JSON.parse(content);
 
-                    // Check if it's a valid report
-                    if (reportData.metadata && reportData.data &&
-                        reportData.metadata.report_id && reportData.metadata.date_created) {
-                        reports.push({
-                            name: entry.name,
-                            handle: entry,
-                            metadata: reportData.metadata,
-                            data: reportData.data
-                        });
+                        // Check if it's a valid report
+                        if (reportData.metadata && reportData.data &&
+                            reportData.metadata.report_id && reportData.metadata.date_created) {
+                            reports.push({
+                                name: entry.name,
+                                handle: entry,
+                                metadata: reportData.metadata,
+                                data: reportData.data
+                            });
+                        }
+                    } catch (error) {
+                        // Skip invalid files
+                        continue;
                     }
-                } catch (error) {
-                    // Skip invalid files
-                    continue;
+                } else if (entry.kind === 'directory') {
+                    // Recursively search subdirectories
+                    await this.searchReportsInDirectory(entry, reports);
                 }
-            } else if (entry.kind === 'directory') {
-                // Recursively search subdirectories
-                await this.searchReportsInDirectory(entry, reports);
             }
-        }
-    } catch (error) {
-        console.error('Ошибка поиска отчетов в каталоге:', error);
-        throw error;
-    }
-}
-
-// Render reports list in the UI
-renderReportsList(reports, container) {
-    // Filter reports based on the user's department
-    const formPostfixes = {
-        'teploelektracentral': '_tec',
-        'stokovye_vody': '_zsv',
-        'parosilovoe_hozyaystvo': '_pcx',
-        'elektroremontnyi_ceh': '_erc'
-    };
-
-    // Get the postfix for the current user's department
-    const currentUserPostfix = formPostfixes[this.selectedForm] || '';
-
-    // Filter reports that match the current user's department
-    const filteredReports = reports.filter(report => {
-        // If we have a postfix for the current department, filter by it
-        if (currentUserPostfix) {
-            return report.name.includes(currentUserPostfix + '.json');
-        }
-        // If no postfix (shouldn't happen), show all reports
-        return true;
-    });
-
-    if (filteredReports.length === 0) {
-        container.innerHTML = '<p>Отчеты не найдены.</p>';
-        return;
-    }
-
-    let reportsHTML = '<div class="reports-grid">';
-
-    filteredReports.forEach((report, index) => {
-        // Format the date properly
-        let formattedDate = 'Неизвестная дата';
-        try {
-            if (report.metadata && report.metadata.date_created) {
-                const createdDate = new Date(report.metadata.date_created);
-                formattedDate = createdDate.toLocaleString('ru-RU');
-            }
-        } catch (dateError) {
-            console.warn('Ошибка форматирования даты:', dateError);
-        }
-
-        // Remove .json extension from filename for display
-        let displayName = report.name;
-        if (displayName.endsWith('.json')) {
-            displayName = displayName.substring(0, displayName.length - 5);
-        }
-
-        reportsHTML += `
-                <div class="report-item" data-index="${index}">
-                    <div class="report-date">${formattedDate}</div>
-                    <div class="report-filename">${displayName}</div>
-                    <button class="btn btn-outline load-report-btn" data-index="${index}">Загрузить</button>
-                </div>
-            `;
-    });
-
-    reportsHTML += '</div>';
-    container.innerHTML = reportsHTML;
-
-    // Add event listeners for load buttons
-    document.querySelectorAll('.load-report-btn').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const index = parseInt(event.target.getAttribute('data-index'));
-            this.loadReportFromList(filteredReports[index]);
-        });
-    });
-}
-
-    // Load report from the reports list
-    async loadReportFromList(report) {
-    try {
-        // Validate report data
-        if (!report || !report.data) {
-            throw new Error('Некорректные данные отчета');
-        }
-
-        // Set form data
-        this.formData = report.data;
-
-        // Mark that form was opened from retrospective
-        console.log('Setting formOpenedFrom to retrospective in loadReportFromList');
-        this.formOpenedFrom = 'retrospective';
-        console.log('formOpenedFrom is now:', this.formOpenedFrom);
-
-        // Populate form with data
-        this.populateForm();
-
-        // Show form screen
-        this.showFormScreen();
-
-        this.showMessage('Отчет успешно загружен для редактирования', 'success');
-    } catch (error) {
-        console.error('Ошибка загрузки отчета:', error);
-        this.showMessage('Ошибка загрузки отчета. Попробуйте еще раз.', 'error');
-    }
-}
-
-// Handle report file selection
-handleReportFileSelection(event) {
-    const fileInput = event.target;
-    if (fileInput.files.length > 0) {
-        const fileName = fileInput.files[0].name;
-        console.log('Выбран файл:', fileName);
-        // Enable the load button
-        const loadButton = document.getElementById('load-report-btn');
-        if (loadButton) {
-            loadButton.disabled = false;
-        }
-    }
-}
-
-    // Load selected report file
-    async loadSelectedReport() {
-    // Try to use File System Access API first (for local server environment)
-    if ('showOpenFilePicker' in window) {
-        await this.loadReportWithFilePicker();
-    } else {
-        // Fallback to traditional file input method
-        const fileInput = document.getElementById('report-file-input');
-        if (!fileInput || fileInput.files.length === 0) {
-            this.showMessage('Пожалуйста, выберите файл отчета', 'error');
-            return;
-        }
-
-        const file = fileInput.files[0];
-        if (!file.name.endsWith('.json')) {
-            this.showMessage('Пожалуйста, выберите файл в формате JSON', 'error');
-            return;
-        }
-
-        try {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const jsonData = e.target.result;
-                    this.loadReportFromJSON(jsonData);
-                } catch (error) {
-                    console.error('Ошибка чтения файла:', error);
-                    this.showMessage('Ошибка чтения файла. Проверьте файл и попробуйте еще раз.', 'error');
-                }
-            };
-            reader.readAsText(file);
         } catch (error) {
-            console.error('Ошибка загрузки файла:', error);
-            this.showMessage('Ошибка загрузки файла. Попробуйте еще раз.', 'error');
-        }
-    }
-}
-
-    // Load report using File System Access API file picker
-    async loadReportWithFilePicker() {
-    try {
-        // Show open file picker
-        const [fileHandle] = await window.showOpenFilePicker({
-            types: [{
-                description: 'JSON файлы отчетов',
-                accept: {
-                    'application/json': ['.json']
-                }
-            }],
-            multiple: false
-        });
-
-        // Get file
-        const file = await fileHandle.getFile();
-
-        // Read file content
-        const content = await file.text();
-
-        // Load report from JSON
-        await this.loadReportFromJSON(content);
-    } catch (error) {
-        // If user cancelled the dialog, do nothing
-        if (error.name === 'AbortError') {
-            return;
-        }
-
-        console.error('Ошибка выбора файла:', error);
-        this.showMessage('Ошибка выбора файла. Попробуйте еще раз.', 'error');
-    }
-}
-
-    // Load report data from JSON and populate form
-    async loadReportFromJSON(jsonData) {
-    try {
-        const reportData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
-
-        // Validate report structure inline
-        if (!reportData ||
-            !reportData.metadata ||
-            !reportData.data ||
-            !reportData.metadata.report_id ||
-            !reportData.metadata.date_created) {
-            throw new Error('Некорректная структура файла отчета');
-        }
-
-        // Set form data
-        this.formData = reportData.data;
-
-        // Mark that form was opened from retrospective
-        console.log('Setting formOpenedFrom to retrospective in loadReportFromJSON');
-        this.formOpenedFrom = 'retrospective';
-        console.log('formOpenedFrom is now:', this.formOpenedFrom);
-
-        // Populate form with data
-        this.populateForm();
-
-        // Show form screen
-        this.showFormScreen();
-
-        this.showMessage('Отчет успешно загружен для редактирования', 'success');
-    } catch (error) {
-        console.error('Ошибка загрузки отчета:', error);
-        this.showMessage('Ошибка загрузки отчета. Проверьте файл и попробуйте еще раз.', 'error');
-    }
-}
-
-// Handle selection of full report
-selectForm(formType) {
-    if (formType === 'full-report') {
-        // Show authentication screen for full report
-        this.showScreen('full-report-auth-screen');
-        return;
-    }
-
-    this.selectedForm = formType;
-    this.showScreen('auth-screen');
-    const formTitle = document.getElementById('form-title');
-    if (formTitle) {
-        formTitle.textContent = `Аутентификация - ${this.departments[formType].name}`;
-    }
-
-    // Update form title in the form
-    const formReportTitle = document.getElementById('form-report-title');
-    if (formReportTitle) {
-        formReportTitle.textContent = `ОТЧЁТ О РАБОТЕ ${this.departments[formType].name} ЗА СУТКИ`;
-    }
-
-    // Show/hide form sections based on form type
-    this.updateFormSections(formType);
-}
-
-// Authenticate for full report (admin only)
-authenticateFullReport() {
-    const username = document.getElementById('full-report-username').value;
-    const password = document.getElementById('full-report-password').value;
-    const errorElements = document.querySelectorAll('#full-report-authentication-form .error-message');
-    errorElements.forEach(el => el.classList.remove('show'));
-
-    if (!username || !password) {
-        // Find the error element for the first empty field
-        if (!username) {
-            this.showFieldError(document.getElementById('full-report-username'), 'Заполните все поля');
-        }
-        if (!password) {
-            this.showFieldError(document.getElementById('full-report-password'), 'Заполните все поля');
-        }
-        return;
-    }
-
-    // Check if user is admin
-    let isAdmin = false;
-    for (const dept in this.departments) {
-        if (this.departments[dept].users['admin'] && this.departments[dept].users['admin'] === password && username === 'admin') {
-            isAdmin = true;
-            break;
+            console.error('Ошибка поиска отчетов в каталоге:', error);
+            throw error;
         }
     }
 
-    if (isAdmin) {
-        this.isAdminAuthenticated = true;
-        // Show folder selection screen
-        this.showScreen('full-report-folder-screen');
-    } else {
-        this.showFieldError(document.getElementById('full-report-username'), 'Неверный логин или пароль');
-    }
-}
-
-    // Browse folder for full report
-    async browseFullReportFolder() {
-    try {
-        // Show directory picker
-        const dirHandle = await window.showDirectoryPicker({
-            mode: 'read'
-        });
-
-        // Display reports from the selected directory
-        await this.displayFullReportFromDirectory(dirHandle);
-    } catch (error) {
-        // If user cancelled the dialog, do nothing
-        if (error.name === 'AbortError') {
-            return;
-        }
-
-        console.error('Ошибка выбора папки:', error);
-        this.showMessage('Ошибка выбора папки. Попробуйте еще раз.', 'error');
-    }
-}
-
-    // Display reports from a directory for full report
-    async displayFullReportFromDirectory(dirHandle) {
-    try {
-        const reportsDisplay = document.getElementById('full-report-display');
-        reportsDisplay.innerHTML = '<p>Поиск отчетов...</p>';
-
-        const reports = [];
-
-        // Recursively search for JSON files in the directory
-        await this.searchReportsInDirectory(dirHandle, reports);
-
-        if (reports.length === 0) {
-            reportsDisplay.innerHTML = '<p>В выбранной папке не найдено отчетов.</p>';
-            return;
-        }
-
-        // Generate full report
-        await this.generateFullReport(reports, reportsDisplay);
-    } catch (error) {
-        console.error('Ошибка формирования полного отчета:', error);
-        const reportsDisplay = document.getElementById('full-report-display');
-        reportsDisplay.innerHTML = '<p>Ошибка формирования полного отчета. Попробуйте еще раз.</p>';
-    }
-}
-
-    // Generate full report from individual reports
-    async generateFullReport(reports, container) {
-    try {
-        // Define postfixes for different form types
+    // Render reports list in the UI
+    renderReportsList(reports, container) {
+        // Filter reports based on the user's department
         const formPostfixes = {
             'teploelektracentral': '_tec',
             'stokovye_vody': '_zsv',
@@ -3176,34 +2872,360 @@ authenticateFullReport() {
             'elektroremontnyi_ceh': '_erc'
         };
 
-        // Group reports by department
-        const reportsByDepartment = {};
+        // Get the postfix for the current user's department
+        const currentUserPostfix = formPostfixes[this.selectedForm] || '';
 
-        // Sort reports by date (newest first)
-        reports.sort((a, b) => {
-            try {
-                return new Date(b.metadata.last_modified || b.metadata.date_created) -
-                    new Date(a.metadata.last_modified || a.metadata.date_created);
-            } catch (error) {
-                return 0;
+        // Filter reports that match the current user's department
+        const filteredReports = reports.filter(report => {
+            // If we have a postfix for the current department, filter by it
+            if (currentUserPostfix) {
+                return report.name.includes(currentUserPostfix + '.json');
             }
+            // If no postfix (shouldn't happen), show all reports
+            return true;
         });
 
-        // Process each report and group by department
-        for (const report of reports) {
-            // Determine which department this report belongs to based on postfix
-            for (const [dept, postfix] of Object.entries(formPostfixes)) {
-                if (report.name.includes(postfix + '.json')) {
-                    if (!reportsByDepartment[dept]) {
-                        reportsByDepartment[dept] = report; // Keep only the latest report for each department
-                    }
-                    break;
+        if (filteredReports.length === 0) {
+            container.innerHTML = '<p>Отчеты не найдены.</p>';
+            return;
+        }
+
+        let reportsHTML = '<div class="reports-grid">';
+
+        filteredReports.forEach((report, index) => {
+            // Format the date properly
+            let formattedDate = 'Неизвестная дата';
+            try {
+                if (report.metadata && report.metadata.date_created) {
+                    const createdDate = new Date(report.metadata.date_created);
+                    formattedDate = createdDate.toLocaleString('ru-RU');
                 }
+            } catch (dateError) {
+                console.warn('Ошибка форматирования даты:', dateError);
+            }
+
+            // Remove .json extension from filename for display
+            let displayName = report.name;
+            if (displayName.endsWith('.json')) {
+                displayName = displayName.substring(0, displayName.length - 5);
+            }
+
+            reportsHTML += `
+                <div class="report-item" data-index="${index}">
+                    <div class="report-date">${formattedDate}</div>
+                    <div class="report-filename">${displayName}</div>
+                    <button class="btn btn-outline load-report-btn" data-index="${index}">Загрузить</button>
+                </div>
+            `;
+        });
+
+        reportsHTML += '</div>';
+        container.innerHTML = reportsHTML;
+
+        // Add event listeners for load buttons
+        document.querySelectorAll('.load-report-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const index = parseInt(event.target.getAttribute('data-index'));
+                this.loadReportFromList(filteredReports[index]);
+            });
+        });
+    }
+
+    // Load report from the reports list
+    async loadReportFromList(report) {
+        try {
+            // Validate report data
+            if (!report || !report.data) {
+                throw new Error('Некорректные данные отчета');
+            }
+
+            // Set form data
+            this.formData = report.data;
+
+            // Mark that form was opened from retrospective
+            console.log('Setting formOpenedFrom to retrospective in loadReportFromList');
+            this.formOpenedFrom = 'retrospective';
+            console.log('formOpenedFrom is now:', this.formOpenedFrom);
+
+            // Populate form with data
+            this.populateForm();
+
+            // Show form screen
+            this.showFormScreen();
+
+            this.showMessage('Отчет успешно загружен для редактирования', 'success');
+        } catch (error) {
+            console.error('Ошибка загрузки отчета:', error);
+            this.showMessage('Ошибка загрузки отчета. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Handle report file selection
+    handleReportFileSelection(event) {
+        const fileInput = event.target;
+        if (fileInput.files.length > 0) {
+            const fileName = fileInput.files[0].name;
+            console.log('Выбран файл:', fileName);
+            // Enable the load button
+            const loadButton = document.getElementById('load-report-btn');
+            if (loadButton) {
+                loadButton.disabled = false;
+            }
+        }
+    }
+
+    // Load selected report file
+    async loadSelectedReport() {
+        // Try to use File System Access API first (for local server environment)
+        if ('showOpenFilePicker' in window) {
+            await this.loadReportWithFilePicker();
+        } else {
+            // Fallback to traditional file input method
+            const fileInput = document.getElementById('report-file-input');
+            if (!fileInput || fileInput.files.length === 0) {
+                this.showMessage('Пожалуйста, выберите файл отчета', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            if (!file.name.endsWith('.json')) {
+                this.showMessage('Пожалуйста, выберите файл в формате JSON', 'error');
+                return;
+            }
+
+            try {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const jsonData = e.target.result;
+                        this.loadReportFromJSON(jsonData);
+                    } catch (error) {
+                        console.error('Ошибка чтения файла:', error);
+                        this.showMessage('Ошибка чтения файла. Проверьте файл и попробуйте еще раз.', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            } catch (error) {
+                console.error('Ошибка загрузки файла:', error);
+                this.showMessage('Ошибка загрузки файла. Попробуйте еще раз.', 'error');
+            }
+        }
+    }
+
+    // Load report using File System Access API file picker
+    async loadReportWithFilePicker() {
+        try {
+            // Show open file picker
+            const [fileHandle] = await window.showOpenFilePicker({
+                types: [{
+                    description: 'JSON файлы отчетов',
+                    accept: {
+                        'application/json': ['.json']
+                    }
+                }],
+                multiple: false
+            });
+
+            // Get file
+            const file = await fileHandle.getFile();
+
+            // Read file content
+            const content = await file.text();
+
+            // Load report from JSON
+            await this.loadReportFromJSON(content);
+        } catch (error) {
+            // If user cancelled the dialog, do nothing
+            if (error.name === 'AbortError') {
+                return;
+            }
+
+            console.error('Ошибка выбора файла:', error);
+            this.showMessage('Ошибка выбора файла. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Load report data from JSON and populate form
+    async loadReportFromJSON(jsonData) {
+        try {
+            const reportData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+
+            // Validate report structure inline
+            if (!reportData ||
+                !reportData.metadata ||
+                !reportData.data ||
+                !reportData.metadata.report_id ||
+                !reportData.metadata.date_created) {
+                throw new Error('Некорректная структура файла отчета');
+            }
+
+            // Set form data
+            this.formData = reportData.data;
+
+            // Mark that form was opened from retrospective
+            console.log('Setting formOpenedFrom to retrospective in loadReportFromJSON');
+            this.formOpenedFrom = 'retrospective';
+            console.log('formOpenedFrom is now:', this.formOpenedFrom);
+
+            // Populate form with data
+            this.populateForm();
+
+            // Show form screen
+            this.showFormScreen();
+
+            this.showMessage('Отчет успешно загружен для редактирования', 'success');
+        } catch (error) {
+            console.error('Ошибка загрузки отчета:', error);
+            this.showMessage('Ошибка загрузки отчета. Проверьте файл и попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Handle selection of full report
+    selectForm(formType) {
+        if (formType === 'full-report') {
+            // Show authentication screen for full report
+            this.showScreen('full-report-auth-screen');
+            return;
+        }
+
+        this.selectedForm = formType;
+        this.showScreen('auth-screen');
+        const formTitle = document.getElementById('form-title');
+        if (formTitle) {
+            formTitle.textContent = `Аутентификация - ${this.departments[formType].name}`;
+        }
+
+        // Update form title in the form
+        const formReportTitle = document.getElementById('form-report-title');
+        if (formReportTitle) {
+            formReportTitle.textContent = `ОТЧЁТ О РАБОТЕ ${this.departments[formType].name} ЗА СУТКИ`;
+        }
+
+        // Show/hide form sections based on form type
+        this.updateFormSections(formType);
+    }
+
+    // Authenticate for full report (admin only)
+    authenticateFullReport() {
+        const username = document.getElementById('full-report-username').value;
+        const password = document.getElementById('full-report-password').value;
+        const errorElements = document.querySelectorAll('#full-report-authentication-form .error-message');
+        errorElements.forEach(el => el.classList.remove('show'));
+
+        if (!username || !password) {
+            // Find the error element for the first empty field
+            if (!username) {
+                this.showFieldError(document.getElementById('full-report-username'), 'Заполните все поля');
+            }
+            if (!password) {
+                this.showFieldError(document.getElementById('full-report-password'), 'Заполните все поля');
+            }
+            return;
+        }
+
+        // Check if user is admin
+        let isAdmin = false;
+        for (const dept in this.departments) {
+            if (this.departments[dept].users['admin'] && this.departments[dept].users['admin'] === password && username === 'admin') {
+                isAdmin = true;
+                break;
             }
         }
 
-        // Generate combined report HTML
-        let fullReportHTML = `
+        if (isAdmin) {
+            this.isAdminAuthenticated = true;
+            // Show folder selection screen
+            this.showScreen('full-report-folder-screen');
+        } else {
+            this.showFieldError(document.getElementById('full-report-username'), 'Неверный логин или пароль');
+        }
+    }
+
+    // Browse folder for full report
+    async browseFullReportFolder() {
+        try {
+            // Show directory picker
+            const dirHandle = await window.showDirectoryPicker({
+                mode: 'read'
+            });
+
+            // Display reports from the selected directory
+            await this.displayFullReportFromDirectory(dirHandle);
+        } catch (error) {
+            // If user cancelled the dialog, do nothing
+            if (error.name === 'AbortError') {
+                return;
+            }
+
+            console.error('Ошибка выбора папки:', error);
+            this.showMessage('Ошибка выбора папки. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Display reports from a directory for full report
+    async displayFullReportFromDirectory(dirHandle) {
+        try {
+            const reportsDisplay = document.getElementById('full-report-display');
+            reportsDisplay.innerHTML = '<p>Поиск отчетов...</p>';
+
+            const reports = [];
+
+            // Recursively search for JSON files in the directory
+            await this.searchReportsInDirectory(dirHandle, reports);
+
+            if (reports.length === 0) {
+                reportsDisplay.innerHTML = '<p>В выбранной папке не найдено отчетов.</p>';
+                return;
+            }
+
+            // Generate full report
+            await this.generateFullReport(reports, reportsDisplay);
+        } catch (error) {
+            console.error('Ошибка формирования полного отчета:', error);
+            const reportsDisplay = document.getElementById('full-report-display');
+            reportsDisplay.innerHTML = '<p>Ошибка формирования полного отчета. Попробуйте еще раз.</p>';
+        }
+    }
+
+    // Generate full report from individual reports
+    async generateFullReport(reports, container) {
+        try {
+            // Define postfixes for different form types
+            const formPostfixes = {
+                'teploelektracentral': '_tec',
+                'stokovye_vody': '_zsv',
+                'parosilovoe_hozyaystvo': '_pcx',
+                'elektroremontnyi_ceh': '_erc'
+            };
+
+            // Group reports by department
+            const reportsByDepartment = {};
+
+            // Sort reports by date (newest first)
+            reports.sort((a, b) => {
+                try {
+                    return new Date(b.metadata.last_modified || b.metadata.date_created) -
+                        new Date(a.metadata.last_modified || a.metadata.date_created);
+                } catch (error) {
+                    return 0;
+                }
+            });
+
+            // Process each report and group by department
+            for (const report of reports) {
+                // Determine which department this report belongs to based on postfix
+                for (const [dept, postfix] of Object.entries(formPostfixes)) {
+                    if (report.name.includes(postfix + '.json')) {
+                        if (!reportsByDepartment[dept]) {
+                            reportsByDepartment[dept] = report; // Keep only the latest report for each department
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // Generate combined report HTML
+            let fullReportHTML = `
                 <div class="combined-report-preview">
                     <div class="combined-report-header">
                         <h1 class="combined-report-title">ПОЛНЫЙ ОТЧЁТ О РАБОТЕ ПОДРАЗДЕЛЕНИЙ ЗА СУТКИ</h1>
@@ -3211,69 +3233,69 @@ authenticateFullReport() {
                     </div>
             `;
 
-        // Add each department's report section
-        for (const [dept, report] of Object.entries(reportsByDepartment)) {
-            fullReportHTML += `
+            // Add each department's report section
+            for (const [dept, report] of Object.entries(reportsByDepartment)) {
+                fullReportHTML += `
                     <div class="full-report-section">
                         <h3>ОТЧЁТ О РАБОТЕ ${this.departments[dept].name} ЗА СУТКИ</h3>
                         ${this.generateDepartmentReportSection(report, dept)}
                     </div>
                 `;
-        }
+            }
 
-        fullReportHTML += `
+            fullReportHTML += `
                 </div>
                 <div style="text-align: center; margin-top: 20px;">
                     <button id="generate-full-report-pdf" class="btn btn-primary">Сформировать отчет в PDF</button>
                 </div>
             `;
 
-        container.innerHTML = fullReportHTML;
+            container.innerHTML = fullReportHTML;
 
-        // Add event listener for PDF generation
-        document.getElementById('generate-full-report-pdf')?.addEventListener('click', async () => {
-            await this.exportFullReportToPDF(reportsByDepartment);
-        });
+            // Add event listener for PDF generation
+            document.getElementById('generate-full-report-pdf')?.addEventListener('click', async () => {
+                await this.exportFullReportToPDF(reportsByDepartment);
+            });
 
-    } catch (error) {
-        console.error('Ошибка генерации полного отчета:', error);
-        container.innerHTML = '<p>Ошибка генерации полного отчета. Попробуйте еще раз.</p>';
+        } catch (error) {
+            console.error('Ошибка генерации полного отчета:', error);
+            container.innerHTML = '<p>Ошибка генерации полного отчета. Попробуйте еще раз.</p>';
+        }
     }
-}
 
-// Generate department report section
-generateDepartmentReportSection(report, department) {
-    try {
-        const data = report.data;
-        let html = '';
+    // Generate department report section
+    generateDepartmentReportSection(report, department) {
+        try {
+            const data = report.data;
+            let html = '';
 
-        // Add basic information
-        html += `
+            // Add basic information
+            html += `
                 <div class="full-report-field">
                     <span class="field-label">Дата составления:</span>
                     <span class="field-value">${data.reportDate || '___  ___  _____'}</span>
                 </div>
             `;
 
-        // Add department-specific fields
-        switch (department) {
-            case 'teploelektracentral':
-                html += this.generateTeploelektracentralSection(data);
-                break;
-            case 'stokovye_vody':
-                html += this.generateStokovyeVodySection(data);
-                break;
-            case 'parosilovoe_hozyaystvo':
-                html += this.generateParosilovoeHozyaystvoSection(data);
-                break;
-            case 'elektroremontnyi_ceh':
-                html += this.generateElektroremontnyiCehSection(data);
-                break;
-        }
+            // Add department-specific fields
+            switch (department) {
+                case 'teploelektracentral':
+                    html += this.generateTeploelektracentralSection(data);
+                    break;
+                case 'stokovye_vody':
+                    html += this.generateStokovyeVodySection(data);
+                    break;
+                case 'parosilovoe_hozyaystvo':
+                    html += this.generateParosilovoeHozyaystvoSection(data);
+                    break;
+                case 'elektroremontnyi_ceh':
+                    html += this.generateElektroremontnyiCehSection(data);
+                    break;
+            }
 
-        // Add emergency situations if any
-        if (data.emergencySituations && data.emergencySituations.length > 0) {
-            html += `
+            // Add emergency situations if any
+            if (data.emergencySituations && data.emergencySituations.length > 0) {
+                html += `
                     <div class="full-report-field">
                         <span class="field-label">Аварийные ситуации:</span>
                         <span class="field-value">
@@ -3290,8 +3312,8 @@ generateDepartmentReportSection(report, department) {
                                 <tbody>
                 `;
 
-            data.emergencySituations.forEach(situation => {
-                html += `
+                data.emergencySituations.forEach(situation => {
+                    html += `
                         <tr>
                             <td style="white-space: pre-wrap;">${situation.time || ''}</td>
                             <td style="white-space: pre-wrap;">${situation.equipment || ''}</td>
@@ -3300,36 +3322,36 @@ generateDepartmentReportSection(report, department) {
                             <td style="white-space: pre-wrap;">${situation.recovery || ''}</td>
                         </tr>
                     `;
-            });
+                });
 
-            html += `
+                html += `
                                 </tbody>
                             </table>
                         </span>
                     </div>
                 `;
-        }
+            }
 
-        // Add equipment deviations if any
-        if (data.equipmentDeviations) {
-            html += `
+            // Add equipment deviations if any
+            if (data.equipmentDeviations) {
+                html += `
                     <div class="full-report-field">
                         <span class="field-label">Отклонения в работе оборудования:</span>
                         <span class="field-value">${data.equipmentDeviations}</span>
                     </div>
                 `;
+            }
+
+            return html;
+        } catch (error) {
+            console.error('Ошибка генерации секции отчета отдела:', error);
+            return '<p>Ошибка при формировании данных отдела</p>';
         }
-
-        return html;
-    } catch (error) {
-        console.error('Ошибка генерации секции отчета отдела:', error);
-        return '<p>Ошибка при формировании данных отдела</p>';
     }
-}
 
-// Generate Теплоэлектроцентраль section
-generateTeploelektracentralSection(data) {
-    return `
+    // Generate Теплоэлектроцентраль section
+    generateTeploelektracentralSection(data) {
+        return `
             <div class="full-report-field">
                 <span class="field-label">Начальник смены ТЭЦ:</span>
                 <span class="field-value">${data.shiftSupervisor || '_________________'}</span>
@@ -3375,11 +3397,11 @@ generateTeploelektracentralSection(data) {
                 <span class="field-value">${data.steamConsumption || '__________'} т.</span>
             </div>
         `;
-}
+    }
 
-// Generate Участок сточных вод section
-generateStokovyeVodySection(data) {
-    return `
+    // Generate Участок сточных вод section
+    generateStokovyeVodySection(data) {
+        return `
             <div class="full-report-field">
                 <span class="field-label">Объём взвешенных веществ (утро):</span>
                 <span class="field-value">${data.morningSuspended || '_____'} мг/л</span>
@@ -3401,82 +3423,82 @@ generateStokovyeVodySection(data) {
                 <span class="field-value">${data.sedimentNight || '_____'} т.</span>
             </div>
         `;
-}
+    }
 
-// Generate Паросиловое хозяйство section
-generateParosilovoeHozyaystvoSection(data) {
-    // This department doesn't have specific fields in the current implementation
-    return '<div class="full-report-field"><span class="field-label">Нет специфических данных</span></div>';
-}
+    // Generate Паросиловое хозяйство section
+    generateParosilovoeHozyaystvoSection(data) {
+        // This department doesn't have specific fields in the current implementation
+        return '<div class="full-report-field"><span class="field-label">Нет специфических данных</span></div>';
+    }
 
-// Generate Электроремонтный цех section
-generateElektroremontnyiCehSection(data) {
-    // This department doesn't have specific fields in the current implementation
-    return '<div class="full-report-field"><span class="field-label">Нет специфических данных</span></div>';
-}
+    // Generate Электроремонтный цех section
+    generateElektroremontnyiCehSection(data) {
+        // This department doesn't have specific fields in the current implementation
+        return '<div class="full-report-field"><span class="field-label">Нет специфических данных</span></div>';
+    }
 
     // Export full report to PDF
     async exportFullReportToPDF(reportsByDepartment) {
-    try {
-        // Create a temporary element for the full report
-        const reportElement = document.querySelector('.combined-report-preview');
-        if (!reportElement) {
-            throw new Error('Элемент отчета не найден');
-        }
-
-        // Clone the element to avoid modifying the original
-        const clonedElement = reportElement.cloneNode(true);
-
-        // Generate filename with timestamp
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const date = String(now.getDate()).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-
-        const filename = `Полный_отчет_${year}-${month}-${date}_${hours}-${minutes}-${seconds}.pdf`;
-
-        const opt = {
-            margin: [10, 5, 10, 5],
-            filename: filename,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: {
-                scale: 2,
-                useCORS: true,
-                scrollX: 0,
-                scrollY: 0
-            },
-            jsPDF: {
-                unit: 'mm',
-                format: 'a4',
-                orientation: 'portrait',
-                compress: true
-            },
-            pagebreak: {
-                mode: ['avoid-all', 'css', 'legacy'],
-                before: '.before-page-break',
-                after: '.after-page-break',
-                avoid: '.avoid-page-break'
+        try {
+            // Create a temporary element for the full report
+            const reportElement = document.querySelector('.combined-report-preview');
+            if (!reportElement) {
+                throw new Error('Элемент отчета не найден');
             }
-        };
 
-        // Try to use File System Access API first (for local server environment)
-        if ('showSaveFilePicker' in window) {
-            await this.exportPDFWithFileSystemAPI(clonedElement, opt, filename);
-        } else {
-            // Fallback to traditional method
-            await html2pdf().set(opt).from(clonedElement).save();
+            // Clone the element to avoid modifying the original
+            const clonedElement = reportElement.cloneNode(true);
+
+            // Generate filename with timestamp
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            const filename = `Полный_отчет_${year}-${month}-${date}_${hours}-${minutes}-${seconds}.pdf`;
+
+            const opt = {
+                margin: [10, 5, 10, 5],
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait',
+                    compress: true
+                },
+                pagebreak: {
+                    mode: ['avoid-all', 'css', 'legacy'],
+                    before: '.before-page-break',
+                    after: '.after-page-break',
+                    avoid: '.avoid-page-break'
+                }
+            };
+
+            // Try to use File System Access API first (for local server environment)
+            if ('showSaveFilePicker' in window) {
+                await this.exportPDFWithFileSystemAPI(clonedElement, opt, filename);
+            } else {
+                // Fallback to traditional method
+                await html2pdf().set(opt).from(clonedElement).save();
+            }
+
+            console.log('Полный отчет экспортирован успешно');
+            this.showMessage('Полный отчет успешно экспортирован в PDF!', 'success');
+        } catch (error) {
+            console.error('Ошибка экспорта полного отчета в PDF:', error);
+            this.showMessage('Ошибка экспорта полного отчета в PDF. Попробуйте еще раз.', 'error');
         }
-
-        console.log('Полный отчет экспортирован успешно');
-        this.showMessage('Полный отчет успешно экспортирован в PDF!', 'success');
-    } catch (error) {
-        console.error('Ошибка экспорта полного отчета в PDF:', error);
-        this.showMessage('Ошибка экспорта полного отчета в PDF. Попробуйте еще раз.', 'error');
     }
-}
 
 }
 
