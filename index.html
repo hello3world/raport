@@ -30,7 +30,55 @@
                         <a href="#" class="form-link" data-form="elektroremontnyi_ceh">
                             4. ОТЧЁТ О РАБОТЕ ЭЛЕКТРОРЕМОНТНОГО ЦЕХА ЗА СУТКИ
                         </a>
+                        <!-- New link for full daily report -->
+                        <a href="#" class="form-link" data-form="full-report" id="full-report-link">
+                            5. ПОЛНЫЙ ОТЧЁТ ЗА СУТКИ
+                        </a>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран аутентификации для полного отчета -->
+        <div id="full-report-auth-screen" class="screen">
+            <div class="container">
+                <div class="auth-form">
+                    <h2>Аутентификация - ПОЛНЫЙ ОТЧЁТ ЗА СУТКИ</h2>
+                    <p>Для доступа к форме введите учетные данные администратора</p>
+                    <form id="full-report-authentication-form">
+                        <div class="form-group">
+                            <label for="full-report-username">Логин <span class="required">*</span></label>
+                            <input type="text" id="full-report-username" name="username" required>
+                            <div class="error-message" data-field="username"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="full-report-password">Пароль <span class="required">*</span></label>
+                            <input type="password" id="full-report-password" name="password" required>
+                            <div class="error-message" data-field="password"></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="back-to-main-full-report" class="btn btn-secondary">Назад</button>
+                            <button type="submit" class="btn btn-primary">Войти</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран выбора папки для полного отчета -->
+        <div id="full-report-folder-screen" class="screen">
+            <div class="container">
+                <h2>Полный отчет за сутки</h2>
+                <div class="full-report-content">
+                    <div class="browse-reports-section">
+                        <p>Выберите папку с отчетами для формирования полного отчета:</p>
+                        <button id="browse-full-report-folder-btn" class="btn btn-primary">Выбрать папку с
+                            отчетами</button>
+                        <div id="full-report-display"></div>
+                    </div>
+                </div>
+                <div class="full-report-actions">
+                    <button type="button" id="back-to-auth-full-report" class="btn btn-secondary">Назад</button>
                 </div>
             </div>
         </div>
@@ -73,6 +121,9 @@
                             <button id="start-form" class="btn btn-primary">Заполнить отчет</button>
                             <button id="retrospective-button" class="btn btn-outline">Ретроспектива</button>
                         </div>
+                    </div>
+                    <div class="loading-actions">
+                        <button id="back-to-main" class="btn btn-secondary">Назад</button>
                     </div>
                 </div>
             </div>
@@ -134,8 +185,8 @@
                     <div class="form-section" data-step="1" id="teploelektracentral-shift-supervisor"
                         style="display: none;">
                         <div class="form-group">
-                            <label for="shiftSupervisor">Начальник смены ТЭЦ <span class="required">*</span></label>
-                            <input type="text" id="shiftSupervisor" name="shiftSupervisor" placeholder="ФИО" required>
+                            <label for="shiftSupervisor">Начальник смены ТЭЦ</label>
+                            <input type="text" id="shiftSupervisor" name="shiftSupervisor" placeholder="ФИО">
                             <div class="error-message" data-field="shiftSupervisor"></div>
                         </div>
                     </div>
@@ -370,11 +421,11 @@
                             <table class="emergency-table">
                                 <thead>
                                     <tr>
-                                        <th>Время</th>
+                                        <th>Дата и время</th>
                                         <th>Наименование оборудования</th>
                                         <th>Описание</th>
                                         <th>Принятые меры</th>
-                                        <th>Время восстановления</th>
+                                        <th>Дата и время восстановления</th>
                                     </tr>
                                 </thead>
                                 <tbody id="emergency-situations">

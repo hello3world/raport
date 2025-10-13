@@ -142,6 +142,29 @@ body {
     margin: 0 auto;
 }
 
+.loading-actions {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+#loading-screen .btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+#loading-screen .btn-secondary:hover {
+    background-color: #7f8c8d;
+}
+
 .draft-options,
 .no-draft {
     margin-top: 1rem;
@@ -1395,4 +1418,146 @@ body {
 #periodStart,
 #periodEnd {
     font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Стили для полного отчета */
+#full-report-folder-screen {
+    background: white;
+    margin: 0 auto;
+    max-width: 1000px;
+    border-radius: 10px;
+}
+
+#full-report-folder-screen h2 {
+    padding: 2rem 2rem 1rem;
+    color: #2c3e50;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #3498db;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.full-report-content {
+    padding: 2rem;
+    background: white;
+    min-height: 400px;
+}
+
+.full-report-actions {
+    padding: 0 2rem 2rem;
+    text-align: center;
+}
+
+#browse-full-report-folder-btn {
+    margin: 14px 0;
+}
+
+.full-report-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+}
+
+.full-report-item>.report-date,
+.full-report-item>.report-filename {
+    margin-right: 10px;
+}
+
+.full-report-item:hover {
+    background-color: #e9ecef;
+    cursor: pointer;
+}
+
+.full-report-info {
+    flex: 1;
+}
+
+.full-report-date {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-right: 15px;
+}
+
+.full-report-filename {
+    color: #666;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+.full-report-id {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.full-report-version {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 3px;
+}
+
+.full-report-generate-btn {
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+.full-report-section {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.full-report-section h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.full-report-field {
+    margin-bottom: 0.5rem;
+    display: flex;
+}
+
+.full-report-field .field-label {
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 200px;
+}
+
+.full-report-field .field-value {
+    flex: 1;
+}
+
+/* Combined report preview */
+.combined-report-preview {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.combined-report-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #3498db;
+}
+
+.combined-report-title {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.combined-report-date {
+    color: #666;
+    font-size: 1.2rem;
 }

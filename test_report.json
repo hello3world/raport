@@ -1,0 +1,33 @@
+{
+    "metadata": {
+        "date_created": "2023-10-15T10:30:00.000Z",
+        "last_modified": "2023-10-15T10:30:00.000Z",
+        "report_id": "test-report-id-123",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "15.10.2023",
+        "periodStart": "15.10.2023",
+        "periodEnd": "15.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Иванов И.И.",
+        "emergencySituations": [
+            {
+                "time": "15.10.2023 10:00",
+                "equipment": "Насос №1",
+                "description": "Неисправность насоса\\nТребуется ремонт",
+                "actions": "Отключение оборудования\\nВызов ремонтной бригады",
+                "recovery": "15.10.2023 12:00"
+            },
+            {
+                "time": "15.10.2023 14:30",
+                "equipment": "Котел №2",
+                "description": "Проблемы с подачей топлива",
+                "actions": "Переключение на резервный котел",
+                "recovery": "15.10.2023 16:00"
+            }
+        ],
+        "equipmentDeviations": "Незначительные отклонения в работе оборудования"
+    }
+}

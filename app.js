@@ -8,6 +8,8 @@ class ReportFormApp {
         this.currentDraftId = null;
         this.selectedForm = null;
         this.authenticated = false;
+        this.formOpenedFrom = null; // Track where the form was opened from ('retrospective' or null)
+        this.isAdminAuthenticated = false; // For full report authentication
         this.departments = {
             'teploelektracentral': {
                 name: 'ТЕПЛОЭЛЕКТРОЦЕНТРАЛИ',
@@ -17,7 +19,7 @@ class ReportFormApp {
                 }
             },
             'stokovye_vody': {
-                name: 'УЧАСТКА СТОЧНЫХ ВОД',
+                name: 'УЧАСТКА ПО ЗАБОРУ, ПОДГОТОВКЕ И ОЧИСТКЕ СТОЧНЫХ ВОД',
                 users: {
                     'stok_user': 'stok_pass',
                     'admin': 'admin'
@@ -64,19 +66,34 @@ class ReportFormApp {
         document.querySelectorAll('.form-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                const formType = e.target.getAttribute('data-form');
+                const formType = e.target.getAttribute('data-form') || e.target.parentElement.getAttribute('data-form');
                 this.selectForm(formType);
             });
         });
 
-        // Аутентификация
+        // Аутентификация для обычных форм
         document.getElementById('authentication-form')?.addEventListener('submit', (e) => {
             e.preventDefault();
             this.authenticate();
         });
 
+        // Аутентификация для полного отчета
+        document.getElementById('full-report-authentication-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.authenticateFullReport();
+        });
+
         document.getElementById('back-to-main')?.addEventListener('click', () => {
             this.showScreen('main-screen');
+        });
+
+        // Back buttons for full report screens
+        document.getElementById('back-to-main-full-report')?.addEventListener('click', () => {
+            this.showScreen('main-screen');
+        });
+
+        document.getElementById('back-to-auth-full-report')?.addEventListener('click', () => {
+            this.showScreen('full-report-auth-screen');
         });
 
         // Загрузочный экран
@@ -116,9 +133,34 @@ class ReportFormApp {
         });
 
         // Навигация по форме
-        document.getElementById('preview-button')?.addEventListener('click', () => this.showPreview());
+        const previewButton = document.getElementById('preview-button');
+        if (previewButton) {
+            console.log('Preview button found, adding event listener');
+            previewButton.addEventListener('click', () => this.showPreview());
+        } else {
+            console.error('Preview button NOT found!');
+        }
+
         document.getElementById('save-draft')?.addEventListener('click', () => this.saveDraft());
-        document.getElementById('back-to-reports')?.addEventListener('click', () => this.showScreen('main-screen'));
+
+        const backButton = document.getElementById('back-to-reports');
+        if (backButton) {
+            console.log('Form back button found, adding event listener');
+            backButton.addEventListener('click', () => {
+                console.log('Form back button clicked');
+                console.log('Current formOpenedFrom value:', this.formOpenedFrom);
+                // If form was opened from retrospective, go back to retrospective screen
+                if (this.formOpenedFrom === 'retrospective') {
+                    console.log('Navigating to retrospective screen');
+                    this.showScreen('retrospective-screen');
+                } else {
+                    console.log('Navigating to main screen');
+                    this.showScreen('main-screen');
+                }
+            });
+        } else {
+            console.error('Form back button NOT found!');
+        }
 
         // Предпросмотр
         document.getElementById('edit-form')?.addEventListener('click', () => this.editForm());
@@ -128,6 +170,11 @@ class ReportFormApp {
         document.getElementById('submit-form')?.addEventListener('click', () => this.submitForm());
 
         document.getElementById('retrospective-button')?.addEventListener('click', () => this.showRetrospective());
+
+        // Full report functionality
+        document.getElementById('browse-full-report-folder-btn')?.addEventListener('click', async () => {
+            await this.browseFullReportFolder();
+        });
 
         // Модальные окна
         document.querySelector('.modal-close')?.addEventListener('click', () => this.hideModal());
@@ -166,6 +213,12 @@ class ReportFormApp {
     }
 
     selectForm(formType) {
+        if (formType === 'full-report') {
+            // Show authentication screen for full report
+            this.showScreen('full-report-auth-screen');
+            return;
+        }
+
         this.selectedForm = formType;
         this.showScreen('auth-screen');
         const formTitle = document.getElementById('form-title');
@@ -280,86 +333,7 @@ class ReportFormApp {
         }
     }
 
-    collectFormData() {
-        const formData = {};
-        const form = document.getElementById('main-form');
 
-        if (!form) return formData;
-
-        // Collect common fields
-        const commonFields = [
-            'reportDate', 'periodStart', 'periodEnd',
-            'startTime', 'endTime'
-        ];
-
-        commonFields.forEach(fieldName => {
-            const element = document.getElementById(fieldName);
-            if (element) {
-                if (element.type === 'radio') {
-                    const checkedRadio = document.querySelector(`input[name="${fieldName}"]:checked`);
-                    if (checkedRadio) {
-                        formData[fieldName] = checkedRadio.value;
-                    }
-                } else {
-                    formData[fieldName] = element.value;
-                }
-            }
-        });
-
-        // Collect shift supervisor only for теплоэлектроцентраль form
-        if (this.selectedForm === 'teploelektracentral') {
-            const shiftSupervisor = document.getElementById('shiftSupervisor');
-            if (shiftSupervisor) {
-                formData.shiftSupervisor = shiftSupervisor.value;
-            }
-        }
-
-        // Collect form-specific fields based on selected form type
-        switch (this.selectedForm) {
-            case 'teploelektracentral':
-                this.collectTeploelektracentralData(formData);
-                break;
-            case 'stokovye_vody':
-                this.collectStokovyeVodyData(formData);
-                break;
-            case 'parosilovoe_hozyaystvo':
-                // No specific fields for this form
-                break;
-            case 'elektroremontnyi_ceh':
-                // No specific fields for this form
-                break;
-        }
-
-        // Collect emergency situations
-        const emergencyRows = document.querySelectorAll('#emergency-situations tr');
-        formData.emergencySituations = [];
-
-        emergencyRows.forEach(row => {
-            const timeInput = row.querySelector('input[name="emergencyTime[]"]');
-            const equipmentInput = row.querySelector('input[name="emergencyEquipment[]"]');
-            const descriptionInput = row.querySelector('input[name="emergencyDescription[]"]');
-            const actionsInput = row.querySelector('input[name="emergencyActions[]"]');
-            const recoveryInput = row.querySelector('input[name="emergencyRecovery[]"]');
-
-            if (timeInput || equipmentInput || descriptionInput || actionsInput || recoveryInput) {
-                formData.emergencySituations.push({
-                    time: timeInput ? timeInput.value : '',
-                    equipment: equipmentInput ? equipmentInput.value : '',
-                    description: descriptionInput ? descriptionInput.value : '',
-                    actions: actionsInput ? actionsInput.value : '',
-                    recovery: recoveryInput ? recoveryInput.value : ''
-                });
-            }
-        });
-
-        // Collect equipment deviations
-        const equipmentDeviations = document.getElementById('equipmentDeviations');
-        if (equipmentDeviations) {
-            formData.equipmentDeviations = equipmentDeviations.value;
-        }
-
-        return formData;
-    }
 
     collectTeploelektracentralData(formData) {
         const fields = [
@@ -443,7 +417,28 @@ class ReportFormApp {
 
                 // Add rows for each emergency situation
                 this.formData.emergencySituations.forEach((situation, index) => {
-                    this.addEmergencyRow(situation);
+                    // Create a new row with the emergency situation data
+                    const newRow = document.createElement('tr');
+
+                    // Format the data properly for display
+                    const equipmentValue = situation.equipment ? situation.equipment.replace(/\\n/g, ' ') : '';
+                    const descriptionValue = situation.description ? situation.description.replace(/\\n/g, ' ') : '';
+                    const actionsValue = situation.actions ? situation.actions.replace(/\\n/g, ' ') : '';
+
+                    // Store the actual values with escaped newlines in data attributes
+                    const equipmentDataValue = situation.equipment ? situation.equipment.replace(/\n/g, '\\n') : '';
+                    const descriptionDataValue = situation.description ? situation.description.replace(/\n/g, '\\n') : '';
+                    const actionsDataValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
+
+                    newRow.innerHTML = `
+                        <td><input type="text" name="emergencyTime[]" value="${situation.time || ''}"></td>
+                        <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
+                        <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
+                        <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
+                        <td><input type="text" name="emergencyRecovery[]" value="${situation.recovery || ''}"></td>
+                    `;
+
+                    tbody.appendChild(newRow);
                 });
             }
         }
@@ -551,6 +546,7 @@ class ReportFormApp {
             if (draft) {
                 this.currentDraftId = this.latestDraftId;
                 this.formData = draft.form || {};
+                this.formOpenedFrom = null; // Reset the source
                 this.populateForm();
                 this.showFormScreen();
                 this.isDirty = false;
@@ -567,6 +563,7 @@ class ReportFormApp {
         this.currentDraftId = null;
         this.formData = {};
         this.isDirty = false;
+        this.formOpenedFrom = null; // Reset the source
         this.showFormScreen();
         console.log('Новая форма запущена');
     }
@@ -640,7 +637,9 @@ class ReportFormApp {
     }
 
     validateForm() {
+        console.log('Validating form');
         const requiredFields = document.querySelectorAll('#main-form [required]');
+        console.log('Found required fields:', requiredFields.length);
         let isValid = true;
 
         // Очищаем предыдущие ошибки
@@ -658,11 +657,13 @@ class ReportFormApp {
             }
 
             if (!hasValue) {
+                console.log('Field missing value:', field.name || field.id);
                 this.showFieldError(field, 'Это поле обязательно для заполнения');
                 isValid = false;
             }
         });
 
+        console.log('Form validation result:', isValid);
         return isValid;
     }
 
@@ -678,25 +679,50 @@ class ReportFormApp {
     }
 
     showPreview() {
+        console.log('Preview button clicked, showPreview called');
         if (!this.validateForm()) {
+            console.log('Form validation failed');
             return;
         }
 
         this.formData = { ...this.formData, ...this.collectFormData() };
         this.generatePreview();
         this.showScreen('preview-screen');
+        console.log('Preview screen shown');
     }
 
-    addEmergencyRow() {
+    addEmergencyRow(situation = null) {
         const tbody = document.getElementById('emergency-situations');
         const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-            <td><input type="text" name="emergencyTime[]"></td>
-            <td><input type="text" name="emergencyEquipment[]"></td>
-            <td><input type="text" name="emergencyDescription[]"></td>
-            <td><input type="text" name="emergencyActions[]"></td>
-            <td><input type="text" name="emergencyRecovery[]"></td>
-        `;
+
+        if (situation) {
+            // Format the data properly for display
+            const equipmentValue = situation.equipment ? situation.equipment.replace(/\\n/g, ' ') : '';
+            const descriptionValue = situation.description ? situation.description.replace(/\\n/g, ' ') : '';
+            const actionsValue = situation.actions ? situation.actions.replace(/\\n/g, ' ') : '';
+
+            // Store the actual values with escaped newlines in data attributes
+            const equipmentDataValue = situation.equipment ? situation.equipment.replace(/\n/g, '\\n') : '';
+            const descriptionDataValue = situation.description ? situation.description.replace(/\n/g, '\\n') : '';
+            const actionsDataValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
+
+            newRow.innerHTML = `
+                <td><input type="text" name="emergencyTime[]" value="${situation.time || ''}"></td>
+                <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
+                <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
+                <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
+                <td><input type="text" name="emergencyRecovery[]" value="${situation.recovery || ''}"></td>
+            `;
+        } else {
+            newRow.innerHTML = `
+                <td><input type="text" name="emergencyTime[]"></td>
+                <td><input type="text" name="emergencyEquipment[]"></td>
+                <td><input type="text" name="emergencyDescription[]"></td>
+                <td><input type="text" name="emergencyActions[]"></td>
+                <td><input type="text" name="emergencyRecovery[]"></td>
+            `;
+        }
+
         tbody.appendChild(newRow);
 
         // Apply white-space styling to preserve line breaks in the new inputs
@@ -1089,11 +1115,11 @@ class ReportFormApp {
                     <table class="emergency-table-preview">
                         <thead>
                             <tr>
-                                <th>Время</th>
+                                <th>Дата и время</th>
                                 <th>Наименование оборудования</th>
                                 <th>Описание</th>
                                 <th>Принятые меры</th>
-                                <th>Время восстановления</th>
+                                <th>Дата и время восстановления</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1173,11 +1199,11 @@ class ReportFormApp {
                     <table class="emergency-table-preview">
                         <thead>
                             <tr>
-                                <th>Время</th>
+                                <th>Дата и время</th>
                                 <th>Наименование оборудования</th>
                                 <th>Описание</th>
                                 <th>Принятые меры</th>
-                                <th>Время восстановления</th>
+                                <th>Дата и время восстановления</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1217,11 +1243,11 @@ class ReportFormApp {
                     <table class="emergency-table-preview">
                         <thead>
                             <tr>
-                                <th>Время</th>
+                                <th>Дата и время</th>
                                 <th>Наименование оборудования</th>
                                 <th>Описание</th>
                                 <th>Принятые меры</th>
-                                <th>Время восстановления</th>
+                                <th>Дата и время восстановления</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1261,11 +1287,11 @@ class ReportFormApp {
                     <table class="emergency-table-preview">
                         <thead>
                             <tr>
-                                <th>Время</th>
+                                <th>Дата и время</th>
                                 <th>Наименование оборудования</th>
                                 <th>Описание</th>
                                 <th>Принятые меры</th>
-                                <th>Время восстановления</th>
+                                <th>Дата и время восстановления</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1628,7 +1654,18 @@ class ReportFormApp {
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
 
-            const filename = `report_${year}-${month}-${date}_${hours}-${minutes}-${seconds}.json`;
+            // Define postfixes for different form types
+            const formPostfixes = {
+                'teploelektracentral': '_tec',
+                'stokovye_vody': '_zsv',
+                'parosilovoe_hozyaystvo': '_pcx',
+                'elektroremontnyi_ceh': '_erc'
+            };
+
+            // Get the postfix for the current form type
+            const postfix = formPostfixes[this.selectedForm] || '';
+
+            const filename = `report_${year}-${month}-${date}_${hours}-${minutes}-${seconds}${postfix}.json`;
             const folderPath = `Отчеты/${year}-${month}`;
 
             // Create JSON content
@@ -1651,13 +1688,490 @@ class ReportFormApp {
 
             // Navigate to the loading screen after successful save
             setTimeout(() => {
-                this.showScreen('main-screen');
+                this.showScreen('loading-screen');
+                this.currentDraftId = null;
             }, 2000);
         } catch (error) {
             console.error('Ошибка сохранения отчета:', error);
             this.showMessage('Ошибка сохранения отчета. Попробуйте еще раз.', 'error');
         }
     }
+
+    // Save report using File System Access API
+    async saveReportWithFileSystemAPI(filename, content, year, month) {
+        try {
+            // Create directory if it doesn't exist
+            const dirHandle = await window.showDirectoryPicker({
+                suggestedName: `Отчеты/${year}-${month}`
+            });
+
+            // Create file handle for the report
+            const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
+
+            // Create a FileSystemWritableFileStream to write to
+            const writable = await fileHandle.createWritable();
+
+            // Write the contents of the file to the stream
+            await writable.write(content);
+
+            // Close the file and write the contents to disk
+            await writable.close();
+
+            console.log('Отчет успешно сохранен:', filename);
+        } catch (error) {
+            // If user cancelled the dialog, do nothing
+            if (error.name === 'AbortError') {
+                return;
+            }
+
+            console.error('Ошибка сохранения отчета:', error);
+            this.showMessage('Ошибка сохранения отчета. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Save report using traditional download method (fallback)
+    async saveReportWithDownload(filename, content) {
+        // Create blob and download
+        const blob = new Blob([content], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+
+        console.log('Отчет успешно сохранен:', filename);
+    }
+
+    // Handle selection of full report
+    selectForm(formType) {
+        if (formType === 'full-report') {
+            // Show authentication screen for full report
+            this.showScreen('full-report-auth-screen');
+            return;
+        }
+
+        this.selectedForm = formType;
+        this.showScreen('auth-screen');
+        const formTitle = document.getElementById('form-title');
+        if (formTitle) {
+            formTitle.textContent = `Аутентификация - ${this.departments[formType].name}`;
+        }
+
+        // Update form title in the form
+        const formReportTitle = document.getElementById('form-report-title');
+        if (formReportTitle) {
+            formReportTitle.textContent = `ОТЧЁТ О РАБОТЕ ${this.departments[formType].name} ЗА СУТКИ`;
+        }
+
+        // Show/hide form sections based on form type
+        this.updateFormSections(formType);
+    }
+
+    // Authenticate for full report (admin only)
+    authenticateFullReport() {
+        const username = document.getElementById('full-report-username').value;
+        const password = document.getElementById('full-report-password').value;
+        const errorElements = document.querySelectorAll('#full-report-authentication-form .error-message');
+        errorElements.forEach(el => el.classList.remove('show'));
+
+        if (!username || !password) {
+            // Find the error element for the first empty field
+            if (!username) {
+                this.showFieldError(document.getElementById('full-report-username'), 'Заполните все поля');
+            }
+            if (!password) {
+                this.showFieldError(document.getElementById('full-report-password'), 'Заполните все поля');
+            }
+            return;
+        }
+
+        // Check if user is admin
+        let isAdmin = false;
+        for (const dept in this.departments) {
+            if (this.departments[dept].users['admin'] && this.departments[dept].users['admin'] === password && username === 'admin') {
+                isAdmin = true;
+                break;
+            }
+        }
+
+        if (isAdmin) {
+            this.isAdminAuthenticated = true;
+            // Show folder selection screen
+            this.showScreen('full-report-folder-screen');
+        } else {
+            this.showFieldError(document.getElementById('full-report-username'), 'Неверный логин или пароль');
+        }
+    }
+
+    // Browse folder for full report
+    async browseFullReportFolder() {
+        try {
+            // Show directory picker
+            const dirHandle = await window.showDirectoryPicker({
+                mode: 'read'
+            });
+
+            // Display reports from the selected directory
+            await this.displayFullReportFromDirectory(dirHandle);
+        } catch (error) {
+            // If user cancelled the dialog, do nothing
+            if (error.name === 'AbortError') {
+                return;
+            }
+
+            console.error('Ошибка выбора папки:', error);
+            this.showMessage('Ошибка выбора папки. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Display reports from a directory for full report
+    async displayFullReportFromDirectory(dirHandle) {
+        try {
+            const reportsDisplay = document.getElementById('full-report-display');
+            reportsDisplay.innerHTML = '<p>Поиск отчетов...</p>';
+
+            const reports = [];
+
+            // Recursively search for JSON files in the directory
+            await this.searchReportsInDirectory(dirHandle, reports);
+
+            if (reports.length === 0) {
+                reportsDisplay.innerHTML = '<p>В выбранной папке не найдено отчетов.</p>';
+                return;
+            }
+
+            // Generate full report
+            await this.generateFullReport(reports, reportsDisplay);
+        } catch (error) {
+            console.error('Ошибка формирования полного отчета:', error);
+            const reportsDisplay = document.getElementById('full-report-display');
+            reportsDisplay.innerHTML = '<p>Ошибка формирования полного отчета. Попробуйте еще раз.</p>';
+        }
+    }
+
+    // Generate full report from individual reports
+    async generateFullReport(reports, container) {
+        try {
+            // Define postfixes for different form types
+            const formPostfixes = {
+                'teploelektracentral': '_tec',
+                'stokovye_vody': '_zsv',
+                'parosilovoe_hozyaystvo': '_pcx',
+                'elektroremontnyi_ceh': '_erc'
+            };
+
+            // Group reports by department
+            const reportsByDepartment = {};
+
+            // Sort reports by date (newest first)
+            reports.sort((a, b) => {
+                try {
+                    return new Date(b.metadata.last_modified || b.metadata.date_created) -
+                        new Date(a.metadata.last_modified || a.metadata.date_created);
+                } catch (error) {
+                    return 0;
+                }
+            });
+
+            // Process each report and group by department
+            for (const report of reports) {
+                // Determine which department this report belongs to based on postfix
+                for (const [dept, postfix] of Object.entries(formPostfixes)) {
+                    if (report.name.includes(postfix + '.json')) {
+                        if (!reportsByDepartment[dept]) {
+                            reportsByDepartment[dept] = report; // Keep only the latest report for each department
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // Generate combined report HTML
+            let fullReportHTML = `
+                <div class="combined-report-preview">
+                    <div class="combined-report-header">
+                        <h1 class="combined-report-title">ПОЛНЫЙ ОТЧЁТ О РАБОТЕ ПОДРАЗДЕЛЕНИЙ ЗА СУТКИ</h1>
+                        <div class="combined-report-date">Дата формирования: ${new Date().toLocaleDateString('ru-RU')}</div>
+                    </div>
+            `;
+
+            // Add each department's report section
+            for (const [dept, report] of Object.entries(reportsByDepartment)) {
+                fullReportHTML += `
+                    <div class="full-report-section">
+                        <h3>ОТЧЁТ О РАБОТЕ ${this.departments[dept].name} ЗА СУТКИ</h3>
+                        ${this.generateDepartmentReportSection(report, dept)}
+                    </div>
+                `;
+            }
+
+            fullReportHTML += `
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button id="generate-full-report-pdf" class="btn btn-primary">Сформировать отчет в PDF</button>
+                </div>
+            `;
+
+            container.innerHTML = fullReportHTML;
+
+            // Add event listener for PDF generation
+            document.getElementById('generate-full-report-pdf')?.addEventListener('click', async () => {
+                await this.exportFullReportToPDF(reportsByDepartment);
+            });
+
+        } catch (error) {
+            console.error('Ошибка генерации полного отчета:', error);
+            container.innerHTML = '<p>Ошибка генерации полного отчета. Попробуйте еще раз.</p>';
+        }
+    }
+
+    // Generate department report section
+    generateDepartmentReportSection(report, department) {
+        try {
+            const data = report.data;
+            let html = '';
+
+            // Add basic information
+            html += `
+                <div class="full-report-field">
+                    <span class="field-label">Дата составления:</span>
+                    <span class="field-value">${data.reportDate || '___  ___  _____'}</span>
+                </div>
+            `;
+
+            // Add department-specific fields
+            switch (department) {
+                case 'teploelektracentral':
+                    html += this.generateTeploelektracentralSection(data);
+                    break;
+                case 'stokovye_vody':
+                    html += this.generateStokovyeVodySection(data);
+                    break;
+                case 'parosilovoe_hozyaystvo':
+                    html += this.generateParosilovoeHozyaystvoSection(data);
+                    break;
+                case 'elektroremontnyi_ceh':
+                    html += this.generateElektroremontnyiCehSection(data);
+                    break;
+            }
+
+            // Add emergency situations if any
+            if (data.emergencySituations && data.emergencySituations.length > 0) {
+                html += `
+                    <div class="full-report-field">
+                        <span class="field-label">Аварийные ситуации:</span>
+                        <span class="field-value">
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Дата и время</th>
+                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Оборудование</th>
+                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Описание</th>
+                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Меры</th>
+                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Восстановление</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+
+                data.emergencySituations.forEach(situation => {
+                    html += `
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 4px;">${situation.time || ''}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">${situation.equipment || ''}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">${situation.description || ''}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">${situation.actions || ''}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">${situation.recovery || ''}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                                </tbody>
+                            </table>
+                        </span>
+                    </div>
+                `;
+            }
+
+            // Add equipment deviations if any
+            if (data.equipmentDeviations) {
+                html += `
+                    <div class="full-report-field">
+                        <span class="field-label">Отклонения в работе оборудования:</span>
+                        <span class="field-value">${data.equipmentDeviations}</span>
+                    </div>
+                `;
+            }
+
+            return html;
+        } catch (error) {
+            console.error('Ошибка генерации секции отчета отдела:', error);
+            return '<p>Ошибка при формировании данных отдела</p>';
+        }
+    }
+
+    // Generate Теплоэлектроцентраль section
+    generateTeploelektracentralSection(data) {
+        return `
+            <div class="full-report-field">
+                <span class="field-label">Начальник смены ТЭЦ:</span>
+                <span class="field-value">${data.shiftSupervisor || '_________________'}</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Выработка электроэнергии (Ракт 1):</span>
+                <span class="field-value">${data.reactor1 || '__________'} МВт·ч</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Выработка электроэнергии (Ракт 2):</span>
+                <span class="field-value">${data.reactor2 || '__________'} МВт·ч</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Выработка электроэнергии (сумма):</span>
+                <span class="field-value">${data.reactorSum || '_________'} МВт·ч</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Показания газового счетчика:</span>
+                <span class="field-value">${data.gasMeter || '__________'} м3</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Потребление газа за сутки:</span>
+                <span class="field-value">${data.gasConsumption || '__________'} м3</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Производство пара (КГУ):</span>
+                <span class="field-value">${data.kgu || '__________'} т.</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Производство пара (Котельная №1, котел №1):</span>
+                <span class="field-value">${data.boiler1 || '__________'} т.</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Производство пара (Котельная №1, котел №2):</span>
+                <span class="field-value">${data.boiler2 || '__________'} т.</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Производство пара (Котельная №3):</span>
+                <span class="field-value">${data.boiler3 || '__________'} т.</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Потребление пара (БДМ-1):</span>
+                <span class="field-value">${data.steamConsumption || '__________'} т.</span>
+            </div>
+        `;
+    }
+
+    // Generate Участок сточных вод section
+    generateStokovyeVodySection(data) {
+        return `
+            <div class="full-report-field">
+                <span class="field-label">Объём взвешенных веществ (утро):</span>
+                <span class="field-value">${data.morningSuspended || '_____'} мг/л</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Объём взвешенных веществ (день):</span>
+                <span class="field-value">${data.daySuspended || '_____'} мг/л</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Объём взвешенных веществ (вечер):</span>
+                <span class="field-value">${data.eveningSuspended || '_____'} мг/л</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Объём обезвоженных осадков (08:00 - 20:00):</span>
+                <span class="field-value">${data.sedimentDay || '_____'} т.</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Объём обезвоженных осадков (20:00 - 08:00):</span>
+                <span class="field-value">${data.sedimentNight || '_____'} т.</span>
+            </div>
+        `;
+    }
+
+    // Generate Паросиловое хозяйство section
+    generateParosilovoeHozyaystvoSection(data) {
+        // This department doesn't have specific fields in the current implementation
+        return '<div class="full-report-field"><span class="field-label">Нет специфических данных</span></div>';
+    }
+
+    // Generate Электроремонтный цех section
+    generateElektroremontnyiCehSection(data) {
+        // This department doesn't have specific fields in the current implementation
+        return '<div class="full-report-field"><span class="field-label">Нет специфических данных</span></div>';
+    }
+
+    // Export full report to PDF
+    async exportFullReportToPDF(reportsByDepartment) {
+        try {
+            // Create a temporary element for the full report
+            const reportElement = document.querySelector('.combined-report-preview');
+            if (!reportElement) {
+                throw new Error('Элемент отчета не найден');
+            }
+
+            // Clone the element to avoid modifying the original
+            const clonedElement = reportElement.cloneNode(true);
+
+            // Generate filename with timestamp
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            const filename = `Полный_отчет_${year}-${month}-${date}_${hours}-${minutes}-${seconds}.pdf`;
+
+            const opt = {
+                margin: [10, 5, 10, 5],
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait',
+                    compress: true
+                },
+                pagebreak: {
+                    mode: ['avoid-all', 'css', 'legacy'],
+                    before: '.before-page-break',
+                    after: '.after-page-break',
+                    avoid: '.avoid-page-break'
+                }
+            };
+
+            // Try to use File System Access API first (for local server environment)
+            if ('showSaveFilePicker' in window) {
+                await this.exportPDFWithFileSystemAPI(clonedElement, opt, filename);
+            } else {
+                // Fallback to traditional method
+                await html2pdf().set(opt).from(clonedElement).save();
+            }
+
+            console.log('Полный отчет экспортирован успешно');
+            this.showMessage('Полный отчет успешно экспортирован в PDF!', 'success');
+        } catch (error) {
+            console.error('Ошибка экспорта полного отчета в PDF:', error);
+            this.showMessage('Ошибка экспорта полного отчета в PDF. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Reuse existing exportPDFWithFileSystemAPI method
+    // (This method already exists in the code, so we don't need to redefine it)
 
     // Save report using File System Access API
     async saveReportWithFileSystemAPI(filename, jsonContent, year, month) {
@@ -1770,6 +2284,7 @@ class ReportFormApp {
 
     showScreen(screenId) {
         console.log(`Переключение на экран: ${screenId}`);
+        console.log(`Current formOpenedFrom value:`, this.formOpenedFrom);
         const screens = document.querySelectorAll('.screen');
         console.log(`Найдено экранов: ${screens.length}`);
 
@@ -1803,6 +2318,14 @@ class ReportFormApp {
                     console.log(`Экран ${s.id}: classes=${s.className}, display=${computed.display}, visibility=${computed.visibility}`);
                 });
             }, 100);
+
+            // Reset formOpenedFrom when navigating away from form screen to other screens
+            if (screenId !== 'form-screen') {
+                console.log(`Resetting formOpenedFrom to null because navigating to: ${screenId}`);
+                this.formOpenedFrom = null;
+            } else {
+                console.log(`Not resetting formOpenedFrom because navigating to form screen`);
+            }
         } else {
             console.error(`Экран с ID ${screenId} не найден!`);
         }
@@ -1810,7 +2333,9 @@ class ReportFormApp {
 
     showFormScreen() {
         console.log('Показываем экран формы...');
+        console.log('Current formOpenedFrom before showScreen:', this.formOpenedFrom);
         this.showScreen('form-screen');
+        console.log('Current formOpenedFrom after showScreen:', this.formOpenedFrom);
 
         // Проверяем основную форму
         const mainForm = document.getElementById('main-form');
@@ -2036,14 +2561,35 @@ class ReportFormApp {
 
     // Render reports list in the UI
     renderReportsList(reports, container) {
-        if (reports.length === 0) {
+        // Filter reports based on the user's department
+        const formPostfixes = {
+            'teploelektracentral': '_tec',
+            'stokovye_vody': '_zsv',
+            'parosilovoe_hozyaystvo': '_pcx',
+            'elektroremontnyi_ceh': '_erc'
+        };
+
+        // Get the postfix for the current user's department
+        const currentUserPostfix = formPostfixes[this.selectedForm] || '';
+
+        // Filter reports that match the current user's department
+        const filteredReports = reports.filter(report => {
+            // If we have a postfix for the current department, filter by it
+            if (currentUserPostfix) {
+                return report.name.includes(currentUserPostfix + '.json');
+            }
+            // If no postfix (shouldn't happen), show all reports
+            return true;
+        });
+
+        if (filteredReports.length === 0) {
             container.innerHTML = '<p>Отчеты не найдены.</p>';
             return;
         }
 
         let reportsHTML = '<div class="reports-grid">';
 
-        reports.forEach((report, index) => {
+        filteredReports.forEach((report, index) => {
             // Format the date properly
             let formattedDate = 'Неизвестная дата';
             try {
@@ -2077,7 +2623,7 @@ class ReportFormApp {
         document.querySelectorAll('.load-report-btn').forEach(button => {
             button.addEventListener('click', (event) => {
                 const index = parseInt(event.target.getAttribute('data-index'));
-                this.loadReportFromList(reports[index]);
+                this.loadReportFromList(filteredReports[index]);
             });
         });
     }
@@ -2092,6 +2638,11 @@ class ReportFormApp {
 
             // Set form data
             this.formData = report.data;
+
+            // Mark that form was opened from retrospective
+            console.log('Setting formOpenedFrom to retrospective in loadReportFromList');
+            this.formOpenedFrom = 'retrospective';
+            console.log('formOpenedFrom is now:', this.formOpenedFrom);
 
             // Populate form with data
             this.populateForm();
@@ -2208,6 +2759,11 @@ class ReportFormApp {
             // Set form data
             this.formData = reportData.data;
 
+            // Mark that form was opened from retrospective
+            console.log('Setting formOpenedFrom to retrospective in loadReportFromJSON');
+            this.formOpenedFrom = 'retrospective';
+            console.log('formOpenedFrom is now:', this.formOpenedFrom);
+
             // Populate form with data
             this.populateForm();
 
@@ -2218,6 +2774,426 @@ class ReportFormApp {
         } catch (error) {
             console.error('Ошибка загрузки отчета:', error);
             this.showMessage('Ошибка загрузки отчета. Проверьте файл и попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Handle selection of full report
+    selectForm(formType) {
+        if (formType === 'full-report') {
+            // Show authentication screen for full report
+            this.showScreen('full-report-auth-screen');
+            return;
+        }
+
+        this.selectedForm = formType;
+        this.showScreen('auth-screen');
+        const formTitle = document.getElementById('form-title');
+        if (formTitle) {
+            formTitle.textContent = `Аутентификация - ${this.departments[formType].name}`;
+        }
+
+        // Update form title in the form
+        const formReportTitle = document.getElementById('form-report-title');
+        if (formReportTitle) {
+            formReportTitle.textContent = `ОТЧЁТ О РАБОТЕ ${this.departments[formType].name} ЗА СУТКИ`;
+        }
+
+        // Show/hide form sections based on form type
+        this.updateFormSections(formType);
+    }
+
+    // Authenticate for full report (admin only)
+    authenticateFullReport() {
+        const username = document.getElementById('full-report-username').value;
+        const password = document.getElementById('full-report-password').value;
+        const errorElements = document.querySelectorAll('#full-report-authentication-form .error-message');
+        errorElements.forEach(el => el.classList.remove('show'));
+
+        if (!username || !password) {
+            // Find the error element for the first empty field
+            if (!username) {
+                this.showFieldError(document.getElementById('full-report-username'), 'Заполните все поля');
+            }
+            if (!password) {
+                this.showFieldError(document.getElementById('full-report-password'), 'Заполните все поля');
+            }
+            return;
+        }
+
+        // Check if user is admin
+        let isAdmin = false;
+        for (const dept in this.departments) {
+            if (this.departments[dept].users['admin'] && this.departments[dept].users['admin'] === password && username === 'admin') {
+                isAdmin = true;
+                break;
+            }
+        }
+
+        if (isAdmin) {
+            this.isAdminAuthenticated = true;
+            // Show folder selection screen
+            this.showScreen('full-report-folder-screen');
+        } else {
+            this.showFieldError(document.getElementById('full-report-username'), 'Неверный логин или пароль');
+        }
+    }
+
+    // Browse folder for full report
+    async browseFullReportFolder() {
+        try {
+            // Show directory picker
+            const dirHandle = await window.showDirectoryPicker({
+                mode: 'read'
+            });
+
+            // Display reports from the selected directory
+            await this.displayFullReportFromDirectory(dirHandle);
+        } catch (error) {
+            // If user cancelled the dialog, do nothing
+            if (error.name === 'AbortError') {
+                return;
+            }
+
+            console.error('Ошибка выбора папки:', error);
+            this.showMessage('Ошибка выбора папки. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Display reports from a directory for full report
+    async displayFullReportFromDirectory(dirHandle) {
+        try {
+            const reportsDisplay = document.getElementById('full-report-display');
+            reportsDisplay.innerHTML = '<p>Поиск отчетов...</p>';
+
+            const reports = [];
+
+            // Recursively search for JSON files in the directory
+            await this.searchReportsInDirectory(dirHandle, reports);
+
+            if (reports.length === 0) {
+                reportsDisplay.innerHTML = '<p>В выбранной папке не найдено отчетов.</p>';
+                return;
+            }
+
+            // Generate full report
+            await this.generateFullReport(reports, reportsDisplay);
+        } catch (error) {
+            console.error('Ошибка формирования полного отчета:', error);
+            const reportsDisplay = document.getElementById('full-report-display');
+            reportsDisplay.innerHTML = '<p>Ошибка формирования полного отчета. Попробуйте еще раз.</p>';
+        }
+    }
+
+    // Generate full report from individual reports
+    async generateFullReport(reports, container) {
+        try {
+            // Define postfixes for different form types
+            const formPostfixes = {
+                'teploelektracentral': '_tec',
+                'stokovye_vody': '_zsv',
+                'parosilovoe_hozyaystvo': '_pcx',
+                'elektroremontnyi_ceh': '_erc'
+            };
+
+            // Group reports by department
+            const reportsByDepartment = {};
+
+            // Sort reports by date (newest first)
+            reports.sort((a, b) => {
+                try {
+                    return new Date(b.metadata.last_modified || b.metadata.date_created) -
+                        new Date(a.metadata.last_modified || a.metadata.date_created);
+                } catch (error) {
+                    return 0;
+                }
+            });
+
+            // Process each report and group by department
+            for (const report of reports) {
+                // Determine which department this report belongs to based on postfix
+                for (const [dept, postfix] of Object.entries(formPostfixes)) {
+                    if (report.name.includes(postfix + '.json')) {
+                        if (!reportsByDepartment[dept]) {
+                            reportsByDepartment[dept] = report; // Keep only the latest report for each department
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // Generate combined report HTML
+            let fullReportHTML = `
+                <div class="combined-report-preview">
+                    <div class="combined-report-header">
+                        <h1 class="combined-report-title">ПОЛНЫЙ ОТЧЁТ О РАБОТЕ ПОДРАЗДЕЛЕНИЙ ЗА СУТКИ</h1>
+                        <div class="combined-report-date">Дата формирования: ${new Date().toLocaleDateString('ru-RU')}</div>
+                    </div>
+            `;
+
+            // Add each department's report section
+            for (const [dept, report] of Object.entries(reportsByDepartment)) {
+                fullReportHTML += `
+                    <div class="full-report-section">
+                        <h3>ОТЧЁТ О РАБОТЕ ${this.departments[dept].name} ЗА СУТКИ</h3>
+                        ${this.generateDepartmentReportSection(report, dept)}
+                    </div>
+                `;
+            }
+
+            fullReportHTML += `
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button id="generate-full-report-pdf" class="btn btn-primary">Сформировать отчет в PDF</button>
+                </div>
+            `;
+
+            container.innerHTML = fullReportHTML;
+
+            // Add event listener for PDF generation
+            document.getElementById('generate-full-report-pdf')?.addEventListener('click', async () => {
+                await this.exportFullReportToPDF(reportsByDepartment);
+            });
+
+        } catch (error) {
+            console.error('Ошибка генерации полного отчета:', error);
+            container.innerHTML = '<p>Ошибка генерации полного отчета. Попробуйте еще раз.</p>';
+        }
+    }
+
+    // Generate department report section
+    generateDepartmentReportSection(report, department) {
+        try {
+            const data = report.data;
+            let html = '';
+
+            // Add basic information
+            html += `
+                <div class="full-report-field">
+                    <span class="field-label">Дата составления:</span>
+                    <span class="field-value">${data.reportDate || '___  ___  _____'}</span>
+                </div>
+            `;
+
+            // Add department-specific fields
+            switch (department) {
+                case 'teploelektracentral':
+                    html += this.generateTeploelektracentralSection(data);
+                    break;
+                case 'stokovye_vody':
+                    html += this.generateStokovyeVodySection(data);
+                    break;
+                case 'parosilovoe_hozyaystvo':
+                    html += this.generateParosilovoeHozyaystvoSection(data);
+                    break;
+                case 'elektroremontnyi_ceh':
+                    html += this.generateElektroremontnyiCehSection(data);
+                    break;
+            }
+
+            // Add emergency situations if any
+            if (data.emergencySituations && data.emergencySituations.length > 0) {
+                html += `
+                    <div class="full-report-field">
+                        <span class="field-label">Аварийные ситуации:</span>
+                        <span class="field-value">
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Дата и время</th>
+                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Оборудование</th>
+                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Описание</th>
+                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Меры</th>
+                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Восстановление</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+
+                data.emergencySituations.forEach(situation => {
+                    html += `
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 4px;">${situation.time || ''}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">${situation.equipment || ''}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">${situation.description || ''}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">${situation.actions || ''}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">${situation.recovery || ''}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                                </tbody>
+                            </table>
+                        </span>
+                    </div>
+                `;
+            }
+
+            // Add equipment deviations if any
+            if (data.equipmentDeviations) {
+                html += `
+                    <div class="full-report-field">
+                        <span class="field-label">Отклонения в работе оборудования:</span>
+                        <span class="field-value">${data.equipmentDeviations}</span>
+                    </div>
+                `;
+            }
+
+            return html;
+        } catch (error) {
+            console.error('Ошибка генерации секции отчета отдела:', error);
+            return '<p>Ошибка при формировании данных отдела</p>';
+        }
+    }
+
+    // Generate Теплоэлектроцентраль section
+    generateTeploelektracentralSection(data) {
+        return `
+            <div class="full-report-field">
+                <span class="field-label">Начальник смены ТЭЦ:</span>
+                <span class="field-value">${data.shiftSupervisor || '_________________'}</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Выработка электроэнергии (Ракт 1):</span>
+                <span class="field-value">${data.reactor1 || '__________'} МВт·ч</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Выработка электроэнергии (Ракт 2):</span>
+                <span class="field-value">${data.reactor2 || '__________'} МВт·ч</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Выработка электроэнергии (сумма):</span>
+                <span class="field-value">${data.reactorSum || '_________'} МВт·ч</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Показания газового счетчика:</span>
+                <span class="field-value">${data.gasMeter || '__________'} м3</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Потребление газа за сутки:</span>
+                <span class="field-value">${data.gasConsumption || '__________'} м3</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Производство пара (КГУ):</span>
+                <span class="field-value">${data.kgu || '__________'} т.</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Производство пара (Котельная №1, котел №1):</span>
+                <span class="field-value">${data.boiler1 || '__________'} т.</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Производство пара (Котельная №1, котел №2):</span>
+                <span class="field-value">${data.boiler2 || '__________'} т.</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Производство пара (Котельная №3):</span>
+                <span class="field-value">${data.boiler3 || '__________'} т.</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Потребление пара (БДМ-1):</span>
+                <span class="field-value">${data.steamConsumption || '__________'} т.</span>
+            </div>
+        `;
+    }
+
+    // Generate Участок сточных вод section
+    generateStokovyeVodySection(data) {
+        return `
+            <div class="full-report-field">
+                <span class="field-label">Объём взвешенных веществ (утро):</span>
+                <span class="field-value">${data.morningSuspended || '_____'} мг/л</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Объём взвешенных веществ (день):</span>
+                <span class="field-value">${data.daySuspended || '_____'} мг/л</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Объём взвешенных веществ (вечер):</span>
+                <span class="field-value">${data.eveningSuspended || '_____'} мг/л</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Объём обезвоженных осадков (08:00 - 20:00):</span>
+                <span class="field-value">${data.sedimentDay || '_____'} т.</span>
+            </div>
+            <div class="full-report-field">
+                <span class="field-label">Объём обезвоженных осадков (20:00 - 08:00):</span>
+                <span class="field-value">${data.sedimentNight || '_____'} т.</span>
+            </div>
+        `;
+    }
+
+    // Generate Паросиловое хозяйство section
+    generateParosilovoeHozyaystvoSection(data) {
+        // This department doesn't have specific fields in the current implementation
+        return '<div class="full-report-field"><span class="field-label">Нет специфических данных</span></div>';
+    }
+
+    // Generate Электроремонтный цех section
+    generateElektroremontnyiCehSection(data) {
+        // This department doesn't have specific fields in the current implementation
+        return '<div class="full-report-field"><span class="field-label">Нет специфических данных</span></div>';
+    }
+
+    // Export full report to PDF
+    async exportFullReportToPDF(reportsByDepartment) {
+        try {
+            // Create a temporary element for the full report
+            const reportElement = document.querySelector('.combined-report-preview');
+            if (!reportElement) {
+                throw new Error('Элемент отчета не найден');
+            }
+
+            // Clone the element to avoid modifying the original
+            const clonedElement = reportElement.cloneNode(true);
+
+            // Generate filename with timestamp
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            const filename = `Полный_отчет_${year}-${month}-${date}_${hours}-${minutes}-${seconds}.pdf`;
+
+            const opt = {
+                margin: [10, 5, 10, 5],
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait',
+                    compress: true
+                },
+                pagebreak: {
+                    mode: ['avoid-all', 'css', 'legacy'],
+                    before: '.before-page-break',
+                    after: '.after-page-break',
+                    avoid: '.avoid-page-break'
+                }
+            };
+
+            // Try to use File System Access API first (for local server environment)
+            if ('showSaveFilePicker' in window) {
+                await this.exportPDFWithFileSystemAPI(clonedElement, opt, filename);
+            } else {
+                // Fallback to traditional method
+                await html2pdf().set(opt).from(clonedElement).save();
+            }
+
+            console.log('Полный отчет экспортирован успешно');
+            this.showMessage('Полный отчет успешно экспортирован в PDF!', 'success');
+        } catch (error) {
+            console.error('Ошибка экспорта полного отчета в PDF:', error);
+            this.showMessage('Ошибка экспорта полного отчета в PDF. Попробуйте еще раз.', 'error');
         }
     }
 
