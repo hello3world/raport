@@ -245,8 +245,26 @@ class StorageAdapter {
     }
 
     // Генерация уникальных ID
-    generateId() {
-        return 'draft-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    generateId(formType = null) {
+        let id = 'draft';
+
+        // Add department postfix if formType is provided
+        if (formType) {
+            const formPostfixes = {
+                'teploelektracentral': '_tec',
+                'stokovye_vody': '_zsv',
+                'parosilovoe_hozyaystvo': '_pcx',
+                'elektroremontnyi_ceh': '_erc'
+            };
+
+            const postfix = formPostfixes[formType] || '';
+            id += postfix;
+        }
+
+        // Add timestamp and random string
+        id += '-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+
+        return id;
     }
 
     // Проверка размера данных
