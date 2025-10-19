@@ -951,6 +951,10 @@ body {
         flex-direction: column;
     }
 
+    .report-field {
+        flex-direction: column;
+    }
+
     .report-field .vertical {
         margin-top: 15px;
     }
@@ -1542,6 +1546,8 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     margin-bottom: 2rem;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
 }
 
 .combined-report-header {
@@ -1555,9 +1561,34 @@ body {
     font-size: 1.8rem;
     color: #2c3e50;
     margin-bottom: 0.5rem;
+    font-family: 'Times New Roman', Times, serif;
 }
 
 .combined-report-date {
     color: #666;
     font-size: 1.2rem;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+#full-report-username,
+#full-report-password {
+    width: 100%;
+}
+
+/* Page break styles for full report PDF export */
+.before-page-break {
+    page-break-before: always;
+}
+
+.after-page-break {
+    page-break-after: always;
+}
+
+.avoid-page-break {
+    page-break-inside: avoid;
+}
+
+/* Ensure the first section doesn't have a page break before it */
+.combined-report-header+.full-report-section {
+    page-break-before: avoid;
 }

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чек-лист проверки - Суточный рапорт</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Checklist page -->
+        <div id="checklist-screen" class="screen active">
+            <div class="container">
+                <h2>Чек-лист проверки программы</h2>
+                <div class="checklist-content">
+                    <h3>Смоук тестирование программы</h3>
+                    <ul class="checklist">
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check1">
+                                <span>Проверка запуска приложения</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check2">
+                                <span>Проверка доступности всех форм отчетов</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check3">
+                                <span>Проверка аутентификации для всех отделов</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check4">
+                                <span>Проверка заполнения всех полей формы</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check5">
+                                <span>Проверка добавления/удаления строк в таблице аварийных ситуаций</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check6">
+                                <span>Проверка функции автосохранения черновиков</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check7">
+                                <span>Проверка предпросмотра отчета</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check8">
+                                <span>Проверка экспорта отчета в PDF</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check9">
+                                <span>Проверка экспорта отчета в Word</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check10">
+                                <span>Проверка сохранения отчета в формате JSON</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check11">
+                                <span>Проверка функции ретроспективы (просмотр сохраненных отчетов)</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check12">
+                                <span>Проверка формирования полного отчета из нескольких отделов</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check13">
+                                <span>Проверка корректности отображения данных в полном отчете</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="check14">
+                                <span>Проверка экспорта полного отчета в PDF</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="checklist-actions">
+                    <button type="button" id="back-to-preview" class="btn btn-secondary">Назад</button>
+                    <button type="button" id="reset-checklist" class="btn btn-outline">Сбросить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add event listener for back button
+            document.getElementById('back-to-preview').addEventListener('click', function () {
+                // Navigate back to the preview screen
+                window.location.href = 'index.html#preview-screen';
+            });
+
+            // Add event listener for reset button
+            document.getElementById('reset-checklist').addEventListener('click', function () {
+                // Uncheck all checkboxes
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            });
+
+            // Load saved checklist state from localStorage
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                const savedState = localStorage.getItem(checkbox.id);
+                if (savedState !== null) {
+                    checkbox.checked = savedState === 'true';
+                }
+
+                // Save checkbox state when it changes
+                checkbox.addEventListener('change', function () {
+                    localStorage.setItem(this.id, this.checked);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

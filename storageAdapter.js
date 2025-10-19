@@ -136,7 +136,7 @@ class StorageAdapter {
         const items = [];
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
-            if (key && key.startsWith('draft-')) {
+            if (key && key.startsWith('draft')) {  // Changed from 'draft-' to 'draft'
                 const data = localStorage.getItem(key);
                 if (data) {
                     try {
