@@ -3930,6 +3930,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the app
     window.reportApp.init();
 
+    // Check for URL hash and show appropriate screen
+    if (window.location.hash) {
+        const hash = window.location.hash.substring(1); // Remove the #
+        const screenId = hash.replace('#', ''); // Remove any extra # characters
+        console.log('Навигация по хешу к экрану:', screenId);
+
+        // Small delay to ensure DOM is fully loaded
+        setTimeout(() => {
+            if (window.reportApp && typeof window.reportApp.showScreen === 'function') {
+                window.reportApp.showScreen(screenId);
+            } else {
+                console.error('Не удалось получить доступ к функции showScreen');
+            }
+        }, 100);
+    }
+
     // Fallback для кнопки, если что-то пошло не так
     setTimeout(() => {
         const noDraftElement = document.getElementById('no-draft');
