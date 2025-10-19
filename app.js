@@ -2697,82 +2697,25 @@ class ReportFormApp {
     generateDepartmentReportSection(report, department) {
         try {
             const data = report.data;
-            let html = '';
-
-            // Add basic information
-            html += `
-                <div class="full-report-field">
-                    <span class="field-label">Дата составления:</span>
-                    <span class="field-value">${data.reportDate || '___  ___  _____'}</span>
-                </div>
-            `;
-
-            // Add department-specific fields
+            
+            // Format dates for display
+            const reportDate = data.reportDate || '___  ___  _____';
+            const periodStart = data.periodStart || '___  ___  _____';
+            const periodEnd = data.periodEnd || '___  ___  _____';
+            
+            // Generate content based on department type using the same structure as preview
             switch (department) {
                 case 'teploelektracentral':
-                    html += this.generateTeploelektracentralSection(data);
-                    break;
+                    return this.generateTeploelektracentralPreviewContent(data, reportDate, periodStart, periodEnd);
                 case 'stokovye_vody':
-                    html += this.generateStokovyeVodySection(data);
-                    break;
+                    return this.generateStokovyeVodyPreviewContent(data, reportDate, periodStart, periodEnd);
                 case 'parosilovoe_hozyaystvo':
-                    html += this.generateParosilovoeHozyaystvoSection(data);
-                    break;
+                    return this.generateParosilovoeHozyaystvoPreviewContent(data, reportDate, periodStart, periodEnd);
                 case 'elektroremontnyi_ceh':
-                    html += this.generateElektroremontnyiCehSection(data);
-                    break;
+                    return this.generateElektroremontnyiCehPreviewContent(data, reportDate, periodStart, periodEnd);
+                default:
+                    return '<p>Неизвестный тип отчета</p>';
             }
-
-            // Add emergency situations if any
-            if (data.emergencySituations && data.emergencySituations.length > 0) {
-                html += `
-                    <div class="full-report-field">
-                        <span class="field-label">Аварийные ситуации:</span>
-                        <span class="field-value">
-                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                <thead>
-                                    <tr>
-                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Дата и время</th>
-                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Оборудование</th>
-                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Описание</th>
-                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Меры</th>
-                                        <th style="border: 1px solid #000; padding: 4px; background-color: #f2f2f2;">Восстановление</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                `;
-
-                data.emergencySituations.forEach(situation => {
-                    html += `
-                        <tr>
-                            <td style="border: 1px solid #000; padding: 4px;">${situation.time || ''}</td>
-                            <td style="border: 1px solid #000; padding: 4px;">${situation.equipment || ''}</td>
-                            <td style="border: 1px solid #000; padding: 4px;">${situation.description || ''}</td>
-                            <td style="border: 1px solid #000; padding: 4px;">${situation.actions || ''}</td>
-                            <td style="border: 1px solid #000; padding: 4px;">${situation.recovery || ''}</td>
-                        </tr>
-                    `;
-                });
-
-                html += `
-                                </tbody>
-                            </table>
-                        </span>
-                    </div>
-                `;
-            }
-
-            // Add equipment deviations if any
-            if (data.equipmentDeviations) {
-                html += `
-                    <div class="full-report-field">
-                        <span class="field-label">Отклонения в работе оборудования:</span>
-                        <span class="field-value">${data.equipmentDeviations}</span>
-                    </div>
-                `;
-            }
-
-            return html;
         } catch (error) {
             console.error('Ошибка генерации секции отчета отдела:', error);
             return '<p>Ошибка при формировании данных отдела</p>';
@@ -3776,82 +3719,25 @@ class ReportFormApp {
     generateDepartmentReportSection(report, department) {
         try {
             const data = report.data;
-            let html = '';
-
-            // Add basic information
-            html += `
-                <div class="full-report-field">
-                    <span class="field-label">Дата составления:</span>
-                    <span class="field-value">${data.reportDate || '___  ___  _____'}</span>
-                </div>
-            `;
-
-            // Add department-specific fields
+            
+            // Format dates for display
+            const reportDate = data.reportDate || '___  ___  _____';
+            const periodStart = data.periodStart || '___  ___  _____';
+            const periodEnd = data.periodEnd || '___  ___  _____';
+            
+            // Generate content based on department type using the same structure as preview
             switch (department) {
                 case 'teploelektracentral':
-                    html += this.generateTeploelektracentralSection(data);
-                    break;
+                    return this.generateTeploelektracentralPreviewContent(data, reportDate, periodStart, periodEnd);
                 case 'stokovye_vody':
-                    html += this.generateStokovyeVodySection(data);
-                    break;
+                    return this.generateStokovyeVodyPreviewContent(data, reportDate, periodStart, periodEnd);
                 case 'parosilovoe_hozyaystvo':
-                    html += this.generateParosilovoeHozyaystvoSection(data);
-                    break;
+                    return this.generateParosilovoeHozyaystvoPreviewContent(data, reportDate, periodStart, periodEnd);
                 case 'elektroremontnyi_ceh':
-                    html += this.generateElektroremontnyiCehSection(data);
-                    break;
+                    return this.generateElektroremontnyiCehPreviewContent(data, reportDate, periodStart, periodEnd);
+                default:
+                    return '<p>Неизвестный тип отчета</p>';
             }
-
-            // Add emergency situations if any
-            if (data.emergencySituations && data.emergencySituations.length > 0) {
-                html += `
-                    <div class="full-report-field">
-                        <span class="field-label">Аварийные ситуации:</span>
-                        <span class="field-value">
-                            <table class="emergency-table-preview">
-                                <thead>
-                                    <tr>
-                                        <th>Дата и время</th>
-                                        <th>Наименование оборудования</th>
-                                        <th>Описание</th>
-                                        <th>Принятые меры</th>
-                                        <th>Дата и время восстановления</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                `;
-
-                data.emergencySituations.forEach(situation => {
-                    html += `
-                        <tr>
-                            <td style="white-space: pre-wrap;">${situation.time || ''}</td>
-                            <td style="white-space: pre-wrap;">${situation.equipment || ''}</td>
-                            <td style="white-space: pre-wrap;">${situation.description || ''}</td>
-                            <td style="white-space: pre-wrap;">${situation.actions || ''}</td>
-                            <td style="white-space: pre-wrap;">${situation.recovery || ''}</td>
-                        </tr>
-                    `;
-                });
-
-                html += `
-                                </tbody>
-                            </table>
-                        </span>
-                    </div>
-                `;
-            }
-
-            // Add equipment deviations if any
-            if (data.equipmentDeviations) {
-                html += `
-                    <div class="full-report-field">
-                        <span class="field-label">Отклонения в работе оборудования:</span>
-                        <span class="field-value">${data.equipmentDeviations}</span>
-                    </div>
-                `;
-            }
-
-            return html;
         } catch (error) {
             console.error('Ошибка генерации секции отчета отдела:', error);
             return '<p>Ошибка при формировании данных отдела</p>';
