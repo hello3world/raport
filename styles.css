@@ -1592,3 +1592,7 @@ body {
 .combined-report-header+.full-report-section {
     page-break-before: avoid;
 }
+
+.checklist {
+    list-style-type: none;
+}

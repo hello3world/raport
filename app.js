@@ -1596,9 +1596,10 @@ class ReportFormApp {
             // Close the file and write the contents to disk
             await writable.close();
         } catch (error) {
-            // If user cancelled the save dialog, re-throw the error
-            if (error.name === 'AbortError') {
-                throw error;
+            // If user cancelled the save dialog or there's a state error, do nothing
+            if (error.name === 'AbortError' || error.name === 'InvalidStateError') {
+                console.log('Операция отменена пользователем или недоступна: ', error.message);
+                return;
             }
 
             // For other errors, fall back to traditional method
@@ -1633,9 +1634,10 @@ class ReportFormApp {
             // Close the file and write the contents to disk
             await writable.close();
         } catch (error) {
-            // If user cancelled the save dialog, re-throw the error
-            if (error.name === 'AbortError') {
-                throw error;
+            // If user cancelled the save dialog or there's a state error, do nothing
+            if (error.name === 'AbortError' || error.name === 'InvalidStateError') {
+                console.log('Операция отменена пользователем или недоступна: ', error.message);
+                return;
             }
 
             // For other errors, fall back to traditional download method
@@ -1753,6 +1755,9 @@ class ReportFormApp {
                                 width: 100%;
                                 table-layout: fixed;
                                 word-wrap: break-word;
+                                border-spacing: 0;
+                                mso-table-layout-alt: fixed;
+                                mso-table-overlap: never;
                             }
                             th, td {
                                 border: 1px solid #000;
@@ -1760,6 +1765,8 @@ class ReportFormApp {
                                 text-align: left;
                                 vertical-align: top;
                                 word-wrap: break-word;
+                                mso-border-alt: solid black .75pt;
+                                mso-padding-alt: 4px 6px;
                             }
                             th {
                                 background-color: #f2f2f2;
@@ -1774,6 +1781,9 @@ class ReportFormApp {
                                 font-size: 16px;
                                 line-height: 1.2;
                                 word-wrap: break-word;
+                                border-spacing: 0;
+                                mso-table-layout-alt: fixed;
+                                mso-table-overlap: never;
                             }
                             .emergency-table-preview th,
                             .emergency-table-preview td {
@@ -1782,6 +1792,8 @@ class ReportFormApp {
                                 text-align: left;
                                 vertical-align: top;
                                 word-wrap: break-word;
+                                mso-border-alt: solid black .75pt;
+                                mso-padding-alt: 4px 6px;
                             }
                             .report-section {
                                 margin-bottom: 20px;
@@ -1793,6 +1805,13 @@ class ReportFormApp {
                             }
                             h3 {
                                 page-break-after: avoid;
+                            }
+                            .report-header {
+                                text-align: center;
+                                margin-bottom: 20px;
+                            }
+                            .report-title {
+                                font-weight: bold;
                             }
                         </style>
                     </head>
@@ -1843,9 +1862,10 @@ class ReportFormApp {
             // Close the file and write the contents to disk
             await writable.close();
         } catch (error) {
-            // If user cancelled the save dialog, re-throw the error
-            if (error.name === 'AbortError') {
-                throw error;
+            // If user cancelled the save dialog or there's a state error, do nothing
+            if (error.name === 'AbortError' || error.name === 'InvalidStateError') {
+                console.log('Операция отменена пользователем или недоступна: ', error.message);
+                return;
             }
 
             // For other errors, fall back to traditional method
@@ -1982,8 +2002,9 @@ class ReportFormApp {
 
             console.log('Отчет успешно сохранен:', filename);
         } catch (error) {
-            // If user cancelled the dialog, do nothing
-            if (error.name === 'AbortError') {
+            // If user cancelled the dialog or there's a state error, do nothing
+            if (error.name === 'AbortError' || error.name === 'InvalidStateError') {
+                console.log('Операция отменена пользователем или недоступна: ', error.message);
                 return;
             }
 
@@ -2062,8 +2083,9 @@ class ReportFormApp {
             // Display reports from the selected directory
             await this.displayFullReportFromDirectory(dirHandle);
         } catch (error) {
-            // If user cancelled the dialog, do nothing
-            if (error.name === 'AbortError') {
+            // If user cancelled the dialog or there's a state error, do nothing
+            if (error.name === 'AbortError' || error.name === 'InvalidStateError') {
+                console.log('Операция отменена пользователем или недоступна: ', error.message);
                 return;
             }
 
@@ -2697,12 +2719,12 @@ class ReportFormApp {
     generateDepartmentReportSection(report, department) {
         try {
             const data = report.data;
-            
+
             // Format dates for display
             const reportDate = data.reportDate || '___  ___  _____';
             const periodStart = data.periodStart || '___  ___  _____';
             const periodEnd = data.periodEnd || '___  ___  _____';
-            
+
             // Generate content based on department type using the same structure as preview
             switch (department) {
                 case 'teploelektracentral':
@@ -3200,8 +3222,9 @@ class ReportFormApp {
             // Display reports from the selected directory
             await this.displayReportsFromDirectory(dirHandle);
         } catch (error) {
-            // If user cancelled the dialog, do nothing
-            if (error.name === 'AbortError') {
+            // If user cancelled the dialog or there's a state error, do nothing
+            if (error.name === 'AbortError' || error.name === 'InvalidStateError') {
+                console.log('Операция отменена пользователем или недоступна: ', error.message);
                 return;
             }
 
@@ -3604,8 +3627,9 @@ class ReportFormApp {
             // Display reports from the selected directory
             await this.displayFullReportFromDirectory(dirHandle);
         } catch (error) {
-            // If user cancelled the dialog, do nothing
-            if (error.name === 'AbortError') {
+            // If user cancelled the dialog or there's a state error, do nothing
+            if (error.name === 'AbortError' || error.name === 'InvalidStateError') {
+                console.log('Операция отменена пользователем или недоступна: ', error.message);
                 return;
             }
 
@@ -3719,12 +3743,12 @@ class ReportFormApp {
     generateDepartmentReportSection(report, department) {
         try {
             const data = report.data;
-            
+
             // Format dates for display
             const reportDate = data.reportDate || '___  ___  _____';
             const periodStart = data.periodStart || '___  ___  _____';
             const periodEnd = data.periodEnd || '___  ___  _____';
-            
+
             // Generate content based on department type using the same structure as preview
             switch (department) {
                 case 'teploelektracentral':
