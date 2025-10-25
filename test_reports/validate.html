@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка Тестовых Отчетов</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .validation-results {
+            margin-top: 30px;
+        }
+        .result-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .valid {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .invalid {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .status-icon {
+            font-size: 24px;
+        }
+        .test-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .test-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Проверка Тестовых Отчетов</h1>
+        <p>Нажмите кнопку ниже для проверки корректности тестовых отчетов:</p>
+        
+        <button class="test-button" onclick="validateReports()">Проверить Отчеты</button>
+        
+        <div class="validation-results" id="results"></div>
+    </div>
+
+    <script>
+        async function validateReports() {
+            const reportFiles = [
+                { name: 'ТЕПЛОЭЛЕКТРОЦЕНТРАЛЬ (_tec)', file: 'test_report_tec.json' },
+                { name: 'СТОКОВЫЕ ВОДЫ (_zsv)', file: 'test_report_zsv.json' },
+                { name: 'ПАРОСИЛОВОЕ ХОЗЯЙСТВО (_pcx)', file: 'test_report_pcx.json' },
+                { name: 'ЭЛЕКТРОРЕМОНТНЫЙ ЦЕХ (_erc)', file: 'test_report_erc.json' }
+            ];
+            
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '<h2>Результаты проверки:</h2>';
+            
+            let allValid = true;
+            
+            for (const report of reportFiles) {
+                try {
+                    const response = await fetch(report.file);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    const data = await response.json();
+                    showResult(report.name, report.file, true, 'Отчет корректен');
+                } catch (error) {
+                    showResult(report.name, report.file, false, `Ошибка: ${error.message}`);
+                    allValid = false;
+                }
+            }
+            
+            const summary = document.createElement('div');
+            summary.className = 'result-item ' + (allValid ? 'valid' : 'invalid');
+            summary.innerHTML = `
+                <span><strong>Итог:</strong> ${allValid ? 'Все отчеты корректны!' : 'Обнаружены ошибки в отчетах!'}</span>
+                <span class="status-icon">${allValid ? '✅' : '❌'}</span>
+            `;
+            resultsContainer.appendChild(summary);
+        }
+        
+        function showResult(departmentName, fileName, isValid, message) {
+            const resultsContainer = document.getElementById('results');
+            const resultItem = document.createElement('div');
+            resultItem.className = `result-item ${isValid ? 'valid' : 'invalid'}`;
+            resultItem.innerHTML = `
+                <div>
+                    <strong>${departmentName}</strong><br>
+                    <small>Файл: ${fileName}</small><br>
+                    <small>${message}</small>
+                </div>
+                <span class="status-icon">${isValid ? '✅' : '❌'}</span>
+            `;
+            resultsContainer.appendChild(resultItem);
+        }
+    </script>
+</body>
+</html>

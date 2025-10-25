@@ -1,0 +1,33 @@
+{
+    "metadata": {
+        "date_created": "2023-10-15T10:30:00.000Z",
+        "last_modified": "2023-10-15T10:30:00.000Z",
+        "report_id": "test-report-zsv-123",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "15.10.2023",
+        "periodStart": "15.10.2023",
+        "periodEnd": "15.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Сидоров С.С.",
+        "emergencySituations": [
+            {
+                "time": "15.10.2023 09:15",
+                "equipment": "Фильтр №1",
+                "description": "Засорение фильтра\\nСнижение эффективности очистки",
+                "actions": "Остановка фильтра\\nПромывка системы",
+                "recovery": "15.10.2023 11:30"
+            },
+            {
+                "time": "15.10.2023 15:45",
+                "equipment": "Насос реагентов",
+                "description": "Неисправность дозировочного насоса",
+                "actions": "Переключение на резервный насос\\nВызов ремонтной бригады",
+                "recovery": "15.10.2023 17:20"
+            }
+        ],
+        "equipmentDeviations": "Отклонения в параметрах очистки воды"
+    }
+}

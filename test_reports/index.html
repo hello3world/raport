@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестовые Отчеты</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .report-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .report-link {
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .report-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тестовые Отчеты по Подразделениям</h1>
+        <p>Выберите тестовый отчет для просмотра:</p>
+        
+        <div class="report-links">
+            <a href="#" class="report-link" onclick="loadReport('tec')">ТЕПЛОЭЛЕКТРОЦЕНТРАЛЬ (_tec)</a>
+            <a href="#" class="report-link" onclick="loadReport('zsv')">СТОКОВЫЕ ВОДЫ (_zsv)</a>
+            <a href="#" class="report-link" onclick="loadReport('pcx')">ПАРОСИЛОВОЕ ХОЗЯЙСТВО (_pcx)</a>
+            <a href="#" class="report-link" onclick="loadReport('erc')">ЭЛЕКТРОРЕМОНТНЫЙ ЦЕХ (_erc)</a>
+            <a href="validate.html" class="report-link">ПРОВЕРИТЬ ВСЕ ОТЧЕТЫ</a>
+        </div>
+        
+        <div id="report-display" style="margin-top: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; display: none;">
+            <h2>Отчет:</h2>
+            <pre id="report-content"></pre>
+        </div>
+    </div>
+
+    <script>
+        function loadReport(dept) {
+            const filePath = `test_report_${dept}.json`;
+            
+            fetch(filePath)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('report-content').textContent = JSON.stringify(data, null, 2);
+                    document.getElementById('report-display').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки отчета:', error);
+                    document.getElementById('report-content').textContent = 'Ошибка загрузки отчета: ' + error.message;
+                    document.getElementById('report-display').style.display = 'block';
+                });
+        }
+    </script>
+</body>
+</html>

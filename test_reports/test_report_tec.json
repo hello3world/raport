@@ -1,0 +1,33 @@
+{
+    "metadata": {
+        "date_created": "2023-10-15T10:30:00.000Z",
+        "last_modified": "2023-10-15T10:30:00.000Z",
+        "report_id": "test-report-tec-123",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "15.10.2023",
+        "periodStart": "15.10.2023",
+        "periodEnd": "15.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Петров П.П.",
+        "emergencySituations": [
+            {
+                "time": "15.10.2023 10:00",
+                "equipment": "Турбина №1",
+                "description": "Неисправность турбины\\nТребуется капитальный ремонт",
+                "actions": "Отключение турбины\\nВызов специалистов",
+                "recovery": "15.10.2023 12:00"
+            },
+            {
+                "time": "15.10.2023 14:30",
+                "equipment": "Котел №3",
+                "description": "Проблемы с подачей угля",
+                "actions": "Переключение на резервный котел",
+                "recovery": "15.10.2023 16:00"
+            }
+        ],
+        "equipmentDeviations": "Незначительные отклонения в работе оборудования"
+    }
+}
