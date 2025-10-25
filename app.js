@@ -272,6 +272,7 @@ class ReportFormApp {
 
         // Предпросмотр
         document.getElementById('edit-form')?.addEventListener('click', () => this.editForm());
+        document.getElementById('back-to-main-preview')?.addEventListener('click', () => this.showScreen('main-screen'));
         document.getElementById('save-final')?.addEventListener('click', () => this.saveReportAsJSON());
         document.getElementById('export-pdf')?.addEventListener('click', () => this.exportToPDF());
         document.getElementById('export-word')?.addEventListener('click', () => this.exportToWord());

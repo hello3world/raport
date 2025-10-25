@@ -38,7 +38,7 @@
                     </div>
                 </div>
                 <div class="version-info" style="text-align: center; margin-top: 30px; color: #666;">
-                    <p>Версия приложения: v.0.2.5</p>
+                    <p>Версия приложения: v.0.2.6</p>
                     <!-- Обновление от 26.10.2025 -->
                     <!-- Исправлена навигация при нажатии кнопки "Назад" в форме отчета - теперь ведет на экран загрузки -->
                     <!-- Исправлена проблема с отображением учетных данных в полях авторизации разных форм отчетов -->
@@ -82,7 +82,6 @@
                         <p>Выберите папку с отчетами для формирования полного отчета:</p>
                         <button id="browse-full-report-folder-btn" class="btn btn-primary">Выбрать папку с
                             отчетами</button>
-                        <button id="download-test-reports-btn" class="btn btn-outline">Скачать тестовые отчеты</button>
                         <div id="full-report-display"></div>
                     </div>
                 </div>
@@ -90,6 +89,7 @@
                     <button type="button" id="back-to-auth-full-report" class="btn btn-secondary">Назад</button>
                     <button type="button" id="checklist-button" class="btn btn-outline">Чек-лист проверки</button>
                     <button type="button" id="update-page-link" class="btn btn-outline">Информация о версии</button>
+                    <button id="download-test-reports-btn" class="btn btn-outline">Скачать тестовые отчеты</button>
                 </div>
             </div>
         </div>
@@ -487,7 +487,8 @@
 
                 <div class="preview-actions"
                     style="display: flex !important; justify-content: space-between !important;">
-                    <button type="button" id="edit-form" class="btn btn-secondary">Редактировать</button>
+                    <button type="button" id="edit-form" class="btn btn-secondary">Назад</button>
+                    <button type="button" id="back-to-main-preview" class="btn btn-secondary">На главную</button>
                     <button type="button" id="save-final" class="btn btn-outline">Сохранить</button>
                     <button type="button" id="export-pdf" class="btn btn-primary">Экспорт в PDF</button>
                     <button type="button" id="export-word" class="btn btn-primary">Экспорт в Word</button>
