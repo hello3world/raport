@@ -1,0 +1,42 @@
+{
+    "metadata": {
+        "date_created": "2023-10-03T10:30:00.000Z",
+        "last_modified": "2023-10-03T10:30:00.000Z",
+        "report_id": "test-report-tec-03",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "03.10.2023",
+        "periodStart": "03.10.2023",
+        "periodEnd": "03.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Петров П.П.",
+        "reactor1": "1240",
+        "reactor2": "1170",
+        "reactorSum": "2410",
+        "gasMeter": "44000",
+        "gasConsumption": "11800",
+        "kgu": "840",
+        "boiler1": "315",
+        "boiler2": "280",
+        "boiler3": "250",
+        "steamConsumption": "740",
+        "woodChips": "118",
+        "bark": "80",
+        "sawdust": "59",
+        "waterConsumption": "4950",
+        "waterLevel": "85",
+        "waterReserve": "92",
+        "emergencySituations": [
+            {
+                "time": "03.10.2023 11:30",
+                "equipment": "Генератор №1",
+                "description": "Перегрев подшипников\\nАномальные шумы",
+                "actions": "Отключение генератора\\nЗамеры температуры",
+                "recovery": "03.10.2023 13:45"
+            }
+        ],
+        "equipmentDeviations": "Повышенные вибрации генератора"
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "metadata": {
+        "date_created": "2023-10-06T10:30:00.000Z",
+        "last_modified": "2023-10-06T10:30:00.000Z",
+        "report_id": "test-report-zsv-06",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "06.10.2023",
+        "periodStart": "06.10.2023",
+        "periodEnd": "06.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Сидоров С.С.",
+        "morningSuspended": "52",
+        "daySuspended": "58",
+        "eveningSuspended": "50",
+        "sedimentDay": "3.5",
+        "sedimentNight": "3.1",
+        "waterHardness": "8.7",
+        "waterTurbidity": "2.4",
+        "waterColor": "16.5",
+        "waterTemperature": "19.5",
+        "emergencySituations": [
+            {
+                "time": "06.10.2023 13:20",
+                "equipment": "Обезвоживатель осадка",
+                "description": "Засорение фильтров\\nСнижение производительности",
+                "actions": "Остановка обезвоживателя\\nПромывка фильтров",
+                "recovery": "06.10.2023 15:30"
+            }
+        ],
+        "equipmentDeviations": "Нестабильная работа обезвоживания"
+    }
+}

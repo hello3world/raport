@@ -1,0 +1,26 @@
+{
+    "metadata": {
+        "date_created": "2023-10-06T10:30:00.000Z",
+        "last_modified": "2023-10-06T10:30:00.000Z",
+        "report_id": "test-report-pcx-06",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "06.10.2023",
+        "periodStart": "06.10.2023",
+        "periodEnd": "06.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Кузнецов К.К.",
+        "emergencySituations": [
+            {
+                "time": "06.10.2023 14:40",
+                "equipment": "Редукционный клапан",
+                "description": "Неисправность привода\\nНестабильное давление",
+                "actions": "Ручное управление\\nВызов специалистов",
+                "recovery": "06.10.2023 16:55"
+            }
+        ],
+        "equipmentDeviations": "Нестабильное давление пара"
+    }
+}

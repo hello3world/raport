@@ -1,0 +1,42 @@
+{
+    "metadata": {
+        "date_created": "2023-10-02T10:30:00.000Z",
+        "last_modified": "2023-10-02T10:30:00.000Z",
+        "report_id": "test-report-tec-02",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "02.10.2023",
+        "periodStart": "02.10.2023",
+        "periodEnd": "02.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Петров П.П.",
+        "reactor1": "1220",
+        "reactor2": "1160",
+        "reactorSum": "2380",
+        "gasMeter": "43000",
+        "gasConsumption": "11500",
+        "kgu": "820",
+        "boiler1": "310",
+        "boiler2": "275",
+        "boiler3": "245",
+        "steamConsumption": "730",
+        "woodChips": "115",
+        "bark": "78",
+        "sawdust": "57",
+        "waterConsumption": "4900",
+        "waterLevel": "84",
+        "waterReserve": "91",
+        "emergencySituations": [
+            {
+                "time": "02.10.2023 14:20",
+                "equipment": "Котел №1",
+                "description": "Проблемы с горелками\\nНестабильное пламя",
+                "actions": "Переключение на резервные горелки\\nЧистка основных горелок",
+                "recovery": "02.10.2023 16:45"
+            }
+        ],
+        "equipmentDeviations": "Отклонения в параметрах горения"
+    }
+}

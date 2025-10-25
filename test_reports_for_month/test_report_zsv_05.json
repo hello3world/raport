@@ -1,0 +1,35 @@
+{
+    "metadata": {
+        "date_created": "2023-10-05T10:30:00.000Z",
+        "last_modified": "2023-10-05T10:30:00.000Z",
+        "report_id": "test-report-zsv-05",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "05.10.2023",
+        "periodStart": "05.10.2023",
+        "periodEnd": "05.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Сидоров С.С.",
+        "morningSuspended": "50",
+        "daySuspended": "56",
+        "eveningSuspended": "49",
+        "sedimentDay": "3.4",
+        "sedimentNight": "3.0",
+        "waterHardness": "8.6",
+        "waterTurbidity": "2.3",
+        "waterColor": "16",
+        "waterTemperature": "19",
+        "emergencySituations": [
+            {
+                "time": "05.10.2023 09:30",
+                "equipment": "Флотатор",
+                "description": "Неисправность системы подачи воздуха\\nСнижение эффективности флотации",
+                "actions": "Отключение флотатора\\nРемонт компрессора",
+                "recovery": "05.10.2023 11:45"
+            }
+        ],
+        "equipmentDeviations": "Снижение эффективности флотации"
+    }
+}

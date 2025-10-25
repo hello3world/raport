@@ -1,0 +1,42 @@
+{
+    "metadata": {
+        "date_created": "2023-10-01T10:30:00.000Z",
+        "last_modified": "2023-10-01T10:30:00.000Z",
+        "report_id": "test-report-tec-01",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "01.10.2023",
+        "periodStart": "01.10.2023",
+        "periodEnd": "01.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Петров П.П.",
+        "reactor1": "1200",
+        "reactor2": "1150",
+        "reactorSum": "2350",
+        "gasMeter": "42000",
+        "gasConsumption": "11000",
+        "kgu": "800",
+        "boiler1": "300",
+        "boiler2": "270",
+        "boiler3": "240",
+        "steamConsumption": "720",
+        "woodChips": "110",
+        "bark": "75",
+        "sawdust": "55",
+        "waterConsumption": "4800",
+        "waterLevel": "82",
+        "waterReserve": "90",
+        "emergencySituations": [
+            {
+                "time": "01.10.2023 09:15",
+                "equipment": "Турбина №2",
+                "description": "Вибрация турбины\\nТребуется балансировка",
+                "actions": "Снижение нагрузки\\nВызов вибродиагностики",
+                "recovery": "01.10.2023 11:30"
+            }
+        ],
+        "equipmentDeviations": "Незначительные отклонения в работе оборудования"
+    }
+}

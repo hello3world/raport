@@ -1,0 +1,26 @@
+{
+    "metadata": {
+        "date_created": "2023-10-06T10:30:00.000Z",
+        "last_modified": "2023-10-06T10:30:00.000Z",
+        "report_id": "test-report-erc-06",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "06.10.2023",
+        "periodStart": "06.10.2023",
+        "periodEnd": "06.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Васильев В.В.",
+        "emergencySituations": [
+            {
+                "time": "06.10.2023 12:25",
+                "equipment": "Конденсаторная батарея",
+                "description": "Пробой конденсаторов\\nСрабатывание защиты",
+                "actions": "Отключение батареи\\nЗамена конденсаторов",
+                "recovery": "06.10.2023 14:40"
+            }
+        ],
+        "equipmentDeviations": "Снижение коэффициента мощности"
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "metadata": {
+        "date_created": "2023-10-03T10:30:00.000Z",
+        "last_modified": "2023-10-03T10:30:00.000Z",
+        "report_id": "test-report-erc-03",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "03.10.2023",
+        "periodStart": "03.10.2023",
+        "periodEnd": "03.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Васильев В.В.",
+        "emergencySituations": [
+            {
+                "time": "03.10.2023 13:15",
+                "equipment": "Кабельная линия 10 кВ",
+                "description": "Повреждение изоляции\\nЗамыкание на землю",
+                "actions": "Отключение линии\\nПоиск повреждения",
+                "recovery": "03.10.2023 15:30"
+            }
+        ],
+        "equipmentDeviations": "Нестабильное напряжение в сети"
+    }
+}

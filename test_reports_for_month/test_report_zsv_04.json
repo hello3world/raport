@@ -1,0 +1,35 @@
+{
+    "metadata": {
+        "date_created": "2023-10-04T10:30:00.000Z",
+        "last_modified": "2023-10-04T10:30:00.000Z",
+        "report_id": "test-report-zsv-04",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "04.10.2023",
+        "periodStart": "04.10.2023",
+        "periodEnd": "04.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Сидоров С.С.",
+        "morningSuspended": "48",
+        "daySuspended": "54",
+        "eveningSuspended": "48",
+        "sedimentDay": "3.3",
+        "sedimentNight": "2.9",
+        "waterHardness": "8.5",
+        "waterTurbidity": "2.2",
+        "waterColor": "15.5",
+        "waterTemperature": "18.5",
+        "emergencySituations": [
+            {
+                "time": "04.10.2023 14:40",
+                "equipment": "Отстойник первичный",
+                "description": "Засорение песколовки\\nНарушение гидравлического режима",
+                "actions": "Остановка отстойника\\nМеханическая очистка",
+                "recovery": "04.10.2023 16:50"
+            }
+        ],
+        "equipmentDeviations": "Нарушение режима осаждения"
+    }
+}

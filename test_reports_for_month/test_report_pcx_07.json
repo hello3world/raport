@@ -1,0 +1,26 @@
+{
+    "metadata": {
+        "date_created": "2023-10-07T10:30:00.000Z",
+        "last_modified": "2023-10-07T10:30:00.000Z",
+        "report_id": "test-report-pcx-07",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "07.10.2023",
+        "periodStart": "07.10.2023",
+        "periodEnd": "07.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Кузнецов К.К.",
+        "emergencySituations": [
+            {
+                "time": "07.10.2023 09:50",
+                "equipment": "Питательный насос",
+                "description": "Снижение подачи воды\\nУтечка в системе",
+                "actions": "Переключение на резервный насос\\nПоиск утечки",
+                "recovery": "07.10.2023 12:05"
+            }
+        ],
+        "equipmentDeviations": "Нестабильная подача питательной воды"
+    }
+}

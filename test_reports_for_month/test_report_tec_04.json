@@ -1,0 +1,42 @@
+{
+    "metadata": {
+        "date_created": "2023-10-04T10:30:00.000Z",
+        "last_modified": "2023-10-04T10:30:00.000Z",
+        "report_id": "test-report-tec-04",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "04.10.2023",
+        "periodStart": "04.10.2023",
+        "periodEnd": "04.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Петров П.П.",
+        "reactor1": "1260",
+        "reactor2": "1180",
+        "reactorSum": "2440",
+        "gasMeter": "45000",
+        "gasConsumption": "12000",
+        "kgu": "850",
+        "boiler1": "320",
+        "boiler2": "285",
+        "boiler3": "255",
+        "steamConsumption": "750",
+        "woodChips": "120",
+        "bark": "82",
+        "sawdust": "60",
+        "waterConsumption": "5000",
+        "waterLevel": "86",
+        "waterReserve": "93",
+        "emergencySituations": [
+            {
+                "time": "04.10.2023 16:45",
+                "equipment": "Трансформатор ТМ-3",
+                "description": "Перегрев трансформатора\\nУтечка масла",
+                "actions": "Отключение трансформатора\\nВызов аварийной бригады",
+                "recovery": "04.10.2023 19:30"
+            }
+        ],
+        "equipmentDeviations": "Отклонения в параметрах трансформатора"
+    }
+}

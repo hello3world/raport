@@ -1,0 +1,26 @@
+{
+    "metadata": {
+        "date_created": "2023-10-01T10:30:00.000Z",
+        "last_modified": "2023-10-01T10:30:00.000Z",
+        "report_id": "test-report-pcx-01",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "01.10.2023",
+        "periodStart": "01.10.2023",
+        "periodEnd": "01.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Кузнецов К.К.",
+        "emergencySituations": [
+            {
+                "time": "01.10.2023 10:45",
+                "equipment": "Паровой котел №1",
+                "description": "Снижение давления пара\\nУтечка в системе",
+                "actions": "Снижение нагрузки\\nПоиск места утечки",
+                "recovery": "01.10.2023 13:10"
+            }
+        ],
+        "equipmentDeviations": "Небольшие колебания параметров пара"
+    }
+}

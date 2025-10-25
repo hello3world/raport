@@ -1,0 +1,26 @@
+{
+    "metadata": {
+        "date_created": "2023-10-05T10:30:00.000Z",
+        "last_modified": "2023-10-05T10:30:00.000Z",
+        "report_id": "test-report-erc-05",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "05.10.2023",
+        "periodStart": "05.10.2023",
+        "periodEnd": "05.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Васильев В.В.",
+        "emergencySituations": [
+            {
+                "time": "05.10.2023 15:10",
+                "equipment": "Дизель-генератор",
+                "description": "Неисправность системы запуска\\nОтказ резервного питания",
+                "actions": "Ручной запуск\\nРемонт системы запуска",
+                "recovery": "05.10.2023 17:25"
+            }
+        ],
+        "equipmentDeviations": "Нестабильная работа резервного питания"
+    }
+}

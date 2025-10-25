@@ -1,0 +1,42 @@
+{
+    "metadata": {
+        "date_created": "2023-10-05T10:30:00.000Z",
+        "last_modified": "2023-10-05T10:30:00.000Z",
+        "report_id": "test-report-tec-05",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "05.10.2023",
+        "periodStart": "05.10.2023",
+        "periodEnd": "05.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Петров П.П.",
+        "reactor1": "1280",
+        "reactor2": "1190",
+        "reactorSum": "2470",
+        "gasMeter": "46000",
+        "gasConsumption": "12200",
+        "kgu": "860",
+        "boiler1": "325",
+        "boiler2": "290",
+        "boiler3": "260",
+        "steamConsumption": "760",
+        "woodChips": "122",
+        "bark": "84",
+        "sawdust": "62",
+        "waterConsumption": "5050",
+        "waterLevel": "87",
+        "waterReserve": "94",
+        "emergencySituations": [
+            {
+                "time": "05.10.2023 10:20",
+                "equipment": "Насос питательной воды",
+                "description": "Снижение напора\\nУтечка в системе",
+                "actions": "Переключение на резервный насос\\nПоиск утечки",
+                "recovery": "05.10.2023 12:45"
+            }
+        ],
+        "equipmentDeviations": "Нестабильная подача питательной воды"
+    }
+}

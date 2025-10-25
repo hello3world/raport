@@ -1,0 +1,26 @@
+{
+    "metadata": {
+        "date_created": "2023-10-02T10:30:00.000Z",
+        "last_modified": "2023-10-02T10:30:00.000Z",
+        "report_id": "test-report-pcx-02",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "02.10.2023",
+        "periodStart": "02.10.2023",
+        "periodEnd": "02.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Кузнецов К.К.",
+        "emergencySituations": [
+            {
+                "time": "02.10.2023 15:20",
+                "equipment": "Деаэратор",
+                "description": "Неисправность системы деаэрации\\nПовышенное содержание кислорода",
+                "actions": "Перевод на обводную линию\\nРемонт оборудования",
+                "recovery": "02.10.2023 17:35"
+            }
+        ],
+        "equipmentDeviations": "Отклонения в параметрах деаэрации"
+    }
+}

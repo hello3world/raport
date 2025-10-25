@@ -1,0 +1,26 @@
+{
+    "metadata": {
+        "date_created": "2023-10-02T10:30:00.000Z",
+        "last_modified": "2023-10-02T10:30:00.000Z",
+        "report_id": "test-report-erc-02",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "02.10.2023",
+        "periodStart": "02.10.2023",
+        "periodEnd": "02.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Васильев В.В.",
+        "emergencySituations": [
+            {
+                "time": "02.10.2023 16:20",
+                "equipment": "Выключатель ВН-35",
+                "description": "Неисправность привода выключателя\\nОтказ операции включения",
+                "actions": "Блокировка выключателя\\nВызов специалистов",
+                "recovery": "02.10.2023 18:35"
+            }
+        ],
+        "equipmentDeviations": "Нестабильная работа высоковольтного оборудования"
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "metadata": {
+        "date_created": "2023-10-03T10:30:00.000Z",
+        "last_modified": "2023-10-03T10:30:00.000Z",
+        "report_id": "test-report-zsv-03",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "03.10.2023",
+        "periodStart": "03.10.2023",
+        "periodEnd": "03.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Сидоров С.С.",
+        "morningSuspended": "46",
+        "daySuspended": "52",
+        "eveningSuspended": "47",
+        "sedimentDay": "3.2",
+        "sedimentNight": "2.8",
+        "waterHardness": "8.4",
+        "waterTurbidity": "2.1",
+        "waterColor": "15",
+        "waterTemperature": "18",
+        "emergencySituations": [
+            {
+                "time": "03.10.2023 10:15",
+                "equipment": "Аэротенк",
+                "description": "Снижение активности ила\\nНедостаток кислорода",
+                "actions": "Увеличение подачи воздуха\\nАнализ состава сточных вод",
+                "recovery": "03.10.2023 12:30"
+            }
+        ],
+        "equipmentDeviations": "Снижение эффективности биологической очистки"
+    }
+}

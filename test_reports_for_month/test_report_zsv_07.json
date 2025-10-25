@@ -1,0 +1,35 @@
+{
+    "metadata": {
+        "date_created": "2023-10-07T10:30:00.000Z",
+        "last_modified": "2023-10-07T10:30:00.000Z",
+        "report_id": "test-report-zsv-07",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "07.10.2023",
+        "periodStart": "07.10.2023",
+        "periodEnd": "07.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Сидоров С.С.",
+        "morningSuspended": "54",
+        "daySuspended": "60",
+        "eveningSuspended": "51",
+        "sedimentDay": "3.6",
+        "sedimentNight": "3.2",
+        "waterHardness": "8.8",
+        "waterTurbidity": "2.5",
+        "waterColor": "17",
+        "waterTemperature": "20",
+        "emergencySituations": [
+            {
+                "time": "07.10.2023 16:10",
+                "equipment": "Хлоратор",
+                "description": "Неисправность дозатора хлора\\nРиск недостаточной дезинфекции",
+                "actions": "Переключение на резервный дозатор\\nРемонт основного",
+                "recovery": "07.10.2023 18:20"
+            }
+        ],
+        "equipmentDeviations": "Нестабильная дозировка хлора"
+    }
+}

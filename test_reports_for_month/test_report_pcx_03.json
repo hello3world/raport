@@ -1,0 +1,26 @@
+{
+    "metadata": {
+        "date_created": "2023-10-03T10:30:00.000Z",
+        "last_modified": "2023-10-03T10:30:00.000Z",
+        "report_id": "test-report-pcx-03",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "03.10.2023",
+        "periodStart": "03.10.2023",
+        "periodEnd": "03.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Кузнецов К.К.",
+        "emergencySituations": [
+            {
+                "time": "03.10.2023 12:10",
+                "equipment": "Конденсатный насос",
+                "description": "Снижение напора\\nКавитация",
+                "actions": "Переключение на резервный насос\\nРегулировка уровня конденсата",
+                "recovery": "03.10.2023 14:25"
+            }
+        ],
+        "equipmentDeviations": "Нестабильная работа конденсатных насосов"
+    }
+}

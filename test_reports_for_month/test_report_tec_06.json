@@ -1,0 +1,42 @@
+{
+    "metadata": {
+        "date_created": "2023-10-06T10:30:00.000Z",
+        "last_modified": "2023-10-06T10:30:00.000Z",
+        "report_id": "test-report-tec-06",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "06.10.2023",
+        "periodStart": "06.10.2023",
+        "periodEnd": "06.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Петров П.П.",
+        "reactor1": "1300",
+        "reactor2": "1200",
+        "reactorSum": "2500",
+        "gasMeter": "47000",
+        "gasConsumption": "12400",
+        "kgu": "870",
+        "boiler1": "330",
+        "boiler2": "295",
+        "boiler3": "265",
+        "steamConsumption": "770",
+        "woodChips": "124",
+        "bark": "86",
+        "sawdust": "64",
+        "waterConsumption": "5100",
+        "waterLevel": "88",
+        "waterReserve": "95",
+        "emergencySituations": [
+            {
+                "time": "06.10.2023 15:10",
+                "equipment": "Конденсатор",
+                "description": "Засорение трубок\\nСнижение вакуума",
+                "actions": "Остановка конденсатора\\nПромывка трубок",
+                "recovery": "06.10.2023 17:30"
+            }
+        ],
+        "equipmentDeviations": "Снижение КПД конденсатора"
+    }
+}

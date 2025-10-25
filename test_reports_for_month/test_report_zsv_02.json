@@ -1,0 +1,35 @@
+{
+    "metadata": {
+        "date_created": "2023-10-02T10:30:00.000Z",
+        "last_modified": "2023-10-02T10:30:00.000Z",
+        "report_id": "test-report-zsv-02",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "02.10.2023",
+        "periodStart": "02.10.2023",
+        "periodEnd": "02.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Сидоров С.С.",
+        "morningSuspended": "44",
+        "daySuspended": "50",
+        "eveningSuspended": "46",
+        "sedimentDay": "3.1",
+        "sedimentNight": "2.7",
+        "waterHardness": "8.3",
+        "waterTurbidity": "2.0",
+        "waterColor": "14.5",
+        "waterTemperature": "17.5",
+        "emergencySituations": [
+            {
+                "time": "02.10.2023 15:30",
+                "equipment": "Насос реагентов №1",
+                "description": "Неисправность дозировочного насоса\\nСнижение подачи реагентов",
+                "actions": "Переключение на резервный насос\\nВызов ремонтной бригады",
+                "recovery": "02.10.2023 17:45"
+            }
+        ],
+        "equipmentDeviations": "Нестабильная дозировка реагентов"
+    }
+}

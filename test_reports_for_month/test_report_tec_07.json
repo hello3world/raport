@@ -1,0 +1,42 @@
+{
+    "metadata": {
+        "date_created": "2023-10-07T10:30:00.000Z",
+        "last_modified": "2023-10-07T10:30:00.000Z",
+        "report_id": "test-report-tec-07",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "07.10.2023",
+        "periodStart": "07.10.2023",
+        "periodEnd": "07.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Петров П.П.",
+        "reactor1": "1320",
+        "reactor2": "1210",
+        "reactorSum": "2530",
+        "gasMeter": "48000",
+        "gasConsumption": "12600",
+        "kgu": "880",
+        "boiler1": "335",
+        "boiler2": "300",
+        "boiler3": "270",
+        "steamConsumption": "780",
+        "woodChips": "126",
+        "bark": "88",
+        "sawdust": "66",
+        "waterConsumption": "5150",
+        "waterLevel": "89",
+        "waterReserve": "96",
+        "emergencySituations": [
+            {
+                "time": "07.10.2023 13:40",
+                "equipment": "Электрофильтр",
+                "description": "Пробой изоляции\\nИскрение электродов",
+                "actions": "Отключение электрофильтра\\nЗамена изоляторов",
+                "recovery": "07.10.2023 16:15"
+            }
+        ],
+        "equipmentDeviations": "Снижение эффективности очистки газов"
+    }
+}

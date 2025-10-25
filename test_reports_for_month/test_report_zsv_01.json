@@ -1,0 +1,35 @@
+{
+    "metadata": {
+        "date_created": "2023-10-01T10:30:00.000Z",
+        "last_modified": "2023-10-01T10:30:00.000Z",
+        "report_id": "test-report-zsv-01",
+        "version": 1
+    },
+    "data": {
+        "reportDate": "01.10.2023",
+        "periodStart": "01.10.2023",
+        "periodEnd": "01.10.2023",
+        "startTime": "08-00",
+        "endTime": "08-00",
+        "shiftSupervisor": "Сидоров С.С.",
+        "morningSuspended": "42",
+        "daySuspended": "48",
+        "eveningSuspended": "45",
+        "sedimentDay": "3.0",
+        "sedimentNight": "2.6",
+        "waterHardness": "8.2",
+        "waterTurbidity": "1.9",
+        "waterColor": "14",
+        "waterTemperature": "17",
+        "emergencySituations": [
+            {
+                "time": "01.10.2023 11:20",
+                "equipment": "Фильтр №2",
+                "description": "Засорение фильтра\\nСнижение эффективности очистки",
+                "actions": "Остановка фильтра\\nПромывка системы",
+                "recovery": "01.10.2023 13:45"
+            }
+        ],
+        "equipmentDeviations": "Отклонения в параметрах очистки воды"
+    }
+}
