@@ -263,6 +263,11 @@ class ReportFormApp {
             await this.browseFullReportFolder();
         });
 
+        // Download test reports functionality
+        document.getElementById('download-test-reports-btn')?.addEventListener('click', () => {
+            this.downloadAllTestReports();
+        });
+
         // Модальные окна
         document.querySelector('.modal-close')?.addEventListener('click', () => this.hideModal());
         document.getElementById('modal-cancel')?.addEventListener('click', () => this.hideModal());
@@ -3075,6 +3080,19 @@ class ReportFormApp {
             } else {
                 console.log(`Not resetting formOpenedFrom because navigating to form screen`);
             }
+
+            // Attach event listener for download button when full report screen is shown
+            if (screenId === 'full-report-folder-screen') {
+                // Ensure the download button event listener is attached
+                const downloadButton = document.getElementById('download-test-reports-btn');
+                if (downloadButton && !downloadButton.hasAttribute('data-listener-attached')) {
+                    downloadButton.addEventListener('click', () => {
+                        this.downloadAllTestReports();
+                    });
+                    downloadButton.setAttribute('data-listener-attached', 'true');
+                    console.log('Download button event listener attached');
+                }
+            }
         } else {
             console.error(`Экран с ID ${screenId} не найден!`);
         }
@@ -3635,6 +3653,200 @@ class ReportFormApp {
 
             console.error('Ошибка выбора папки:', error);
             this.showMessage('Ошибка выбора папки. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Download all test reports as a zip file
+    async downloadAllTestReports() {
+        try {
+            // Define test reports content directly to avoid CORS issues
+            const testReports = [
+                { 
+                    name: 'test_report_tec.json', 
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-15T10:30:00.000Z",
+                            "last_modified": "2023-10-15T10:30:00.000Z",
+                            "report_id": "test-report-tec-123",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "15.10.2023",
+                            "periodStart": "15.10.2023",
+                            "periodEnd": "15.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Петров П.П.",
+                            "emergencySituations": [
+                                {
+                                    "time": "15.10.2023 10:00",
+                                    "equipment": "Турбина №1",
+                                    "description": "Неисправность турбины\\nТребуется капитальный ремонт",
+                                    "actions": "Отключение турбины\\nВызов специалистов",
+                                    "recovery": "15.10.2023 12:00"
+                                },
+                                {
+                                    "time": "15.10.2023 14:30",
+                                    "equipment": "Котел №3",
+                                    "description": "Проблемы с подачей угля",
+                                    "actions": "Переключение на резервный котел",
+                                    "recovery": "15.10.2023 16:00"
+                                }
+                            ],
+                            "equipmentDeviations": "Незначительные отклонения в работе оборудования"
+                        }
+                    }, null, 2)
+                },
+                { 
+                    name: 'test_report_zsv.json', 
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-15T10:30:00.000Z",
+                            "last_modified": "2023-10-15T10:30:00.000Z",
+                            "report_id": "test-report-zsv-123",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "15.10.2023",
+                            "periodStart": "15.10.2023",
+                            "periodEnd": "15.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Сидоров С.С.",
+                            "emergencySituations": [
+                                {
+                                    "time": "15.10.2023 09:15",
+                                    "equipment": "Фильтр №1",
+                                    "description": "Засорение фильтра\\nСнижение эффективности очистки",
+                                    "actions": "Остановка фильтра\\nПромывка системы",
+                                    "recovery": "15.10.2023 11:30"
+                                },
+                                {
+                                    "time": "15.10.2023 15:45",
+                                    "equipment": "Насос реагентов",
+                                    "description": "Неисправность дозировочного насоса",
+                                    "actions": "Переключение на резервный насос\\nВызов ремонтной бригады",
+                                    "recovery": "15.10.2023 17:20"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах очистки воды"
+                        }
+                    }, null, 2)
+                },
+                { 
+                    name: 'test_report_pcx.json', 
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-15T10:30:00.000Z",
+                            "last_modified": "2023-10-15T10:30:00.000Z",
+                            "report_id": "test-report-pcx-123",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "15.10.2023",
+                            "periodStart": "15.10.2023",
+                            "periodEnd": "15.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Кузнецов К.К.",
+                            "emergencySituations": [
+                                {
+                                    "time": "15.10.2023 11:20",
+                                    "equipment": "Паровой котел №2",
+                                    "description": "Снижение давления пара\\nУтечка в системе",
+                                    "actions": "Снижение нагрузки\\nПоиск места утечки",
+                                    "recovery": "15.10.2023 13:45"
+                                },
+                                {
+                                    "time": "15.10.2023 16:30",
+                                    "equipment": "Деаэратор",
+                                    "description": "Неисправность системы деаэрации",
+                                    "actions": "Перевод на обводную линию\\nРемонт оборудования",
+                                    "recovery": "15.10.2023 18:15"
+                                }
+                            ],
+                            "equipmentDeviations": "Небольшие колебания параметров пара"
+                        }
+                    }, null, 2)
+                },
+                { 
+                    name: 'test_report_erc.json', 
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-15T10:30:00.000Z",
+                            "last_modified": "2023-10-15T10:30:00.000Z",
+                            "report_id": "test-report-erc-123",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "15.10.2023",
+                            "periodStart": "15.10.2023",
+                            "periodEnd": "15.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Васильев В.В.",
+                            "emergencySituations": [
+                                {
+                                    "time": "15.10.2023 09:45",
+                                    "equipment": "Трансформатор ТМ-1",
+                                    "description": "Перегрев трансформатора\\nАномальные шумы",
+                                    "actions": "Отключение трансформатора\\nЗамеры температуры",
+                                    "recovery": "15.10.2023 12:30"
+                                },
+                                {
+                                    "time": "15.10.2023 14:20",
+                                    "equipment": "Выключатель ВН-35",
+                                    "description": "Неисправность привода выключателя",
+                                    "actions": "Блокировка выключателя\\nВызов специалистов",
+                                    "recovery": "15.10.2023 16:50"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах электрооборудования"
+                        }
+                    }, null, 2)
+                }
+            ];
+
+            // Create a zip file containing all reports
+            const zip = new JSZip();
+            let filesAdded = 0;
+
+            // Add each report to the zip
+            for (const report of testReports) {
+                try {
+                    console.log(`Adding file to zip: ${report.name}`);
+                    zip.file(report.name, report.content);
+                    filesAdded++;
+                } catch (error) {
+                    console.error(`Error adding ${report.name} to zip:`, error);
+                    this.showMessage(`Ошибка добавления ${report.name} в архив: ${error.message}`, 'error');
+                }
+            }
+
+            console.log(`Total files added to zip: ${filesAdded}`);
+            
+            if (filesAdded === 0) {
+                this.showMessage('Не удалось добавить ни один тестовый отчет в архив', 'error');
+                return;
+            }
+
+            // Generate and download the zip file
+            const zipContent = await zip.generateAsync({ type: 'blob' });
+            console.log(`Generated zip file size: ${zipContent.size} bytes`);
+            
+            const zipUrl = URL.createObjectURL(zipContent);
+            const link = document.createElement('a');
+            link.href = zipUrl;
+            link.download = 'test_reports.zip';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(zipUrl);
+
+            this.showMessage(`Тестовые отчеты успешно скачаны! (${filesAdded} файлов)`, 'success');
+        } catch (error) {
+            console.error('Ошибка при скачивании тестовых отчетов:', error);
+            this.showMessage('Ошибка при скачивании тестовых отчетов: ' + error.message, 'error');
         }
     }
 

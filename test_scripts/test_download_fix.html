@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест скачивания отчетов - Исправленный</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+    <h1>Тест скачивания отчетов - Исправленный</h1>
+    <button id="download-test">Скачать тестовые отчеты</button>
+    <div id="status"></div>
+
+    <script>
+        document.getElementById('download-test').addEventListener('click', async function() {
+            try {
+                const status = document.getElementById('status');
+                status.innerHTML = '<p>Загрузка отчетов...</p>';
+                
+                // Define test reports to download
+                const testReports = [
+                    { name: 'test_report_tec.json', url: './test_reports/test_report_tec.json' },
+                    { name: 'test_report_zsv.json', url: './test_reports/test_report_zsv.json' },
+                    { name: 'test_report_pcx.json', url: './test_reports/test_report_pcx.json' },
+                    { name: 'test_report_erc.json', url: './test_reports/test_report_erc.json' }
+                ];
+
+                // Create a zip file containing all reports
+                const zip = new JSZip();
+                let filesAdded = 0;
+
+                // Add each report to the zip
+                for (const report of testReports) {
+                    try {
+                        console.log(`Fetching report: ${report.url}`);
+                        const response = await fetch(report.url);
+                        if (response.ok) {
+                            const content = await response.text();
+                            console.log(`Adding file to zip: ${report.name}`, content.substring(0, 100) + '...');
+                            zip.file(report.name, content);
+                            filesAdded++;
+                        } else {
+                            console.error(`Failed to fetch ${report.name}: ${response.status} ${response.statusText}`);
+                            status.innerHTML += `<p style="color: red;">Ошибка загрузки ${report.name}: ${response.status}</p>`;
+                        }
+                    } catch (error) {
+                        console.error(`Error fetching ${report.name}:`, error);
+                        status.innerHTML += `<p style="color: red;">Ошибка загрузки ${report.name}: ${error.message}</p>`;
+                    }
+                }
+
+                console.log(`Total files added to zip: ${filesAdded}`);
+                
+                if (filesAdded === 0) {
+                    status.innerHTML += '<p style="color: red;">Не удалось загрузить ни один тестовый отчет</p>';
+                    return;
+                }
+
+                // Generate and download the zip file
+                const zipContent = await zip.generateAsync({ type: 'blob' });
+                console.log(`Generated zip file size: ${zipContent.size} bytes`);
+                
+                const zipUrl = URL.createObjectURL(zipContent);
+                const link = document.createElement('a');
+                link.href = zipUrl;
+                link.download = 'test_reports.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(zipUrl);
+
+                status.innerHTML += `<p style="color: green;">Тестовые отчеты успешно скачаны! (${filesAdded} файлов)</p>`;
+            } catch (error) {
+                console.error('Ошибка при скачивании тестовых отчетов:', error);
+                document.getElementById('status').innerHTML += `<p style="color: red;">Ошибка при скачивании тестовых отчетов: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Button Visibility</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Экран выбора папки для полного отчета -->
+        <div id="full-report-folder-screen" class="screen active">
+            <div class="container">
+                <h2>Полный отчет за сутки</h2>
+                <div class="full-report-content">
+                    <div class="browse-reports-section">
+                        <p>Выберите папку с отчетами для формирования полного отчета:</p>
+                        <button id="browse-full-report-folder-btn" class="btn btn-primary">Выбрать папку с
+                            отчетами</button>
+                        <button id="download-test-reports-btn" class="btn btn-outline">Скачать тестовые отчеты</button>
+                        <div id="full-report-display"></div>
+                    </div>
+                </div>
+                <div class="full-report-actions">
+                    <button type="button" id="back-to-auth-full-report" class="btn btn-secondary">Назад</button>
+                    <button type="button" id="checklist-button" class="btn btn-outline">Чек-лист проверки</button>
+                    <button type="button" id="update-page-link" class="btn btn-outline">Информация о версии</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Debug function to check button visibility
+        function debugButton() {
+            const button = document.getElementById('download-test-reports-btn');
+            if (button) {
+                console.log('Button found in DOM');
+                console.log('Button style:', window.getComputedStyle(button));
+                console.log('Button offsetParent:', button.offsetParent);
+                console.log('Button offsetWidth:', button.offsetWidth);
+                console.log('Button offsetHeight:', button.offsetHeight);
+                console.log('Button clientWidth:', button.clientWidth);
+                console.log('Button clientHeight:', button.clientHeight);
+
+                // Check parent elements
+                let parent = button.parentElement;
+                while (parent) {
+                    console.log('Parent:', parent.id || parent.tagName, 'display:', window.getComputedStyle(parent).display);
+                    parent = parent.parentElement;
+                }
+            } else {
+                console.log('Button NOT found in DOM');
+            }
+        }
+
+        // Run debug when page loads
+        window.addEventListener('load', debugButton);
+
+        // Add event listener to the button
+        document.getElementById('download-test-reports-btn')?.addEventListener('click', async function () {
+            try {
+                console.log('Button clicked!');
+
+                // Define test reports to download
+                const testReports = [
+                    { name: 'test_report_tec.json', url: 'test_reports/test_report_tec.json' },
+                    { name: 'test_report_zsv.json', url: 'test_reports/test_report_zsv.json' },
+                    { name: 'test_report_pcx.json', url: 'test_reports/test_report_pcx.json' },
+                    { name: 'test_report_erc.json', url: 'test_reports/test_report_erc.json' }
+                ];
+
+                // Create a zip file containing all reports
+                const zip = new JSZip();
+
+                // Add each report to the zip
+                for (const report of testReports) {
+                    try {
+                        const response = await fetch(report.url);
+                        if (response.ok) {
+                            const content = await response.text();
+                            zip.file(report.name, content);
+                        } else {
+                            console.error(`Failed to fetch ${report.name}: ${response.status}`);
+                            alert(`Ошибка загрузки ${report.name}`);
+                        }
+                    } catch (error) {
+                        console.error(`Error fetching ${report.name}:`, error);
+                        alert(`Ошибка загрузки ${report.name}: ${error.message}`);
+                    }
+                }
+
+                // Generate and download the zip file
+                const zipContent = await zip.generateAsync({ type: 'blob' });
+                const zipUrl = URL.createObjectURL(zipContent);
+                const link = document.createElement('a');
+                link.href = zipUrl;
+                link.download = 'test_reports.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(zipUrl);
+
+                alert('Тестовые отчеты успешно скачаны!');
+            } catch (error) {
+                console.error('Ошибка при скачивании тестовых отчетов:', error);
+                alert('Ошибка при скачивании тестовых отчетов: ' + error.message);
+            }
+        });
+    </script>
+</body>
+
+</html>
