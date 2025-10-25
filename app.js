@@ -350,6 +350,11 @@ class ReportFormApp {
             await this.browseRetrospectiveFolder();
         });
 
+        // Download retrospective test reports functionality
+        document.getElementById('download-retrospective-test-reports-btn')?.addEventListener('click', () => {
+            this.downloadRetrospectiveTestReports();
+        });
+
         // Download test reports functionality
         document.getElementById('download-test-reports-btn')?.addEventListener('click', () => {
             this.downloadAllTestReports();
@@ -4470,6 +4475,1052 @@ class ReportFormApp {
         } catch (error) {
             console.error('Ошибка при скачивании тестовых отчетов за неделю:', error);
             this.showMessage('Ошибка при скачивании тестовых отчетов за неделю: ' + error.message, 'error');
+        }
+    }
+
+    // Download retrospective test reports functionality
+    // Обновление от 26.10.2025: Исправлена проблема с CORS при запуске через file:// протокол
+    // Вместо fetch() файлы теперь встраиваются напрямую для избежания проблем с доступом к файлам
+    async downloadRetrospectiveTestReports() {
+        try {
+            // Define retrospective test reports content directly to avoid CORS issues
+            const retrospectiveTestReports = [
+                // TEC reports (Теплоэлектроцентраль) - 7 days
+                {
+                    name: 'test_report_tec_01.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-01T10:30:00.000Z",
+                            "last_modified": "2023-10-01T10:30:00.000Z",
+                            "report_id": "test-report-tec-01",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "01.10.2023",
+                            "periodStart": "01.10.2023",
+                            "periodEnd": "01.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Петров П.П.",
+                            "reactor1": "1200",
+                            "reactor2": "1150",
+                            "reactorSum": "2350",
+                            "gasMeter": "42000",
+                            "gasConsumption": "11000",
+                            "kgu": "800",
+                            "boiler1": "300",
+                            "boiler2": "270",
+                            "boiler3": "240",
+                            "steamConsumption": "720",
+                            "woodChips": "110",
+                            "bark": "75",
+                            "sawdust": "55",
+                            "waterConsumption": "4800",
+                            "waterLevel": "82",
+                            "waterReserve": "90",
+                            "emergencySituations": [
+                                {
+                                    "time": "01.10.2023 09:15",
+                                    "equipment": "Турбина №2",
+                                    "description": "Вибрация турбины\\nТребуется балансировка",
+                                    "actions": "Снижение нагрузки\\nВызов вибродиагностики",
+                                    "recovery": "01.10.2023 11:30"
+                                }
+                            ],
+                            "equipmentDeviations": "Незначительные отклонения в работе оборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_tec_02.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-02T10:30:00.000Z",
+                            "last_modified": "2023-10-02T10:30:00.000Z",
+                            "report_id": "test-report-tec-02",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "02.10.2023",
+                            "periodStart": "02.10.2023",
+                            "periodEnd": "02.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Петров П.П.",
+                            "reactor1": "1220",
+                            "reactor2": "1170",
+                            "reactorSum": "2390",
+                            "gasMeter": "42500",
+                            "gasConsumption": "11200",
+                            "kgu": "810",
+                            "boiler1": "305",
+                            "boiler2": "275",
+                            "boiler3": "245",
+                            "steamConsumption": "730",
+                            "woodChips": "112",
+                            "bark": "76",
+                            "sawdust": "56",
+                            "waterConsumption": "4850",
+                            "waterLevel": "83",
+                            "waterReserve": "91",
+                            "emergencySituations": [
+                                {
+                                    "time": "02.10.2023 10:30",
+                                    "equipment": "Котел №1",
+                                    "description": "Неисправность горелки\\nТребуется замена",
+                                    "actions": "Отключение котла\\nВызов специалистов",
+                                    "recovery": "02.10.2023 13:45"
+                                }
+                            ],
+                            "equipmentDeviations": "Незначительные отклонения в работе оборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_tec_03.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-03T10:30:00.000Z",
+                            "last_modified": "2023-10-03T10:30:00.000Z",
+                            "report_id": "test-report-tec-03",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "03.10.2023",
+                            "periodStart": "03.10.2023",
+                            "periodEnd": "03.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Петров П.П.",
+                            "reactor1": "1210",
+                            "reactor2": "1160",
+                            "reactorSum": "2370",
+                            "gasMeter": "42300",
+                            "gasConsumption": "11100",
+                            "kgu": "805",
+                            "boiler1": "302",
+                            "boiler2": "272",
+                            "boiler3": "242",
+                            "steamConsumption": "725",
+                            "woodChips": "111",
+                            "bark": "75",
+                            "sawdust": "55",
+                            "waterConsumption": "4820",
+                            "waterLevel": "82",
+                            "waterReserve": "90",
+                            "emergencySituations": [
+                                {
+                                    "time": "03.10.2023 14:20",
+                                    "equipment": "Турбина №1",
+                                    "description": "Превышение температуры\\nТребуется охлаждение",
+                                    "actions": "Снижение нагрузки\\nВключение дополнительного охлаждения",
+                                    "recovery": "03.10.2023 16:30"
+                                }
+                            ],
+                            "equipmentDeviations": "Незначительные отклонения в работе оборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_tec_04.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-04T10:30:00.000Z",
+                            "last_modified": "2023-10-04T10:30:00.000Z",
+                            "report_id": "test-report-tec-04",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "04.10.2023",
+                            "periodStart": "04.10.2023",
+                            "periodEnd": "04.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Петров П.П.",
+                            "reactor1": "1230",
+                            "reactor2": "1180",
+                            "reactorSum": "2410",
+                            "gasMeter": "42700",
+                            "gasConsumption": "11300",
+                            "kgu": "815",
+                            "boiler1": "308",
+                            "boiler2": "278",
+                            "boiler3": "248",
+                            "steamConsumption": "735",
+                            "woodChips": "113",
+                            "bark": "77",
+                            "sawdust": "57",
+                            "waterConsumption": "4870",
+                            "waterLevel": "84",
+                            "waterReserve": "92",
+                            "emergencySituations": [
+                                {
+                                    "time": "04.10.2023 11:45",
+                                    "equipment": "Котел №3",
+                                    "description": "Проблемы с подачей угля\\nЗасорение транспортера",
+                                    "actions": "Остановка подачи угля\\nЧистка транспортера",
+                                    "recovery": "04.10.2023 14:20"
+                                }
+                            ],
+                            "equipmentDeviations": "Незначительные отклонения в работе оборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_tec_05.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-05T10:30:00.000Z",
+                            "last_modified": "2023-10-05T10:30:00.000Z",
+                            "report_id": "test-report-tec-05",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "05.10.2023",
+                            "periodStart": "05.10.2023",
+                            "periodEnd": "05.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Петров П.П.",
+                            "reactor1": "1240",
+                            "reactor2": "1190",
+                            "reactorSum": "2430",
+                            "gasMeter": "42900",
+                            "gasConsumption": "11400",
+                            "kgu": "820",
+                            "boiler1": "310",
+                            "boiler2": "280",
+                            "boiler3": "250",
+                            "steamConsumption": "740",
+                            "woodChips": "114",
+                            "bark": "78",
+                            "sawdust": "58",
+                            "waterConsumption": "4890",
+                            "waterLevel": "85",
+                            "waterReserve": "93",
+                            "emergencySituations": [
+                                {
+                                    "time": "05.10.2023 09:30",
+                                    "equipment": "Турбина №2",
+                                    "description": "Утечка масла\\nТребуется замена уплотнений",
+                                    "actions": "Отключение турбины\\nПоиск места утечки",
+                                    "recovery": "05.10.2023 12:15"
+                                }
+                            ],
+                            "equipmentDeviations": "Незначительные отклонения в работе оборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_tec_06.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-06T10:30:00.000Z",
+                            "last_modified": "2023-10-06T10:30:00.000Z",
+                            "report_id": "test-report-tec-06",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "06.10.2023",
+                            "periodStart": "06.10.2023",
+                            "periodEnd": "06.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Петров П.П.",
+                            "reactor1": "1250",
+                            "reactor2": "1200",
+                            "reactorSum": "2450",
+                            "gasMeter": "43100",
+                            "gasConsumption": "11500",
+                            "kgu": "825",
+                            "boiler1": "312",
+                            "boiler2": "282",
+                            "boiler3": "252",
+                            "steamConsumption": "745",
+                            "woodChips": "115",
+                            "bark": "79",
+                            "sawdust": "59",
+                            "waterConsumption": "4910",
+                            "waterLevel": "86",
+                            "waterReserve": "94",
+                            "emergencySituations": [
+                                {
+                                    "time": "06.10.2023 13:15",
+                                    "equipment": "Котел №2",
+                                    "description": "Неисправность дымососа\\nТребуется ремонт",
+                                    "actions": "Отключение котла\\nВызов ремонтной бригады",
+                                    "recovery": "06.10.2023 16:45"
+                                }
+                            ],
+                            "equipmentDeviations": "Незначительные отклонения в работе оборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_tec_07.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-07T10:30:00.000Z",
+                            "last_modified": "2023-10-07T10:30:00.000Z",
+                            "report_id": "test-report-tec-07",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "07.10.2023",
+                            "periodStart": "07.10.2023",
+                            "periodEnd": "07.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Петров П.П.",
+                            "reactor1": "1260",
+                            "reactor2": "1210",
+                            "reactorSum": "2470",
+                            "gasMeter": "43300",
+                            "gasConsumption": "11600",
+                            "kgu": "830",
+                            "boiler1": "315",
+                            "boiler2": "285",
+                            "boiler3": "255",
+                            "steamConsumption": "750",
+                            "woodChips": "116",
+                            "bark": "80",
+                            "sawdust": "60",
+                            "waterConsumption": "4930",
+                            "waterLevel": "87",
+                            "waterReserve": "95",
+                            "emergencySituations": [
+                                {
+                                    "time": "07.10.2023 10:45",
+                                    "equipment": "Турбина №1",
+                                    "description": "Неисправность регулирующего клапана\\nТребуется замена",
+                                    "actions": "Отключение турбины\\nВызов специалистов",
+                                    "recovery": "07.10.2023 14:30"
+                                }
+                            ],
+                            "equipmentDeviations": "Незначительные отклонения в работе оборудования"
+                        }
+                    }, null, 2)
+                },
+
+                // ZSV reports (Участок сточных вод) - 7 days
+                {
+                    name: 'test_report_zsv_01.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-01T10:30:00.000Z",
+                            "last_modified": "2023-10-01T10:30:00.000Z",
+                            "report_id": "test-report-zsv-01",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "01.10.2023",
+                            "periodStart": "01.10.2023",
+                            "periodEnd": "01.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Сидоров С.С.",
+                            "morningSuspended": "42",
+                            "daySuspended": "48",
+                            "eveningSuspended": "45",
+                            "sedimentDay": "3.0",
+                            "sedimentNight": "2.6",
+                            "waterHardness": "8.2",
+                            "waterTurbidity": "1.9",
+                            "waterColor": "14",
+                            "waterTemperature": "17",
+                            "emergencySituations": [
+                                {
+                                    "time": "01.10.2023 11:20",
+                                    "equipment": "Фильтр №2",
+                                    "description": "Засорение фильтра\\nСнижение эффективности очистки",
+                                    "actions": "Остановка фильтра\\nПромывка системы",
+                                    "recovery": "01.10.2023 13:45"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах очистки воды"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_zsv_02.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-02T10:30:00.000Z",
+                            "last_modified": "2023-10-02T10:30:00.000Z",
+                            "report_id": "test-report-zsv-02",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "02.10.2023",
+                            "periodStart": "02.10.2023",
+                            "periodEnd": "02.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Сидоров С.С.",
+                            "morningSuspended": "43",
+                            "daySuspended": "49",
+                            "eveningSuspended": "46",
+                            "sedimentDay": "3.1",
+                            "sedimentNight": "2.7",
+                            "waterHardness": "8.3",
+                            "waterTurbidity": "2.0",
+                            "waterColor": "15",
+                            "waterTemperature": "17",
+                            "emergencySituations": [
+                                {
+                                    "time": "02.10.2023 09:30",
+                                    "equipment": "Насос реагентов №1",
+                                    "description": "Неисправность дозировочного насоса\\nТребуется ремонт",
+                                    "actions": "Переключение на резервный насос\\nВызов ремонтной бригады",
+                                    "recovery": "02.10.2023 12:15"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах очистки воды"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_zsv_03.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-03T10:30:00.000Z",
+                            "last_modified": "2023-10-03T10:30:00.000Z",
+                            "report_id": "test-report-zsv-03",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "03.10.2023",
+                            "periodStart": "03.10.2023",
+                            "periodEnd": "03.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Сидоров С.С.",
+                            "morningSuspended": "44",
+                            "daySuspended": "50",
+                            "eveningSuspended": "47",
+                            "sedimentDay": "3.2",
+                            "sedimentNight": "2.8",
+                            "waterHardness": "8.4",
+                            "waterTurbidity": "2.1",
+                            "waterColor": "16",
+                            "waterTemperature": "18",
+                            "emergencySituations": [
+                                {
+                                    "time": "03.10.2023 14:45",
+                                    "equipment": "Фильтр №3",
+                                    "description": "Засорение фильтра\\nСнижение эффективности очистки",
+                                    "actions": "Остановка фильтра\\nПромывка системы",
+                                    "recovery": "03.10.2023 17:20"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах очистки воды"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_zsv_04.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-04T10:30:00.000Z",
+                            "last_modified": "2023-10-04T10:30:00.000Z",
+                            "report_id": "test-report-zsv-04",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "04.10.2023",
+                            "periodStart": "04.10.2023",
+                            "periodEnd": "04.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Сидоров С.С.",
+                            "morningSuspended": "45",
+                            "daySuspended": "51",
+                            "eveningSuspended": "48",
+                            "sedimentDay": "3.3",
+                            "sedimentNight": "2.9",
+                            "waterHardness": "8.5",
+                            "waterTurbidity": "2.2",
+                            "waterColor": "17",
+                            "waterTemperature": "18",
+                            "emergencySituations": [
+                                {
+                                    "time": "04.10.2023 10:15",
+                                    "equipment": "Насос реагентов №2",
+                                    "description": "Неисправность дозировочного насоса\\nТребуется ремонт",
+                                    "actions": "Переключение на резервный насос\\nВызов ремонтной бригады",
+                                    "recovery": "04.10.2023 13:30"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах очистки воды"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_zsv_05.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-05T10:30:00.000Z",
+                            "last_modified": "2023-10-05T10:30:00.000Z",
+                            "report_id": "test-report-zsv-05",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "05.10.2023",
+                            "periodStart": "05.10.2023",
+                            "periodEnd": "05.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Сидоров С.С.",
+                            "morningSuspended": "46",
+                            "daySuspended": "52",
+                            "eveningSuspended": "49",
+                            "sedimentDay": "3.4",
+                            "sedimentNight": "3.0",
+                            "waterHardness": "8.6",
+                            "waterTurbidity": "2.3",
+                            "waterColor": "18",
+                            "waterTemperature": "19",
+                            "emergencySituations": [
+                                {
+                                    "time": "05.10.2023 15:30",
+                                    "equipment": "Фильтр №1",
+                                    "description": "Засорение фильтра\\nСнижение эффективности очистки",
+                                    "actions": "Остановка фильтра\\nПромывка системы",
+                                    "recovery": "05.10.2023 18:15"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах очистки воды"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_zsv_06.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-06T10:30:00.000Z",
+                            "last_modified": "2023-10-06T10:30:00.000Z",
+                            "report_id": "test-report-zsv-06",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "06.10.2023",
+                            "periodStart": "06.10.2023",
+                            "periodEnd": "06.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Сидоров С.С.",
+                            "morningSuspended": "47",
+                            "daySuspended": "53",
+                            "eveningSuspended": "50",
+                            "sedimentDay": "3.5",
+                            "sedimentNight": "3.1",
+                            "waterHardness": "8.7",
+                            "waterTurbidity": "2.4",
+                            "waterColor": "19",
+                            "waterTemperature": "19",
+                            "emergencySituations": [
+                                {
+                                    "time": "06.10.2023 11:45",
+                                    "equipment": "Насос реагентов №3",
+                                    "description": "Неисправность дозировочного насоса\\nТребуется ремонт",
+                                    "actions": "Переключение на резервный насос\\nВызов ремонтной бригады",
+                                    "recovery": "06.10.2023 15:20"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах очистки воды"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_zsv_07.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-07T10:30:00.000Z",
+                            "last_modified": "2023-10-07T10:30:00.000Z",
+                            "report_id": "test-report-zsv-07",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "07.10.2023",
+                            "periodStart": "07.10.2023",
+                            "periodEnd": "07.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Сидоров С.С.",
+                            "morningSuspended": "48",
+                            "daySuspended": "54",
+                            "eveningSuspended": "51",
+                            "sedimentDay": "3.6",
+                            "sedimentNight": "3.2",
+                            "waterHardness": "8.8",
+                            "waterTurbidity": "2.5",
+                            "waterColor": "20",
+                            "waterTemperature": "20",
+                            "emergencySituations": [
+                                {
+                                    "time": "07.10.2023 13:20",
+                                    "equipment": "Фильтр №4",
+                                    "description": "Засорение фильтра\\nСнижение эффективности очистки",
+                                    "actions": "Остановка фильтра\\nПромывка системы",
+                                    "recovery": "07.10.2023 16:45"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах очистки воды"
+                        }
+                    }, null, 2)
+                },
+
+                // PCX reports (Паросиловое хозяйство) - 7 days
+                {
+                    name: 'test_report_pcx_01.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-01T10:30:00.000Z",
+                            "last_modified": "2023-10-01T10:30:00.000Z",
+                            "report_id": "test-report-pcx-01",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "01.10.2023",
+                            "periodStart": "01.10.2023",
+                            "periodEnd": "01.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Кузнецов К.К.",
+                            "emergencySituations": [
+                                {
+                                    "time": "01.10.2023 09:45",
+                                    "equipment": "Паровой котел №1",
+                                    "description": "Снижение давления пара\\nУтечка в системе",
+                                    "actions": "Снижение нагрузки\\nПоиск места утечки",
+                                    "recovery": "01.10.2023 12:30"
+                                }
+                            ],
+                            "equipmentDeviations": "Небольшие колебания параметров пара"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_pcx_02.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-02T10:30:00.000Z",
+                            "last_modified": "2023-10-02T10:30:00.000Z",
+                            "report_id": "test-report-pcx-02",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "02.10.2023",
+                            "periodStart": "02.10.2023",
+                            "periodEnd": "02.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Кузнецов К.К.",
+                            "emergencySituations": [
+                                {
+                                    "time": "02.10.2023 11:30",
+                                    "equipment": "Деаэратор №1",
+                                    "description": "Неисправность системы деаэрации\\nТребуется ремонт",
+                                    "actions": "Перевод на обводную линию\\nРемонт оборудования",
+                                    "recovery": "02.10.2023 14:45"
+                                }
+                            ],
+                            "equipmentDeviations": "Небольшие колебания параметров пара"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_pcx_03.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-03T10:30:00.000Z",
+                            "last_modified": "2023-10-03T10:30:00.000Z",
+                            "report_id": "test-report-pcx-03",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "03.10.2023",
+                            "periodStart": "03.10.2023",
+                            "periodEnd": "03.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Кузнецов К.К.",
+                            "emergencySituations": [
+                                {
+                                    "time": "03.10.2023 15:20",
+                                    "equipment": "Паровой котел №2",
+                                    "description": "Снижение давления пара\\nУтечка в системе",
+                                    "actions": "Снижение нагрузки\\nПоиск места утечки",
+                                    "recovery": "03.10.2023 18:15"
+                                }
+                            ],
+                            "equipmentDeviations": "Небольшие колебания параметров пара"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_pcx_04.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-04T10:30:00.000Z",
+                            "last_modified": "2023-10-04T10:30:00.000Z",
+                            "report_id": "test-report-pcx-04",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "04.10.2023",
+                            "periodStart": "04.10.2023",
+                            "periodEnd": "04.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Кузнецов К.К.",
+                            "emergencySituations": [
+                                {
+                                    "time": "04.10.2023 10:15",
+                                    "equipment": "Деаэратор №2",
+                                    "description": "Неисправность системы деаэрации\\nТребуется ремонт",
+                                    "actions": "Перевод на обводную линию\\nРемонт оборудования",
+                                    "recovery": "04.10.2023 13:30"
+                                }
+                            ],
+                            "equipmentDeviations": "Небольшие колебания параметров пара"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_pcx_05.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-05T10:30:00.000Z",
+                            "last_modified": "2023-10-05T10:30:00.000Z",
+                            "report_id": "test-report-pcx-05",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "05.10.2023",
+                            "periodStart": "05.10.2023",
+                            "periodEnd": "05.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Кузнецов К.К.",
+                            "emergencySituations": [
+                                {
+                                    "time": "05.10.2023 14:30",
+                                    "equipment": "Паровой котел №3",
+                                    "description": "Снижение давления пара\\nУтечка в системе",
+                                    "actions": "Снижение нагрузки\\nПоиск места утечки",
+                                    "recovery": "05.10.2023 17:45"
+                                }
+                            ],
+                            "equipmentDeviations": "Небольшие колебания параметров пара"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_pcx_06.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-06T10:30:00.000Z",
+                            "last_modified": "2023-10-06T10:30:00.000Z",
+                            "report_id": "test-report-pcx-06",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "06.10.2023",
+                            "periodStart": "06.10.2023",
+                            "periodEnd": "06.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Кузнецов К.К.",
+                            "emergencySituations": [
+                                {
+                                    "time": "06.10.2023 11:45",
+                                    "equipment": "Деаэратор №3",
+                                    "description": "Неисправность системы деаэрации\\nТребуется ремонт",
+                                    "actions": "Перевод на обводную линию\\nРемонт оборудования",
+                                    "recovery": "06.10.2023 15:20"
+                                }
+                            ],
+                            "equipmentDeviations": "Небольшие колебания параметров пара"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_pcx_07.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-07T10:30:00.000Z",
+                            "last_modified": "2023-10-07T10:30:00.000Z",
+                            "report_id": "test-report-pcx-07",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "07.10.2023",
+                            "periodStart": "07.10.2023",
+                            "periodEnd": "07.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Кузнецов К.К.",
+                            "emergencySituations": [
+                                {
+                                    "time": "07.10.2023 16:30",
+                                    "equipment": "Паровой котел №4",
+                                    "description": "Снижение давления пара\\nУтечка в системе",
+                                    "actions": "Снижение нагрузки\\nПоиск места утечки",
+                                    "recovery": "07.10.2023 19:45"
+                                }
+                            ],
+                            "equipmentDeviations": "Небольшие колебания параметров пара"
+                        }
+                    }, null, 2)
+                },
+
+                // ERC reports (Электроремонтный цех) - 7 days
+                {
+                    name: 'test_report_erc_01.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-01T10:30:00.000Z",
+                            "last_modified": "2023-10-01T10:30:00.000Z",
+                            "report_id": "test-report-erc-01",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "01.10.2023",
+                            "periodStart": "01.10.2023",
+                            "periodEnd": "01.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Васильев В.В.",
+                            "emergencySituations": [
+                                {
+                                    "time": "01.10.2023 10:30",
+                                    "equipment": "Трансформатор ТМ-1",
+                                    "description": "Перегрев трансформатора\\nАномальные шумы",
+                                    "actions": "Отключение трансформатора\\nЗамеры температуры",
+                                    "recovery": "01.10.2023 13:45"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах электрооборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_erc_02.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-02T10:30:00.000Z",
+                            "last_modified": "2023-10-02T10:30:00.000Z",
+                            "report_id": "test-report-erc-02",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "02.10.2023",
+                            "periodStart": "02.10.2023",
+                            "periodEnd": "02.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Васильев В.В.",
+                            "emergencySituations": [
+                                {
+                                    "time": "02.10.2023 14:20",
+                                    "equipment": "Выключатель ВН-35",
+                                    "description": "Неисправность привода выключателя\\nТребуется ремонт",
+                                    "actions": "Блокировка выключателя\\nВызов специалистов",
+                                    "recovery": "02.10.2023 17:30"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах электрооборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_erc_03.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-03T10:30:00.000Z",
+                            "last_modified": "2023-10-03T10:30:00.000Z",
+                            "report_id": "test-report-erc-03",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "03.10.2023",
+                            "periodStart": "03.10.2023",
+                            "periodEnd": "03.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Васильев В.В.",
+                            "emergencySituations": [
+                                {
+                                    "time": "03.10.2023 09:15",
+                                    "equipment": "Трансформатор ТМ-2",
+                                    "description": "Перегрев трансформатора\\nАномальные шумы",
+                                    "actions": "Отключение трансформатора\\nЗамеры температуры",
+                                    "recovery": "03.10.2023 12:30"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах электрооборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_erc_04.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-04T10:30:00.000Z",
+                            "last_modified": "2023-10-04T10:30:00.000Z",
+                            "report_id": "test-report-erc-04",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "04.10.2023",
+                            "periodStart": "04.10.2023",
+                            "periodEnd": "04.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Васильев В.В.",
+                            "emergencySituations": [
+                                {
+                                    "time": "04.10.2023 15:45",
+                                    "equipment": "Выключатель ВН-110",
+                                    "description": "Неисправность привода выключателя\\nТребуется ремонт",
+                                    "actions": "Блокировка выключателя\\nВызов специалистов",
+                                    "recovery": "04.10.2023 19:15"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах электрооборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_erc_05.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-05T10:30:00.000Z",
+                            "last_modified": "2023-10-05T10:30:00.000Z",
+                            "report_id": "test-report-erc-05",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "05.10.2023",
+                            "periodStart": "05.10.2023",
+                            "periodEnd": "05.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Васильев В.В.",
+                            "emergencySituations": [
+                                {
+                                    "time": "05.10.2023 11:30",
+                                    "equipment": "Трансформатор ТМ-3",
+                                    "description": "Перегрев трансформатора\\nАномальные шумы",
+                                    "actions": "Отключение трансформатора\\nЗамеры температуры",
+                                    "recovery": "05.10.2023 14:45"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах электрооборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_erc_06.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-06T10:30:00.000Z",
+                            "last_modified": "2023-10-06T10:30:00.000Z",
+                            "report_id": "test-report-erc-06",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "06.10.2023",
+                            "periodStart": "06.10.2023",
+                            "periodEnd": "06.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Васильев В.В.",
+                            "emergencySituations": [
+                                {
+                                    "time": "06.10.2023 16:20",
+                                    "equipment": "Выключатель ВН-220",
+                                    "description": "Неисправность привода выключателя\\nТребуется ремонт",
+                                    "actions": "Блокировка выключателя\\nВызов специалистов",
+                                    "recovery": "06.10.2023 19:45"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах электрооборудования"
+                        }
+                    }, null, 2)
+                },
+                {
+                    name: 'test_report_erc_07.json',
+                    content: JSON.stringify({
+                        "metadata": {
+                            "date_created": "2023-10-07T10:30:00.000Z",
+                            "last_modified": "2023-10-07T10:30:00.000Z",
+                            "report_id": "test-report-erc-07",
+                            "version": 1
+                        },
+                        "data": {
+                            "reportDate": "07.10.2023",
+                            "periodStart": "07.10.2023",
+                            "periodEnd": "07.10.2023",
+                            "startTime": "08-00",
+                            "endTime": "08-00",
+                            "shiftSupervisor": "Васильев В.В.",
+                            "emergencySituations": [
+                                {
+                                    "time": "07.10.2023 13:45",
+                                    "equipment": "Трансформатор ТМ-4",
+                                    "description": "Перегрев трансформатора\\nАномальные шумы",
+                                    "actions": "Отключение трансформатора\\nЗамеры температуры",
+                                    "recovery": "07.10.2023 17:15"
+                                }
+                            ],
+                            "equipmentDeviations": "Отклонения в параметрах электрооборудования"
+                        }
+                    }, null, 2)
+                }
+            ];
+
+            // Create a zip file containing all reports
+            const zip = new JSZip();
+            let filesAdded = 0;
+
+            // Add each report to the zip
+            for (const report of retrospectiveTestReports) {
+                try {
+                    console.log(`Adding file to zip: ${report.name}`);
+                    zip.file(report.name, report.content);
+                    filesAdded++;
+                } catch (error) {
+                    console.error(`Error adding ${report.name} to zip:`, error);
+                    this.showMessage(`Ошибка добавления ${report.name} в архив: ${error.message}`, 'error');
+                }
+            }
+
+            console.log(`Total files added to zip: ${filesAdded}`);
+
+            if (filesAdded === 0) {
+                this.showMessage('Не удалось добавить ни один тестовый отчет в архив', 'error');
+                return;
+            }
+
+            // Generate and download the zip file
+            const zipContent = await zip.generateAsync({ type: 'blob' });
+            console.log(`Generated zip file size: ${zipContent.size} bytes`);
+
+            const zipUrl = URL.createObjectURL(zipContent);
+            const link = document.createElement('a');
+            link.href = zipUrl;
+            link.download = 'retrospective_test_reports.zip';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(zipUrl);
+
+            this.showMessage(`Тестовые отчеты для ретроспективы успешно скачаны! (${filesAdded} файлов)`, 'success');
+        } catch (error) {
+            console.error('Ошибка при скачивании тестовых отчетов для ретроспективы:', error);
+            this.showMessage('Ошибка при скачивании тестовых отчетов для ретроспективы: ' + error.message, 'error');
         }
     }
 
