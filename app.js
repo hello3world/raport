@@ -3921,14 +3921,25 @@ class ReportFormApp {
                     </div>
             `;
 
-            // Add each department's report section
-            for (const [dept, report] of Object.entries(reportsByDepartment)) {
-                fullReportHTML += `
-                    <div class="full-report-section">
-                        <h3>ОТЧЁТ О РАБОТЕ ${this.departments[dept].name} ЗА СУТКИ</h3>
-                        ${this.generateDepartmentReportSection(report, dept)}
-                    </div>
-                `;
+            // Define the required order of departments
+            const departmentOrder = [
+                'teploelektracentral',
+                'stokovye_vody',
+                'parosilovoe_hozyaystvo',
+                'elektroremontnyi_ceh'
+            ];
+
+            // Add each department's report section in the required order
+            for (const dept of departmentOrder) {
+                const report = reportsByDepartment[dept];
+                if (report) {
+                    fullReportHTML += `
+                        <div class="full-report-section">
+                            <h3>ОТЧЁТ О РАБОТЕ ${this.departments[dept].name} ЗА СУТКИ</h3>
+                            ${this.generateDepartmentReportSection(report, dept)}
+                        </div>
+                    `;
+                }
             }
 
             fullReportHTML += `
