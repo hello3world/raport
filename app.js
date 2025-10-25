@@ -226,7 +226,7 @@ class ReportFormApp {
 
         // Add event listener for back button in retrospective screen
         document.getElementById('back-to-loading')?.addEventListener('click', () => {
-            this.showScreen('loading-screen');
+            this.checkForDrafts();
         });
 
         // Add event listeners for report loading functionality
@@ -262,7 +262,8 @@ class ReportFormApp {
                     this.showScreen('retrospective-screen');
                 } else {
                     console.log('Navigating to loading screen');
-                    this.showScreen('loading-screen');
+                    // Check for drafts when going back to loading screen
+                    this.checkForDrafts();
                 }
             });
         } else {
@@ -2006,7 +2007,7 @@ class ReportFormApp {
 
             // Navigate to the loading screen after successful save
             setTimeout(() => {
-                this.showScreen('loading-screen');
+                this.checkForDrafts();
                 this.currentDraftId = null;
             }, 2000);
         } catch (error) {
