@@ -195,6 +195,11 @@ class ReportFormApp {
         });
 
         document.getElementById('back-to-auth-full-report')?.addEventListener('click', () => {
+            // Clear full report authentication fields when going back to auth screen
+            const fullReportUsernameField = document.getElementById('full-report-username');
+            const fullReportPasswordField = document.getElementById('full-report-password');
+            if (fullReportUsernameField instanceof HTMLInputElement) fullReportUsernameField.value = '';
+            if (fullReportPasswordField instanceof HTMLInputElement) fullReportPasswordField.value = '';
             this.showScreen('full-report-auth-screen');
         });
 
@@ -256,8 +261,8 @@ class ReportFormApp {
                     console.log('Navigating to retrospective screen');
                     this.showScreen('retrospective-screen');
                 } else {
-                    console.log('Navigating to main screen');
-                    this.showScreen('main-screen');
+                    console.log('Navigating to loading screen');
+                    this.showScreen('loading-screen');
                 }
             });
         } else {
@@ -417,17 +422,17 @@ class ReportFormApp {
 
     populateForm() {
         console.log('Восстановление формы с данными:', this.formData);
-        
+
         // Define fields that should NOT be restored (authentication fields)
         const excludedFields = ['username', 'password', 'full-report-username', 'full-report-password'];
-        
+
         Object.keys(this.formData).forEach(key => {
             // Skip authentication fields
             if (excludedFields.includes(key)) {
                 console.log(`Пропущено поле аутентификации: ${key}`);
                 return;
             }
-            
+
             const element = document.getElementById(key) || document.querySelector(`[name="${key}"]`);
             if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || element instanceof HTMLSelectElement) {
                 console.log(`Восстановление элемента ${key} с значением:`, this.formData[key]);
@@ -3622,8 +3627,8 @@ class ReportFormApp {
         // Clear authentication fields to isolate credentials for each report type
         const usernameField = document.getElementById('username');
         const passwordField = document.getElementById('password');
-        if (usernameField) usernameField.value = '';
-        if (passwordField) passwordField.value = '';
+        if (usernameField instanceof HTMLInputElement) usernameField.value = '';
+        if (passwordField instanceof HTMLInputElement) passwordField.value = '';
 
         // Show/hide form sections based on form type
         this.updateFormSections(formType);
