@@ -12,6 +12,15 @@
         "startTime": "08-00",
         "endTime": "08-00",
         "shiftSupervisor": "Сидоров С.С.",
+        "morningSuspended": "45",
+        "daySuspended": "52",
+        "eveningSuspended": "48",
+        "sedimentDay": "3.2",
+        "sedimentNight": "2.8",
+        "waterHardness": "8.5",
+        "waterTurbidity": "2.1",
+        "waterColor": "15",
+        "waterTemperature": "18",
         "emergencySituations": [
             {
                 "time": "15.10.2023 09:15",
