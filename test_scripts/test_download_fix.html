@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тест скачивания отчетов - Исправленный</title>
+    <link rel="icon" type="image/png" href="../images/ico.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
+
 <body>
     <h1>Тест скачивания отчетов - Исправленный</h1>
     <button id="download-test">Скачать тестовые отчеты</button>
     <div id="status"></div>
 
     <script>
-        document.getElementById('download-test').addEventListener('click', async function() {
+        document.getElementById('download-test').addEventListener('click', async function () {
             try {
                 const status = document.getElementById('status');
                 status.innerHTML = '<p>Загрузка отчетов...</p>';
-                
+
                 // Define test reports to download
                 const testReports = [
                     { name: 'test_report_tec.json', url: './test_reports/test_report_tec.json' },
@@ -50,7 +53,7 @@
                 }
 
                 console.log(`Total files added to zip: ${filesAdded}`);
-                
+
                 if (filesAdded === 0) {
                     status.innerHTML += '<p style="color: red;">Не удалось загрузить ни один тестовый отчет</p>';
                     return;
@@ -59,7 +62,7 @@
                 // Generate and download the zip file
                 const zipContent = await zip.generateAsync({ type: 'blob' });
                 console.log(`Generated zip file size: ${zipContent.size} bytes`);
-                
+
                 const zipUrl = URL.createObjectURL(zipContent);
                 const link = document.createElement('a');
                 link.href = zipUrl;
@@ -77,4 +80,5 @@
         });
     </script>
 </body>
+
 </html>

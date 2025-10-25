@@ -153,6 +153,11 @@ class ReportFormApp {
             window.location.href = 'checklist.html';
         });
 
+        // Add event listener for credentials page button
+        document.getElementById('credentials-page-link')?.addEventListener('click', () => {
+            window.location.href = 'credentials.html';
+        });
+
         // Аутентификация для обычных форм
         document.getElementById('authentication-form')?.addEventListener('submit', (e) => {
             e.preventDefault();

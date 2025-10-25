@@ -1441,6 +1441,15 @@ body {
     text-align: center;
 }
 
+.credentials-content h2 {
+    padding: 2rem 2rem 1rem;
+    color: #2c3e50;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #3498db;
+    margin-bottom: 0;
+    text-align: center;
+}
+
 .full-report-content {
     padding: 2rem;
     background: white;
@@ -1622,4 +1631,60 @@ body {
 
 .checklist {
     list-style-type: none;
+}
+
+/* Credentials page styles */
+.credentials-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+}
+
+.credentials-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.credentials-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.credentials-section h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.credential-item {
+    display: flex;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.credential-item.admin {
+    background-color: #f8f9fa;
+    border-left: 3px solid #3498db;
+}
+
+.credential-item .label {
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 150px;
+}
+
+.credential-item .value {
+    flex: 1;
+    font-family: 'Courier New', monospace;
+    background-color: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.credentials-actions {
+    text-align: center;
+    padding: 1rem;
 }
