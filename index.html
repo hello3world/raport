@@ -36,10 +36,14 @@
                         <a href="#" class="form-link" data-form="full-report" id="full-report-link">
                             5. ПОЛНЫЙ ОТЧЁТ ЗА СУТКИ
                         </a>
+                        <!-- New link for monthly emergency repair retrospective -->
+                        <a href="#" class="form-link" data-form="monthly-retrospective" id="monthly-retrospective-link">
+                            6. РЕТРОСПЕКТИВА АВАРИЙНЫХ РЕМОНТОВ ЗА МЕСЯЦ (Beta)
+                        </a>
                     </div>
                 </div>
                 <div class="version-info" style="text-align: center; margin-top: 30px; color: #666;">
-                    <p>Версия приложения: v.0.2.7</p>
+                    <p>Версия приложения: v.0.2.8</p>
                     <!-- Обновление от 26.10.2025 -->
                     <!-- Исправлена навигация при нажатии кнопки "Назад" в форме отчета - теперь ведет на экран загрузки -->
                     <!-- Исправлена проблема с отображением учетных данных в полях авторизации разных форм отчетов -->
@@ -74,6 +78,33 @@
             </div>
         </div>
 
+        <!-- Экран аутентификации для ретроспективы -->
+        <div id="retrospective-auth-screen" class="screen">
+            <div class="container">
+                <div class="auth-form">
+                    <h2>Аутентификация - РЕТРОСПЕКТИВА АВАРИЙНЫХ РЕМОНТОВ ЗА МЕСЯЦ</h2>
+                    <p>Для доступа к форме введите учетные данные администратора</p>
+                    <form id="retrospective-authentication-form">
+                        <div class="form-group">
+                            <label for="retrospective-username">Логин <span class="required">*</span></label>
+                            <input type="text" id="retrospective-username" name="username" required>
+                            <div class="error-message" data-field="username"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="retrospective-password">Пароль <span class="required">*</span></label>
+                            <input type="password" id="retrospective-password" name="password" required>
+                            <div class="error-message" data-field="password"></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="back-to-main-retrospective"
+                                class="btn btn-secondary">Назад</button>
+                            <button type="submit" class="btn btn-primary">Войти</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Экран выбора папки для полного отчета -->
         <div id="full-report-folder-screen" class="screen">
             <div class="container">
@@ -92,6 +123,46 @@
                     <button type="button" id="checklist-button" class="btn btn-outline">Чек-лист проверки</button>
                     <button type="button" id="update-page-link" class="btn btn-outline">Информация о версии</button>
                     <button id="download-test-reports-btn" class="btn btn-outline">Скачать тестовые отчеты</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран выбора папки для ретроспективы -->
+        <div id="retrospective-folder-screen" class="screen">
+            <div class="container">
+                <h2>Ретроспектива аварийных ремонтов за месяц</h2>
+                <div class="retrospective-content">
+                    <div class="browse-reports-section">
+                        <p>Выберите папку с отчетами для формирования ретроспективы:</p>
+                        <button id="browse-retrospective-folder-btn" class="btn btn-primary">Выбрать папку с
+                            отчетами</button>
+                        <div class="feature-description" id="retrospective-description"
+                            style="margin-top: 20px; padding: 15px; background-color: #f0f8ff; border-left: 4px solid #4CAF50;">
+                            <h3>Ретроспектива аварийных ремонтов за месяц (Beta)</h3>
+                            <p><strong>Как работает эта функция:</strong></p>
+                            <ul>
+                                <li>Выберите папку с отчетами за месяц</li>
+                                <li>Система автоматически объединит все аварийные ситуации из всех отчетов</li>
+                                <li>Все записи будут отсортированы в хронологическом порядке</li>
+                                <li>Даты отделяют записи разных дней друг от друга</li>
+                                <li>Можно экспортировать результат в PDF для дальнейшего анализа</li>
+                            </ul>
+                        </div>
+                        <div id="retrospective-display"></div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="button" id="back-to-auth-retrospective-standalone"
+                        class="btn btn-secondary">Назад</button>
+                </div>
+                <div class="retrospective-actions">
+                    <button type="button" id="back-to-auth-retrospective" class="btn btn-secondary">Назад</button>
+                    <button type="button" id="credentials-page-link-retrospective" class="btn btn-outline">Учетные
+                        данные</button>
+                    <button type="button" id="checklist-button-retrospective" class="btn btn-outline">Чек-лист
+                        проверки</button>
+                    <button type="button" id="update-page-link-retrospective" class="btn btn-outline">Информация о
+                        версии</button>
                 </div>
             </div>
         </div>
@@ -127,7 +198,7 @@
             <div class="container">
                 <h1>Суточный рапорт</h1>
                 <div class="loading-content">
-                    <p>Проверка сохраненных черновиков...</p>
+                    <p>Черновиков не обнаружено.</p>
                     <div id="draft-container"></div>
                     <div id="no-draft" class="no-draft" style="display: none;">
                         <div class="button-group">
@@ -512,6 +583,9 @@
                     <div id="reports-list">
                         <!-- Список отчетов будет сгенерирован JavaScript -->
                     </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="button" id="back-to-loading-standalone" class="btn btn-secondary">Назад</button>
                 </div>
                 <div class="retrospective-actions">
                     <button type="button" id="back-to-loading" class="btn btn-secondary">Назад</button>

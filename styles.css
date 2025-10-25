@@ -790,6 +790,11 @@ body {
     width: 15%;
 }
 
+.emergency-table-preview th:nth-child(6),
+.emergency-table-preview td:nth-child(6) {
+    width: 15%;
+}
+
 .emergency-table-preview tr {
     page-break-inside: avoid;
     vertical-align: top;
@@ -1687,4 +1692,22 @@ body {
 .credentials-actions {
     text-align: center;
     padding: 1rem;
+}
+
+/* Hide retrospective actions block */
+.retrospective-actions {
+    display: none !important;
+}
+
+/* Department separator in retrospective view */
+.department-separator {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+}
+
+.department-separator h3 {
+    color: #2c3e50;
+    font-size: 1.3rem;
 }
