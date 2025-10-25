@@ -745,7 +745,7 @@ body {
     border-collapse: collapse;
     margin-top: 10px;
     table-layout: fixed;
-    page-break-inside: auto;
+    page-break-inside: avoid;
     font-family: 'Times New Roman', Times, serif;
     font-size: 16px;
     line-height: 1.2;
@@ -1510,18 +1510,19 @@ body {
     white-space: nowrap;
 }
 
+/* Обновление от 25.10.2025: Убрана рамка вокруг каждого отчета для PDF экспорта */
 .full-report-section {
-    margin-bottom: 2rem;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    margin-bottom: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
 }
 
 .full-report-section h3 {
     color: #2c3e50;
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: none;
 }
 
 .full-report-field {
@@ -1540,27 +1541,28 @@ body {
 }
 
 /* Combined report preview */
+/* Обновление от 25.10.2025: Убраны синяя линия и рамка для PDF экспорта */
 .combined-report-preview {
     background: white;
     padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 0;
     font-family: 'Times New Roman', Times, serif;
     font-size: 16px;
 }
 
 .combined-report-header {
     text-align: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #3498db;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: none;
 }
 
 .combined-report-title {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     color: #2c3e50;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem;
     font-family: 'Times New Roman', Times, serif;
 }
 
@@ -1576,6 +1578,7 @@ body {
 }
 
 /* Page break styles for full report PDF export */
+/* Обновление от 25.10.2025: Обеспечено начало каждого отчета с новой страницы и сохранение таблиц целиком */
 .before-page-break {
     page-break-before: always;
 }
@@ -1588,9 +1591,33 @@ body {
     page-break-inside: avoid;
 }
 
+/* Ensure each department report starts on a new page */
+.full-report-section {
+    page-break-before: always;
+    page-break-inside: avoid;
+}
+
 /* Ensure the first section doesn't have a page break before it */
 .combined-report-header+.full-report-section {
     page-break-before: avoid;
+}
+
+/* Ensure tables stay together on one page */
+.emergency-table-preview {
+    page-break-inside: avoid;
+    page-break-after: auto;
+}
+
+.emergency-table-preview thead {
+    display: table-header-group;
+}
+
+.emergency-table-preview tr {
+    page-break-inside: avoid;
+}
+
+.emergency-table-preview td {
+    page-break-inside: avoid;
 }
 
 .checklist {

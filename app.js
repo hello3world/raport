@@ -3657,12 +3657,14 @@ class ReportFormApp {
     }
 
     // Download all test reports as a zip file
+    // Обновление от 25.10.2025: Исправлена проблема с CORS при запуске через file:// протокол
+    // Вместо fetch() файлы теперь встраиваются напрямую для избежания проблем с доступом к файлам
     async downloadAllTestReports() {
         try {
             // Define test reports content directly to avoid CORS issues
             const testReports = [
-                { 
-                    name: 'test_report_tec.json', 
+                {
+                    name: 'test_report_tec.json',
                     content: JSON.stringify({
                         "metadata": {
                             "date_created": "2023-10-15T10:30:00.000Z",
@@ -3697,8 +3699,8 @@ class ReportFormApp {
                         }
                     }, null, 2)
                 },
-                { 
-                    name: 'test_report_zsv.json', 
+                {
+                    name: 'test_report_zsv.json',
                     content: JSON.stringify({
                         "metadata": {
                             "date_created": "2023-10-15T10:30:00.000Z",
@@ -3733,8 +3735,8 @@ class ReportFormApp {
                         }
                     }, null, 2)
                 },
-                { 
-                    name: 'test_report_pcx.json', 
+                {
+                    name: 'test_report_pcx.json',
                     content: JSON.stringify({
                         "metadata": {
                             "date_created": "2023-10-15T10:30:00.000Z",
@@ -3769,8 +3771,8 @@ class ReportFormApp {
                         }
                     }, null, 2)
                 },
-                { 
-                    name: 'test_report_erc.json', 
+                {
+                    name: 'test_report_erc.json',
                     content: JSON.stringify({
                         "metadata": {
                             "date_created": "2023-10-15T10:30:00.000Z",
@@ -3824,7 +3826,7 @@ class ReportFormApp {
             }
 
             console.log(`Total files added to zip: ${filesAdded}`);
-            
+
             if (filesAdded === 0) {
                 this.showMessage('Не удалось добавить ни один тестовый отчет в архив', 'error');
                 return;
@@ -3833,7 +3835,7 @@ class ReportFormApp {
             // Generate and download the zip file
             const zipContent = await zip.generateAsync({ type: 'blob' });
             console.log(`Generated zip file size: ${zipContent.size} bytes`);
-            
+
             const zipUrl = URL.createObjectURL(zipContent);
             const link = document.createElement('a');
             link.href = zipUrl;
