@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Справочник - Суточный рапорт</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="images/ico.png">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Reference page -->
+        <div id="reference-screen" class="screen active">
+            <div class="container">
+                <h1>Суточный рапорт - Локальная веб-форма</h1>
+
+                <div class="reference-content">
+                    <h2>Реализованные возможности</h2>
+                    <ul>
+                        <li>✅ <strong>Многошаговый интерфейс</strong> - удобная навигация по шагам заполнения</li>
+                        <li>✅ <strong>Валидация полей</strong> - проверка обязательных полей и корректности данных</li>
+                        <li>✅ <strong>Автосохранение</strong> - автоматическое сохранение изменений с задержкой</li>
+                        <li>✅ <strong>Управление черновиками</strong> - сохранение, восстановление и очистка черновиков
+                        </li>
+                        <li>✅ <strong>Предварительный просмотр</strong> - точное отображение итогового документа</li>
+                        <li>✅ <strong>Экспорт в PDF</strong> - генерация PDF-файла высокого качества</li>
+                        <li>✅ <strong>Экспорт в Word</strong> - генерация DOCX-файла</li>
+                        <li>✅ <strong>Загрузка файлов</strong> - прикрепление изображений и документов</li>
+                        <li>✅ <strong>Локальное хранение</strong> - данные остаются на устройстве пользователя</li>
+                        <li>✅ <strong>Адаптивный дизайн</strong> - работает на различных устройствах</li>
+                        <li>✅ <strong>Печать</strong> - оптимизированные стили для печати</li>
+                        <li>✅ <strong>Формирование полного отчета</strong> - объединение отчетов от всех подразделений
+                        </li>
+                        <li>✅ <strong>Ретроспектива аварийных ремонтов</strong> - просмотр всех аварийных ситуаций за
+                            выбранный период</li>
+                        <li>✅ <strong>Система аутентификации</strong> - разграничение доступа для разных подразделений
+                        </li>
+                        <li>✅ <strong>Тестовые данные</strong> - готовые отчеты для тестирования функциональности</li>
+                    </ul>
+
+                    <h2>Установка и запуск</h2>
+                    <h3>Системные требования</h3>
+                    <ul>
+                        <li>Современный веб-браузер (Chrome, Edge, Firefox, Safari)</li>
+                        <li>Операционная система: Windows, macOS, Linux</li>
+                        <li>Не менее 100 МБ свободного места на диске</li>
+                    </ul>
+
+                    <h3>Установка</h3>
+                    <ol>
+                        <li>Скачайте все файлы проекта в одну папку</li>
+                        <li>Убедитесь, что все файлы находятся в одной директории:
+                            <ul>
+                                <li><code>index.html</code> - главная страница приложения</li>
+                                <li><code>styles.css</code> - стили оформления</li>
+                                <li><code>app.js</code> - основная логика приложения</li>
+                                <li><code>storageAdapter.js</code> - адаптер для работы с локальным хранилищем</li>
+                                <li>Папка <code>test_reports</code> с тестовыми отчетами</li>
+                                <li>Папка <code>test_reports_for_month</code> с тестовыми отчетами за месяц</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <h3>Запуск приложения</h3>
+                    <ol>
+                        <li>Двойным кликом откройте файл <code>index.html</code></li>
+                        <li>Или перетащите файл в окно браузера Chrome</li>
+                        <li>Приложение готово к использованию</li>
+                    </ol>
+
+                    <h2>Используемые технологии</h2>
+                    <h3>Фронтенд</h3>
+                    <ul>
+                        <li><strong>HTML5</strong> - структура веб-страниц</li>
+                        <li><strong>CSS3</strong> - стилизация и адаптивный дизайн</li>
+                        <li><strong>JavaScript (ES6+)</strong> - интерактивность и логика приложения</li>
+                        <li><strong>LocalStorage/IndexedDB</strong> - локальное хранение данных</li>
+                        <li><strong>File API</strong> - работа с файлами пользователя</li>
+                    </ul>
+
+                    <h3>Внешние библиотеки</h3>
+                    <ul>
+                        <li><strong>html2pdf.js</strong> - генерация PDF-документов</li>
+                        <li><strong>JSZip</strong> - создание ZIP-архивов с тестовыми данными</li>
+                    </ul>
+
+                    <h3>Архитектура</h3>
+                    <ul>
+                        <li><strong>Одностраничное приложение (SPA)</strong> - все взаимодействие происходит в рамках
+                            одной HTML-страницы</li>
+                        <li><strong>Модульная структура</strong> - код разделен на логические модули (app.js,
+                            storageAdapter.js)</li>
+                        <li><strong>Событийная модель</strong> - реакция на действия пользователя через систему событий
+                        </li>
+                        <li><strong>Адаптивный дизайн</strong> - корректное отображение на устройствах с разными
+                            размерами экранов</li>
+                    </ul>
+
+                    <h2>Структура проекта</h2>
+                    <pre>
+Суточный рапорт/
+├── index.html          # Основная HTML-страница
+├── styles.css          # Стили оформления
+├── app.js              # Главная логика приложения
+├── storageAdapter.js   # Адаптер для работы с локальным хранилищем
+├── update.html         # Страница с информацией о версии
+├── checklist.html      # Чек-лист проверки программы
+├── credentials.html    # Страница с учетными данными
+├── reference.html      # Справочник (этот файл)
+├── test_reports/       # Тестовые отчеты для каждого подразделения
+│   ├── index.html      # Страница для тестирования отчетов
+│   ├── test_report_tec.json  # Тестовый отчет для Теплоэлектроцентрали
+│   ├── test_report_zsv.json  # Тестовый отчет для Стоковых вод
+│   ├── test_report_pcx.json  # Тестовый отчет для Паросилового хозяйства
+│   └── test_report_erc.json  # Тестовый отчет для Электроремонтного цеха
+├── test_reports_for_month/   # Тестовые отчеты за месяц
+│   ├── test_report_tec_01.json ... test_report_tec_07.json
+│   ├── test_report_zsv_01.json ... test_report_zsv_07.json
+│   ├── test_report_pcx_01.json ... test_report_pcx_07.json
+│   └── test_report_erc_01.json ... test_report_erc_07.json
+└── README.md           # Инструкция в формате Markdown
+</pre>
+
+                    <h2>Формы отчетов</h2>
+                    <p>Приложение предоставляет возможность заполнения отчетов для следующих подразделений:</p>
+                    <ol>
+                        <li><strong>Отчет о работе Теплоэлектроцентрали за сутки</strong></li>
+                        <li><strong>Отчет о работе участка по забору, подготовке и очистке сточных вод за сутки</strong>
+                        </li>
+                        <li><strong>Отчет о работе участка паросилового хозяйства за сутки</strong></li>
+                        <li><strong>Отчет о работе электроремонтного цеха за сутки</strong></li>
+                        <li><strong>Полный отчет за сутки</strong> (доступен только администратору)</li>
+                        <li><strong>Ретроспектива аварийных ремонтов за месяц</strong> (Beta)</li>
+                    </ol>
+
+                    <h2>Аутентификация</h2>
+                    <p>Для доступа к формам отчетов используются следующие учетные данные:</p>
+
+                    <h3>Теплоэлектроцентраль</h3>
+                    <ul>
+                        <li>Логин: <code>teplo_user</code></li>
+                        <li>Пароль: <code>teplo_pass</code></li>
+                        <li>Администратор: <code>admin</code> / <code>admin</code></li>
+                    </ul>
+
+                    <h3>Участок сточных вод</h3>
+                    <ul>
+                        <li>Логин: <code>stok_user</code></li>
+                        <li>Пароль: <code>stok_pass</code></li>
+                        <li>Администратор: <code>admin</code> / <code>admin</code></li>
+                    </ul>
+
+                    <h3>Паросиловое хозяйство</h3>
+                    <ul>
+                        <li>Логин: <code>paro_user</code></li>
+                        <li>Пароль: <code>paro_pass</code></li>
+                        <li>Администратор: <code>admin</code> / <code>admin</code></li>
+                    </ul>
+
+                    <h3>Электроремонтный цех</h3>
+                    <ul>
+                        <li>Логин: <code>elektro_user</code></li>
+                        <li>Пароль: <code>elektro_pass</code></li>
+                        <li>Администратор: <code>admin</code> / <code>admin</code></li>
+                    </ul>
+
+                    <h3>Полный отчет</h3>
+                    <ul>
+                        <li>Администратор: <code>admin</code> / <code>admin</code></li>
+                    </ul>
+
+                    <h2>Работа с приложением</h2>
+                    <h3>1. Заполнение формы</h3>
+                    <p><strong>Шаг 1: Личные данные</strong></p>
+                    <ul>
+                        <li>ФИО (обязательно)</li>
+                        <li>Звание (обязательно)</li>
+                        <li>Должность (обязательно)</li>
+                        <li>Подразделение (обязательно)</li>
+                    </ul>
+
+                    <p><strong>Шаг 2: Служебная информация</strong></p>
+                    <ul>
+                        <li>Дата рапорта (обязательно)</li>
+                        <li>Тип службы (обязательно)</li>
+                        <li>Время заступления и окончания</li>
+                        <li>Место несения службы</li>
+                    </ul>
+
+                    <p><strong>Шаг 3: Дополнительная информация</strong></p>
+                    <ul>
+                        <li>Происшествия и особые отметки</li>
+                        <li>Состояние оборудования</li>
+                        <li>Погодные условия</li>
+                        <li>Приложения (файлы)</li>
+                        <li>Дополнительные замечания</li>
+                    </ul>
+
+                    <h3>2. Сохранение и восстановление</h3>
+                    <ul>
+                        <li><strong>Автосохранение</strong>: происходит автоматически через 1.5 секунды после изменения
+                            полей</li>
+                        <li><strong>Ручное сохранение</strong>: кнопка "Сохранить черновик"</li>
+                        <li><strong>Восстановление</strong>: при повторном открытии приложения предлагается восстановить
+                            незавершенный черновик</li>
+                    </ul>
+
+                    <h3>3. Предварительный просмотр и экспорт</h3>
+                    <ul>
+                        <li>После заполнения всех обязательных полей нажмите "Предпросмотр"</li>
+                        <li>Проверьте корректность данных</li>
+                        <li>При необходимости вернитесь к редактированию</li>
+                        <li>Экспортируйте документ в PDF, Word или сохраните в формате JSON</li>
+                    </ul>
+
+                    <h3>4. Полный отчет</h3>
+                    <ul>
+                        <li>Доступен только для администратора</li>
+                        <li>Позволяет объединить отчеты от всех подразделений в один документ</li>
+                        <li>Поддерживает экспорт в PDF</li>
+                    </ul>
+
+                    <h3>5. Ретроспектива аварийных ремонтов</h3>
+                    <ul>
+                        <li>Функция позволяет просмотреть все аварийные ситуации за выбранный период</li>
+                        <li>Автоматически объединяет данные из всех отчетов</li>
+                        <li>Сортирует записи в хронологическом порядке</li>
+                        <li>Поддерживает экспорт в PDF</li>
+                    </ul>
+
+                    <h2>Технические особенности</h2>
+                    <h3>Хранение данных</h3>
+                    <ul>
+                        <li><strong>localStorage</strong>: для небольших форм (до ~5MB)</li>
+                        <li><strong>IndexedDB</strong>: автоматическое переключение при превышении лимитов</li>
+                        <li><strong>Файлы</strong>: конвертируются в base64 и сохраняются локально</li>
+                    </ul>
+
+                    <h3>Совместимость</h3>
+                    <ul>
+                        <li><strong>Браузеры</strong>: Chrome (рекомендуется), Edge, Firefox, Safari</li>
+                        <li><strong>Устройства</strong>: настольные компьютеры, планшеты</li>
+                        <li><strong>ОС</strong>: Windows, macOS, Linux</li>
+                    </ul>
+
+                    <h3>Безопасность</h3>
+                    <ul>
+                        <li>Все данные сохраняются только локально на устройстве пользователя</li>
+                        <li>Нет передачи данных на внешние серверы</li>
+                        <li>Автоматическая очистка старых черновиков (настраивается)</li>
+                    </ul>
+
+                    <h2>Устранение неполадок</h2>
+                    <h3>Проблемы с сохранением</h3>
+                    <ol>
+                        <li>Проверьте, что в браузере включено локальное хранилище</li>
+                        <li>Освободите место на диске</li>
+                        <li>Проверьте настройки приватности браузера</li>
+                    </ol>
+
+                    <h3>Проблемы с PDF</h3>
+                    <ol>
+                        <li>Убедитесь, что браузер поддерживает современные веб-технологии</li>
+                        <li>Отключите блокировщики рекламы/скриптов</li>
+                        <li>Попробуйте обновить страницу и повторить экспорт</li>
+                    </ol>
+
+                    <h3>Проблемы с файлами</h3>
+                    <ol>
+                        <li>Проверьте размер загружаемых файлов (рекомендуется до 10MB)</li>
+                        <li>Используйте поддерживаемые форматы: JPG, PNG, PDF, DOC, DOCX</li>
+                        <li>При больших файлах приложение автоматически переключится на IndexedDB</li>
+                    </ol>
+
+                    <h2>Дополнительные возможности</h2>
+                    <h3>Тестирование</h3>
+                    <p>В папке <code>test_reports</code> находятся тестовые отчеты для каждого подразделения:</p>
+                    <ul>
+                        <li><code>test_report_tec.json</code> - Тестовый отчет для Теплоэлектроцентрали</li>
+                        <li><code>test_report_zsv.json</code> - Тестовый отчет для Участка сточных вод</li>
+                        <li><code>test_report_pcx.json</code> - Тестовый отчет для Паросилового хозяйства</li>
+                        <li><code>test_report_erc.json</code> - Тестовый отчет для Электроремонтного цеха</li>
+                    </ul>
+                    <p>Для тестирования откройте <code>test_reports/index.html</code> в браузере.</p>
+
+                    <h3>Горячие клавиши</h3>
+                    <ul>
+                        <li><code>Tab</code> / <code>Shift+Tab</code>: навигация по полям</li>
+                        <li><code>Enter</code>: переход к следующему шагу (при валидной форме)</li>
+                        <li><code>Escape</code>: закрытие модальных окон</li>
+                    </ul>
+
+                    <h3>Экспорт/импорт черновиков</h3>
+                    <p>В адаптере хранения предусмотрены методы для экспорта и импорта данных:</p>
+                    <pre>// Экспорт всех черновиков
+const exportData = await window.storageAdapter.exportData();
+
+// Импорт черновиков
+await window.storageAdapter.importData(jsonData);</pre>
+
+                    <h3>Очистка старых данных</h3>
+                    <p>Автоматическая очистка черновиков старше 30 дней:</p>
+                    <pre>await window.storageAdapter.cleanupOldDrafts(30);</pre>
+
+                    <h2>Разработка и модификация</h2>
+                    <h3>Добавление новых полей</h3>
+                    <ol>
+                        <li>Добавьте поле в соответствующий шаг в <code>index.html</code></li>
+                        <li>Обновите валидацию в методе <code>validateStep()</code> в <code>app.js</code></li>
+                        <li>Добавьте отображение в методе <code>generatePreview()</code> в <code>app.js</code></li>
+                    </ol>
+
+                    <h3>Изменение стилей</h3>
+                    <p>Основные настройки находятся в начале файла <code>styles.css</code>:</p>
+                    <ul>
+                        <li>Цвета: переменные CSS для легкой кастомизации</li>
+                        <li>Размеры: адаптивные единицы для различных экранов</li>
+                        <li>Анимации: настраиваемые transition и animation</li>
+                    </ul>
+
+                    <h3>Добавление новых шагов</h3>
+                    <ol>
+                        <li>Добавьте новый шаг в HTML с атрибутом <code>data-step</code></li>
+                        <li>Обновите <code>maxSteps</code> в <code>app.js</code></li>
+                        <li>Добавьте соответствующий элемент в прогресс-бар</li>
+                    </ol>
+
+                    <h2>Лицензия</h2>
+                    <p>Свободное использование для личных и коммерческих целей.</p>
+
+                    <h2>Поддержка</h2>
+                    <p>При возникновении вопросов или проблем:</p>
+                    <ol>
+                        <li>Проверьте консоль браузера (F12) на наличие ошибок</li>
+                        <li>Убедитесь, что все файлы проекта находятся в одной папке</li>
+                        <li>Попробуйте открыть приложение в режиме инкогнито</li>
+                    </ol>
+
+                    <div class="version-info">
+                        <p><strong>Версия</strong>: 0.2.9</p>
+                        <p><strong>Последнее обновление</strong>: 26 октября 2025 г.</p>
+                        <p><strong>Совместимость</strong>: Chrome 88+, Edge 88+, Firefox 85+, Safari 14+</p>
+                    </div>
+                </div>
+
+                <div class="reference-actions">
+                    <button type="button" id="back-to-main-reference" class="btn btn-secondary">Назад</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add event listener for back button
+            document.getElementById('back-to-main-reference').addEventListener('click', function () {
+                // Check if page was opened from full report folder screen
+                const pageOpenedFrom = sessionStorage.getItem('pageOpenedFrom');
+                if (pageOpenedFrom === 'full-report') {
+                    // Navigate back to the full report folder screen
+                    window.location.href = 'index.html#full-report-folder-screen';
+                    // Clear the sessionStorage item
+                    sessionStorage.removeItem('pageOpenedFrom');
+                } else {
+                    // Navigate back to the main screen
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
