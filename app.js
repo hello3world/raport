@@ -384,6 +384,9 @@ class ReportFormApp {
             }
         });
 
+        // Initialize Flatpickr for datetime inputs
+        this.initializeFlatpickr();
+
         // Предотвращение потери данных при закрытии
         window.addEventListener('beforeunload', (e) => {
             if (this.isDirty) {
@@ -432,6 +435,27 @@ class ReportFormApp {
         if (section) {
             section.style.display = 'block';
         }
+    }
+
+    initializeFlatpickr() {
+        // Initialize Flatpickr for all datetime inputs
+        // This provides a better user experience for date/time selection
+        // with a 24-hour format time picker
+        const datetimeInputs = document.querySelectorAll('.emergency-datetime');
+        datetimeInputs.forEach(input => {
+            flatpickr(input, {
+                locale: 'ru',
+                dateFormat: 'd.m.Y H:i',
+                enableTime: true,
+                time_24hr: true,
+                allowInput: true,
+                minuteIncrement: 1,
+                onChange: (selectedDates, dateStr, instance) => {
+                    // Mark form as dirty when datetime is changed
+                    this.isDirty = true;
+                }
+            });
+        });
     }
 
     authenticate() {
@@ -583,93 +607,50 @@ class ReportFormApp {
                     const descriptionDataValue = situation.description ? situation.description.replace(/\n/g, '\\n') : '';
                     const actionsDataValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
 
-                    // Handle datetime-local inputs for emergencyTime and emergencyRecovery
-                    let timeValue = '';
+                    // Combine datetime values for Flatpickr
+                    // Flatpickr expects the value in the same format as it returns: 'd.m.Y H:i'
+                    let emergencyDateTime = '';
+                    let recoveryDateTime = '';
+
                     if (situation.time) {
-                        // Convert dd.mm.yyyy hh:mm format to yyyy-mm-ddThh:mm for datetime-local inputs
-                        const dateTimeParts = situation.time.split(' ');
-                        if (dateTimeParts.length === 2) {
-                            const dateParts = dateTimeParts[0].split('.');
-                            if (dateParts.length === 3) {
-                                const pad = (num) => num < 10 ? '0' + num : num;
-                                timeValue = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}T${dateTimeParts[1]}`;
-                            }
-                        }
+                        // For Flatpickr, we can directly use the stored format 'd.m.Y H:i'
+                        emergencyDateTime = situation.time;
                     }
 
-                    let recoveryValue = '';
                     if (situation.recovery) {
-                        // Convert dd.mm.yyyy hh:mm format to yyyy-mm-ddThh:mm for datetime-local inputs
-                        const dateTimeParts = situation.recovery.split(' ');
-                        if (dateTimeParts.length === 2) {
-                            const dateParts = dateTimeParts[0].split('.');
-                            if (dateParts.length === 3) {
-                                const pad = (num) => num < 10 ? '0' + num : num;
-                                recoveryValue = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}T${dateTimeParts[1]}`;
-                            }
-                        }
+                        // For Flatpickr, we can directly use the stored format 'd.m.Y H:i'
+                        recoveryDateTime = situation.recovery;
                     }
 
-                    // Add rows for each emergency situation
-                    this.formData.emergencySituations.forEach((situation, index) => {
-                        // Create a new row with the emergency situation data
-                        const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td>
+                            <input type="text" name="emergencyDateTime[]" class="emergency-datetime" value="${emergencyDateTime}" placeholder="Выберите дату и время">
+                        </td>
+                        <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
+                        <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
+                        <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
+                        <td>
+                            <input type="text" name="emergencyRecoveryDateTime[]" class="emergency-datetime" value="${recoveryDateTime}" placeholder="Выберите дату и время">
+                        </td>
+                    `;
 
-                        // Format the data properly for display
-                        const equipmentValue = situation.equipment ? situation.equipment.replace(/\\n/g, ' ') : '';
-                        const descriptionValue = situation.description ? situation.description.replace(/\\n/g, ' ') : '';
-                        const actionsValue = situation.actions ? situation.actions.replace(/\\n/g, ' ') : '';
+                    tbody.appendChild(newRow);
 
-                        // Store the actual values with escaped newlines in data attributes
-                        const equipmentDataValue = situation.equipment ? situation.equipment.replace(/\n/g, '\\n') : '';
-                        const descriptionDataValue = situation.description ? situation.description.replace(/\n/g, '\\n') : '';
-                        const actionsDataValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
-
-                        // Split datetime values into separate date and time for emergencyTime
-                        let emergencyDate = '';
-                        let emergencyTime = '';
-                        if (situation.time) {
-                            const dateTimeParts = situation.time.split(' ');
-                            if (dateTimeParts.length === 2) {
-                                const dateParts = dateTimeParts[0].split('.');
-                                if (dateParts.length === 3) {
-                                    const pad = (num) => num < 10 ? '0' + num : num;
-                                    emergencyDate = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}`;
-                                    emergencyTime = dateTimeParts[1];
-                                }
+                    // Initialize Flatpickr on datetime inputs
+                    const datetimeInputs = newRow.querySelectorAll('.emergency-datetime');
+                    datetimeInputs.forEach(input => {
+                        flatpickr(input, {
+                            locale: 'ru',
+                            dateFormat: 'd.m.Y H:i',
+                            enableTime: true,
+                            time_24hr: true,
+                            allowInput: true,
+                            minuteIncrement: 1,
+                            onChange: (selectedDates, dateStr, instance) => {
+                                // Mark form as dirty when datetime is changed
+                                this.isDirty = true;
                             }
-                        }
-
-                        // Split datetime values into separate date and time for emergencyRecovery
-                        let recoveryDate = '';
-                        let recoveryTime = '';
-                        if (situation.recovery) {
-                            const dateTimeParts = situation.recovery.split(' ');
-                            if (dateTimeParts.length === 2) {
-                                const dateParts = dateTimeParts[0].split('.');
-                                if (dateParts.length === 3) {
-                                    const pad = (num) => num < 10 ? '0' + num : num;
-                                    recoveryDate = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}`;
-                                    recoveryTime = dateTimeParts[1];
-                                }
-                            }
-                        }
-
-                        newRow.innerHTML = `
-                            <td>
-                                <input type="time" name="emergencyTime[]" class="emergency-time" step="60" value="${emergencyTime}">
-                                <input type="date" name="emergencyDate[]" class="emergency-date" value="${emergencyDate}">
-                            </td>
-                            <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
-                            <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
-                            <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
-                            <td>
-                                <input type="time" name="emergencyRecoveryTime[]" class="emergency-time" step="60" value="${recoveryTime}">
-                                <input type="date" name="emergencyRecoveryDate[]" class="emergency-date" value="${recoveryDate}">
-                            </td>
-                        `;
-
-                        tbody.appendChild(newRow);
+                        });
                     });
                 });
             }
@@ -697,66 +678,64 @@ class ReportFormApp {
             const descriptionDataValue = situation.description ? situation.description.replace(/\n/g, '\\n') : '';
             const actionsDataValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
 
-            // Split datetime values into separate date and time
-            let emergencyDate = '';
-            let emergencyTime = '';
-            let recoveryDate = '';
-            let recoveryTime = '';
+            // Combine datetime values for Flatpickr
+            // Flatpickr expects the value in the same format as it returns: 'd.m.Y H:i'
+            let emergencyDateTime = '';
+            let recoveryDateTime = '';
 
             if (situation.time) {
-                const dateTimeParts = situation.time.split(' ');
-                if (dateTimeParts.length === 2) {
-                    const dateParts = dateTimeParts[0].split('.');
-                    if (dateParts.length === 3) {
-                        const pad = (num) => num < 10 ? '0' + num : num;
-                        emergencyDate = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}`;
-                        emergencyTime = dateTimeParts[1];
-                    }
-                }
+                // For Flatpickr, we can directly use the stored format 'd.m.Y H:i'
+                emergencyDateTime = situation.time;
             }
 
             if (situation.recovery) {
-                const dateTimeParts = situation.recovery.split(' ');
-                if (dateTimeParts.length === 2) {
-                    const dateParts = dateTimeParts[0].split('.');
-                    if (dateParts.length === 3) {
-                        const pad = (num) => num < 10 ? '0' + num : num;
-                        recoveryDate = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}`;
-                        recoveryTime = dateTimeParts[1];
-                    }
-                }
+                // For Flatpickr, we can directly use the stored format 'd.m.Y H:i'
+                recoveryDateTime = situation.recovery;
             }
 
             newRow.innerHTML = `
                 <td>
-                    <input type="time" name="emergencyTime[]" class="emergency-time" step="60" value="${emergencyTime}">
-                    <input type="date" name="emergencyDate[]" class="emergency-date" value="${emergencyDate}">
+                    <input type="text" name="emergencyDateTime[]" class="emergency-datetime" value="${emergencyDateTime}" placeholder="Выберите дату и время">
                 </td>
                 <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
                 <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
                 <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
                 <td>
-                    <input type="time" name="emergencyRecoveryTime[]" class="emergency-time" step="60" value="${recoveryTime}">
-                    <input type="date" name="emergencyRecoveryDate[]" class="emergency-date" value="${recoveryDate}">
+                    <input type="text" name="emergencyRecoveryDateTime[]" class="emergency-datetime" value="${recoveryDateTime}" placeholder="Выберите дату и время">
                 </td>
             `;
         } else {
             newRow.innerHTML = `
                 <td>
-                    <input type="time" name="emergencyTime[]" class="emergency-time" step="60">
-                    <input type="date" name="emergencyDate[]" class="emergency-date">
+                    <input type="text" name="emergencyDateTime[]" class="emergency-datetime" placeholder="Выберите дату и время">
                 </td>
                 <td><input type="text" name="emergencyEquipment[]"></td>
                 <td><input type="text" name="emergencyDescription[]"></td>
                 <td><input type="text" name="emergencyActions[]"></td>
                 <td>
-                    <input type="time" name="emergencyRecoveryTime[]" class="emergency-time" step="60">
-                    <input type="date" name="emergencyRecoveryDate[]" class="emergency-date">
+                    <input type="text" name="emergencyRecoveryDateTime[]" class="emergency-datetime" placeholder="Выберите дату и время">
                 </td>
             `;
         }
 
         tbody.appendChild(newRow);
+
+        // Initialize Flatpickr on new datetime inputs
+        const newDatetimeInputs = newRow.querySelectorAll('.emergency-datetime');
+        newDatetimeInputs.forEach(input => {
+            flatpickr(input, {
+                locale: 'ru',
+                dateFormat: 'd.m.Y H:i',
+                enableTime: true,
+                time_24hr: true,
+                allowInput: true,
+                minuteIncrement: 1,
+                onChange: (selectedDates, dateStr, instance) => {
+                    // Mark form as dirty when datetime is changed
+                    this.isDirty = true;
+                }
+            });
+        });
 
         // Apply white-space styling to preserve line breaks in the new inputs
         const inputs = newRow.querySelectorAll('input');
@@ -1047,41 +1026,33 @@ class ReportFormApp {
             // Get all inputs in the row
             const inputs = row.querySelectorAll('input');
 
-            // We now have separate date and time inputs, so we need to handle them differently
-            // Each row now has 7 inputs instead of 5:
-            // [time, date, equipment, description, actions, recoveryTime, recoveryDate]
-            if (inputs.length >= 7) {
-                // Get date and time values for emergency time
-                const emergencyTimeInput = inputs[0];
-                const emergencyDateInput = inputs[1];
+            // We now have datetime inputs with Flatpickr, so we need to handle them differently
+            // Each row now has 5 inputs instead of 7:
+            // [dateTime, equipment, description, actions, recoveryDateTime]
+            if (inputs.length >= 5) {
+                // Get datetime values for emergency time
+                const emergencyDateTimeInput = inputs[0];
 
-                // Get date and time values for recovery time
-                const recoveryTimeInput = inputs[5];
-                const recoveryDateInput = inputs[6];
+                // Get datetime values for recovery time
+                const recoveryDateTimeInput = inputs[4];
 
-                // Combine date and time values
+                // Process datetime values
                 let timeValue = '';
-                if (emergencyDateInput.value && emergencyTimeInput.value) {
-                    // Convert yyyy-mm-dd format to dd.mm.yyyy format
-                    const dateParts = emergencyDateInput.value.split('-');
-                    if (dateParts.length === 3) {
-                        timeValue = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]} ${emergencyTimeInput.value}`;
-                    }
+                if (emergencyDateTimeInput.value) {
+                    // Flatpickr returns format 'd.m.Y H:i' (e.g., '31.10.2025 14:30')
+                    timeValue = emergencyDateTimeInput.value;
                 }
 
                 let recoveryValue = '';
-                if (recoveryDateInput.value && recoveryTimeInput.value) {
-                    // Convert yyyy-mm-dd format to dd.mm.yyyy format
-                    const dateParts = recoveryDateInput.value.split('-');
-                    if (dateParts.length === 3) {
-                        recoveryValue = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]} ${recoveryTimeInput.value}`;
-                    }
+                if (recoveryDateTimeInput.value) {
+                    // Flatpickr returns format 'd.m.Y H:i' (e.g., '31.10.2025 14:30')
+                    recoveryValue = recoveryDateTimeInput.value;
                 }
 
                 // Get other values
-                const equipmentValue = inputs[2].dataset.value ? inputs[2].dataset.value : inputs[2].value;
-                const descriptionValue = inputs[3].dataset.value ? inputs[3].dataset.value : inputs[3].value;
-                const actionsValue = inputs[4].dataset.value ? inputs[4].dataset.value : inputs[4].value;
+                const equipmentValue = inputs[1].dataset.value ? inputs[1].dataset.value : inputs[1].value;
+                const descriptionValue = inputs[2].dataset.value ? inputs[2].dataset.value : inputs[2].value;
+                const actionsValue = inputs[3].dataset.value ? inputs[3].dataset.value : inputs[3].value;
 
                 emergencyData.push({
                     time: timeValue,
@@ -1793,6 +1764,8 @@ class ReportFormApp {
 
     editForm() {
         this.showScreen('form-screen');
+        // Reinitialize Flatpickr when returning to form from preview
+        this.initializeFlatpickr();
     }
 
     async exportToPDF() {
@@ -2895,7 +2868,7 @@ class ReportFormApp {
         if (formType === 'monthly-retrospective') {
             // For monthly retrospective, we need admin authentication
             this.selectedForm = 'monthly-retrospective';
-            this.showScreen('full-report-auth-screen');
+            this.showScreen('retrospective-auth-screen');
             return;
         }
 
@@ -3135,7 +3108,7 @@ class ReportFormApp {
             retrospectiveHTML += `
                 </div>
                 <div style="text-align: center; margin-top: 20px;">
-                    <button id="back-to-retrospective-folder" class="btn btn-secondary" style="margin-right: 10px;">Назад</button>
+                    
                     <button id="export-retrospective-pdf" class="btn btn-primary">Экспорт в PDF</button>
                 </div>
             `;
@@ -3419,6 +3392,9 @@ class ReportFormApp {
             console.error('Основная форма не найдена!');
         }
 
+        // Initialize Flatpickr for datetime inputs
+        this.initializeFlatpickr();
+
         console.log('Экран формы отображён');
     }
 
@@ -3471,7 +3447,7 @@ class ReportFormApp {
     // New method for handling retrospective functionality
     async showRetrospective() {
         console.log('Открытие ретроспективы...');
-        // Show the retrospective screen
+        // Show the retrospective screen directly
         this.showScreen('retrospective-screen');
         // Load and display saved reports
         await this.loadSavedReports();

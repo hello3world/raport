@@ -9,6 +9,9 @@
     <link rel="icon" type="image/png" href="images/ico.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
 </head>
 
 <body>
@@ -43,11 +46,10 @@
                     </div>
                 </div>
                 <div class="version-info" style="text-align: center; margin-top: 30px; color: #666;">
-                    <p>Версия приложения: v.0.2.9</p>
-                    <!-- Обновление от 26.10.2025 -->
-                    <!-- Исправлена навигация при нажатии кнопки "Назад" в форме отчета - теперь ведет на экран загрузки -->
-                    <!-- Исправлена проблема с отображением учетных данных в полях авторизации разных форм отчетов -->
-                    <!-- Улучшена изоляция учетных данных для каждой формы отчета -->
+                    <p>Версия приложения: v.0.3.0</p>
+                    <!-- Обновление от 31.10.2025 -->
+                    <!-- Исправлена навигация для ретроспективы аварийных ремонтов -->
+                    <!-- Улучшена структура таблицы аварийных ситуаций с использованием Flatpickr -->
                 </div>
             </div>
         </div>
@@ -145,8 +147,7 @@
                             <ul>
                                 <li>Выберите папку с отчетами за месяц</li>
                                 <li>Система автоматически объединит все аварийные ситуации из всех отчетов</li>
-                                <li>Все записи будут отсортированы в хронологическом порядке</li>
-                                <li>Даты отделяют записи разных дней друг от друга</li>
+                                <li>Все записи будут отсортированы в хронологическом порядке по отделам</li>
                                 <li>Можно экспортировать результат в PDF для дальнейшего анализа</li>
                             </ul>
                         </div>
@@ -159,12 +160,6 @@
                 </div>
                 <div class="retrospective-actions">
                     <button type="button" id="back-to-auth-retrospective" class="btn btn-secondary">Назад</button>
-                    <button type="button" id="credentials-page-link-retrospective" class="btn btn-outline">Учетные
-                        данные</button>
-                    <button type="button" id="checklist-button-retrospective" class="btn btn-outline">Чек-лист
-                        проверки</button>
-                    <button type="button" id="update-page-link-retrospective" class="btn btn-outline">Информация о
-                        версии</button>
                 </div>
             </div>
         </div>
@@ -515,16 +510,15 @@
                                 <tbody id="emergency-situations">
                                     <tr>
                                         <td>
-                                            <input type="time" name="emergencyTime[]" class="emergency-time" step="60">
-                                            <input type="date" name="emergencyDate[]" class="emergency-date">
+                                            <input type="text" name="emergencyDateTime[]" class="emergency-datetime"
+                                                placeholder="Выберите дату и время">
                                         </td>
                                         <td><input type="text" name="emergencyEquipment[]"></td>
                                         <td><input type="text" name="emergencyDescription[]"></td>
                                         <td><input type="text" name="emergencyActions[]"></td>
                                         <td>
-                                            <input type="time" name="emergencyRecoveryTime[]" class="emergency-time"
-                                                step="60">
-                                            <input type="date" name="emergencyRecoveryDate[]" class="emergency-date">
+                                            <input type="text" name="emergencyRecoveryDateTime[]"
+                                                class="emergency-datetime" placeholder="Выберите дату и время">
                                         </td>
                                     </tr>
                                 </tbody>
