@@ -1860,7 +1860,7 @@ class ReportFormApp {
     async exportPDFWithFileSystemAPI(element, opt, filename) {
         try {
             // Generate PDF as blob
-            const pdfBlob = await html2pdf().set(opt).from(/** @type {HTMLElement} */(element)).outputPdf('blob');
+            const pdfBlob = await html2pdf().set(opt).from(/** @type {HTMLElement} */ (element)).outputPdf('blob');
 
             // Show save file picker
             const fileHandle = await window.showSaveFilePicker({
@@ -1890,7 +1890,7 @@ class ReportFormApp {
 
             // For other errors, fall back to traditional method
             console.warn('File System Access API недоступен, используем традиционный метод экспорта:', error);
-            await html2pdf().set(opt).from(/** @type {HTMLElement} */(element)).save();
+            await html2pdf().set(opt).from(/** @type {HTMLElement} */ (element)).save();
         }
     }
 
@@ -1984,7 +1984,7 @@ class ReportFormApp {
                 await this.exportPDFWithFileSystemAPI(clonedElement, opt, filename);
             } else {
                 // Fallback to traditional method
-                await html2pdf().set(opt).from(/** @type {HTMLElement} */(clonedElement)).save();
+                await html2pdf().set(opt).from(/** @type {HTMLElement} */ (clonedElement)).save();
             }
 
             console.log('Полный отчет экспортирован успешно');
@@ -2926,15 +2926,15 @@ class ReportFormApp {
     authenticateFullReport() {
         const usernameElement = document.getElementById('full-report-username');
         const passwordElement = document.getElementById('full-report-password');
-
+        
         if (!usernameElement || !passwordElement) {
             console.error('Authentication elements not found');
             return;
         }
-
+        
         const username = usernameElement instanceof HTMLInputElement ? usernameElement.value : '';
         const password = passwordElement instanceof HTMLInputElement ? passwordElement.value : '';
-
+        
         const errorElements = document.querySelectorAll('#full-report-authentication-form .error-message');
         errorElements.forEach(el => el.classList.remove('show'));
 
@@ -3216,7 +3216,7 @@ class ReportFormApp {
                 await this.exportPDFWithFileSystemAPI(clonedElement, opt, filename);
             } else {
                 // Fallback to traditional method
-                await html2pdf().set(opt).from(/** @type {HTMLElement} */(clonedElement)).save();
+                await html2pdf().set(opt).from(/** @type {HTMLElement} */ (clonedElement)).save();
             }
 
             console.log('Ретроспектива экспортирована успешно');
@@ -3336,9 +3336,7 @@ class ReportFormApp {
             console.log(`Скрываем экран: ${screen.id}`);
             screen.classList.remove('active');
             // Принудительно скрываем
-            if (screen instanceof HTMLElement) {
-                screen.style.display = 'none';
-            }
+            screen.style.display = 'none';
         });
 
         const targetScreen = document.getElementById(screenId);
@@ -3755,14 +3753,8 @@ class ReportFormApp {
         // Add event listeners for load buttons
         document.querySelectorAll('.load-report-btn').forEach(button => {
             button.addEventListener('click', (event) => {
-                const target = event.target;
-                if (target instanceof Element) {
-                    const dataIndex = target.getAttribute('data-index');
-                    if (dataIndex) {
-                        const index = parseInt(dataIndex);
-                        this.loadReportFromList(filteredReports[index]);
-                    }
-                }
+                const index = parseInt(event.target.getAttribute('data-index'));
+                this.loadReportFromList(filteredReports[index]);
             });
         });
     }
@@ -3804,7 +3796,7 @@ class ReportFormApp {
             console.log('Выбран файл:', fileName);
             // Enable the load button
             const loadButton = document.getElementById('load-report-btn');
-            if (loadButton instanceof HTMLButtonElement) {
+            if (loadButton) {
                 loadButton.disabled = false;
             }
         }
@@ -3818,7 +3810,7 @@ class ReportFormApp {
         } else {
             // Fallback to traditional file input method
             const fileInput = document.getElementById('report-file-input');
-            if (!fileInput || !(fileInput instanceof HTMLInputElement) || !fileInput.files || fileInput.files.length === 0) {
+            if (!fileInput || fileInput.files.length === 0) {
                 this.showMessage('Пожалуйста, выберите файл отчета', 'error');
                 return;
             }
@@ -3916,24 +3908,59 @@ class ReportFormApp {
         }
     }
 
+    // Handle selection of full report
+    selectForm(formType) {
+        if (formType === 'full-report') {
+            // Show authentication screen for full report
+            this.showScreen('full-report-auth-screen');
+            return;
+        }
+
+        // Handle selection of monthly retrospective
+        if (formType === 'monthly-retrospective') {
+            // For monthly retrospective, we need admin authentication
+            this.selectedForm = 'monthly-retrospective';
+            this.showScreen('full-report-auth-screen');
+            return;
+        }
+
+        this.selectedForm = formType;
+        this.showScreen('auth-screen');
+        const formTitle = document.getElementById('form-title');
+        if (formTitle) {
+            formTitle.textContent = `Аутентификация - ${this.departments[formType].name}`;
+        }
+
+        // Update form title in the form
+        const formReportTitle = document.getElementById('form-report-title');
+        if (formReportTitle) {
+            formReportTitle.textContent = `ОТЧЁТ О РАБОТЕ ${this.departments[formType].name} ЗА СУТКИ`;
+        }
+
+        // Clear authentication fields to isolate credentials for each report type
+        const usernameField = document.getElementById('username');
+        const passwordField = document.getElementById('password');
+        if (usernameField instanceof HTMLInputElement) usernameField.value = '';
+        if (passwordField instanceof HTMLInputElement) passwordField.value = '';
+
+        // Show/hide form sections based on form type
+        this.updateFormSections(formType);
+    }
+
     // Authenticate for retrospective (admin only)
     authenticateRetrospective() {
-        const usernameElement = document.getElementById('retrospective-username');
-        const passwordElement = document.getElementById('retrospective-password');
-
-        const username = usernameElement instanceof HTMLInputElement ? usernameElement.value : '';
-        const password = passwordElement instanceof HTMLInputElement ? passwordElement.value : '';
-
+        const username = document.getElementById('retrospective-username').value;
+        const password = document.getElementById('retrospective-password').value;
         const errorElements = document.querySelectorAll('#retrospective-authentication-form .error-message');
         errorElements.forEach(el => el.classList.remove('show'));
 
         if (!username || !password) {
             // Find the error element for the first empty field
             if (!username) {
-                this.showFieldError(usernameElement, 'Заполните все поля');
+                this.showFieldError(document.getElementById('retrospective-username'), 'Заполните все поля');
             }
             if (!password) {
-                this.showFieldError(passwordElement, 'Заполните все поля');
+                this.showFieldError(document.getElementById('retrospective-password'), 'Заполните все поля');
             }
             return;
         }
@@ -3954,7 +3981,29 @@ class ReportFormApp {
             // Show folder selection screen for retrospective
             this.showScreen('retrospective-folder-screen');
         } else {
-            this.showFieldError(usernameElement, 'Неверный логин или пароль');
+            this.showFieldError(document.getElementById('retrospective-username'), 'Неверный логин или пароль');
+        }
+    }
+
+    // Browse folder for full report
+    async browseFullReportFolder() {
+        try {
+            // Show directory picker
+            const dirHandle = await window.showDirectoryPicker({
+                mode: 'read'
+            });
+
+            // Display reports from the selected directory
+            await this.displayFullReportFromDirectory(dirHandle);
+        } catch (error) {
+            // If user cancelled the dialog or there's a state error, do nothing
+            if (error.name === 'AbortError' || error.name === 'InvalidStateError') {
+                console.log('Операция отменена пользователем или недоступна: ', error.message);
+                return;
+            }
+
+            console.error('Ошибка выбора папки:', error);
+            this.showMessage('Ошибка выбора папки. Попробуйте еще раз.', 'error');
         }
     }
 
@@ -5293,7 +5342,45 @@ class ReportFormApp {
         }
     }
 
+    // Display reports from a directory for full report
+    async displayFullReportFromDirectory(dirHandle) {
+        try {
+            const reportsDisplay = document.getElementById('full-report-display');
+            const retrospectiveDescription = document.getElementById('retrospective-description');
 
+            // Show or hide the retrospective description based on the selected form
+            if (this.selectedForm === 'monthly-retrospective' && retrospectiveDescription) {
+                retrospectiveDescription.style.display = 'block';
+            } else if (retrospectiveDescription) {
+                retrospectiveDescription.style.display = 'none';
+            }
+
+            reportsDisplay.innerHTML = '<p>Поиск отчетов...</p>';
+
+            const reports = [];
+
+            // Recursively search for JSON files in the directory
+            await this.searchReportsInDirectory(dirHandle, reports);
+
+            if (reports.length === 0) {
+                reportsDisplay.innerHTML = '<p>В выбранной папке не найдено отчетов.</p>';
+                return;
+            }
+
+            // Check if we're in monthly retrospective mode
+            if (this.selectedForm === 'monthly-retrospective') {
+                // Generate retrospective view
+                await this.generateRetrospectiveView(reports, reportsDisplay);
+            } else {
+                // Generate full report
+                await this.generateFullReport(reports, reportsDisplay);
+            }
+        } catch (error) {
+            console.error('Ошибка формирования отчета:', error);
+            const reportsDisplay = document.getElementById('full-report-display');
+            reportsDisplay.innerHTML = '<p>Ошибка формирования отчета. Попробуйте еще раз.</p>';
+        }
+    }
 
     // Display reports from a directory for retrospective
     async displayRetrospectiveFromDirectory(dirHandle) {
@@ -5320,6 +5407,57 @@ class ReportFormApp {
         }
     }
 
+    // Generate Паросиловое хозяйство section
+    generateParosilovoeHozyaystvoSection(data) {
+        // This department doesn't have specific fields in the current implementation
+        return '<div class="full-report-field"><span class="field-label">Нет специфических данных</span></div>';
+    }
+
+    // Generate Электроремонтный цех section
+    generateElektroremontnyiCehSection(data) {
+        // This department doesn't have specific fields in the current implementation
+        return '<div class="full-report-field"><span class="field-label">Нет специфических данных</span></div>';
+    }
+
+    // Handle selection of full report
+    selectForm(formType) {
+        if (formType === 'full-report') {
+            // Show authentication screen for full report
+            this.showScreen('full-report-auth-screen');
+            return;
+        }
+
+        // Handle selection of monthly retrospective
+        if (formType === 'monthly-retrospective') {
+            // For monthly retrospective, we need admin authentication
+            this.selectedForm = 'monthly-retrospective';
+            this.showScreen('full-report-auth-screen');
+            return;
+        }
+
+        this.selectedForm = formType;
+        this.showScreen('auth-screen');
+        const formTitle = document.getElementById('form-title');
+        if (formTitle) {
+            formTitle.textContent = `Аутентификация - ${this.departments[formType].name}`;
+        }
+
+        // Update form title in the form
+        const formReportTitle = document.getElementById('form-report-title');
+        if (formReportTitle) {
+            formReportTitle.textContent = `ОТЧЁТ О РАБОТЕ ${this.departments[formType].name} ЗА СУТКИ`;
+        }
+
+        // Clear authentication fields to isolate credentials for each report type
+        const usernameField = document.getElementById('username');
+        const passwordField = document.getElementById('password');
+        if (usernameField instanceof HTMLInputElement) usernameField.value = '';
+        if (passwordField instanceof HTMLInputElement) passwordField.value = '';
+
+        // Show/hide form sections based on form type
+        this.updateFormSections(formType);
+    }
+
 }
 
 // Инициализация приложения при загрузке страницы
@@ -5327,7 +5465,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM загружен, инициализируем приложение...');
 
     // Создаем приложение
-    /** @type {ReportFormApp} */
     window.reportApp = new ReportFormApp();
     // Initialize the app
     window.reportApp.init();
