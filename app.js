@@ -1152,46 +1152,7 @@ class ReportFormApp {
         console.log('Preview screen shown');
     }
 
-    addEmergencyRow(situation = null) {
-        const tbody = document.getElementById('emergency-situations');
-        const newRow = document.createElement('tr');
 
-        if (situation) {
-            // Format the data properly for display
-            const equipmentValue = situation.equipment ? situation.equipment.replace(/\\n/g, ' ') : '';
-            const descriptionValue = situation.description ? situation.description.replace(/\\n/g, ' ') : '';
-            const actionsValue = situation.actions ? situation.actions.replace(/\\n/g, ' ') : '';
-
-            // Store the actual values with escaped newlines in data attributes
-            const equipmentDataValue = situation.equipment ? situation.equipment.replace(/\n/g, '\\n') : '';
-            const descriptionDataValue = situation.description ? situation.description.replace(/\n/g, '\\n') : '';
-            const actionsDataValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
-
-            newRow.innerHTML = `
-                <td><input type="datetime-local" name="emergencyTime[]" value="${situation.time || ''}"></td>
-                <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
-                <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
-                <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
-                <td><input type="datetime-local" name="emergencyRecovery[]" value="${situation.recovery || ''}"></td>
-            `;
-        } else {
-            newRow.innerHTML = `
-                <td><input type="datetime-local" name="emergencyTime[]"></td>
-                <td><input type="text" name="emergencyEquipment[]"></td>
-                <td><input type="text" name="emergencyDescription[]"></td>
-                <td><input type="text" name="emergencyActions[]"></td>
-                <td><input type="datetime-local" name="emergencyRecovery[]"></td>
-            `;
-        }
-
-        tbody.appendChild(newRow);
-
-        // Apply white-space styling to preserve line breaks in the new inputs
-        const inputs = newRow.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.style.whiteSpace = 'pre-wrap';
-        });
-    }
 
     deleteEmergencyRow() {
         const tbody = document.getElementById('emergency-situations');
@@ -2299,231 +2260,17 @@ class ReportFormApp {
         }
     }
 
-    // Save report using File System Access API
-    async saveReportWithFileSystemAPI(filename, content, year, month) {
-        try {
-            // Create directory if it doesn't exist
-            const dirHandle = await window.showDirectoryPicker({
-                suggestedName: "Отчеты / " + year + "-" + month + " "
-            });
-
-            // Create file handle for the report
-            const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
-
-            // Create a FileSystemWritableFileStream to write to
-            const writable = await fileHandle.createWritable();
-
-            // Write the contents of the file to the stream
-            await writable.write(content);
-
-            // Close the file and write the contents to disk
-            await writable.close();
-
-            console.log('Отчет успешно сохранен:', filename);
-        } catch (error) {
-            // If user cancelled the dialog or there's a state error, do nothing
-            if (error.name === 'AbortError' || error.name === 'InvalidStateError') {
-                console.log('Операция отменена пользователем или недоступна: ', error.message);
-                return;
-            }
-
-            console.error('Ошибка сохранения отчета:', error);
-            this.showMessage('Ошибка сохранения отчета. Попробуйте еще раз.', 'error');
-        }
-    }
-
-    // Save report using traditional download method (fallback)
-    async saveReportWithDownload(filename, content) {
-        // Create blob and download
-        const blob = new Blob([content], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-
-        // Clean up
-        setTimeout(() => {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }, 100);
-
-        console.log('Отчет успешно сохранен:', filename);
-    }
 
 
 
-    // Authenticate for full report (admin only)
-    authenticateFullReport() {
-        const username = document.getElementById('full-report-username').value;
-        const password = document.getElementById('full-report-password').value;
-        const errorElements = document.querySelectorAll('#full-report-authentication-form .error-message');
-        errorElements.forEach(el => el.classList.remove('show'));
 
-        if (!username || !password) {
-            // Find the error element for the first empty field
-            if (!username) {
-                this.showFieldError(document.getElementById('full-report-username'), 'Заполните все поля');
-            }
-            if (!password) {
-                this.showFieldError(document.getElementById('full-report-password'), 'Заполните все поля');
-            }
-            return;
-        }
 
-        // Check if user is admin
-        let isAdmin = false;
-        for (const dept in this.departments) {
-            if (this.departments[dept].users['admin'] && this.departments[dept].users['admin'] === password && username === 'admin') {
-                isAdmin = true;
-                break;
-            }
-        }
 
-        if (isAdmin) {
-            this.isAdminAuthenticated = true;
-            // Show folder selection screen
-            this.showScreen('full-report-folder-screen');
-        } else {
-            this.showFieldError(document.getElementById('full-report-username'), 'Неверный логин или пароль');
-        }
-    }
 
-    // Browse folder for full report
-    async browseFullReportFolder() {
-        try {
-            // Show directory picker
-            const dirHandle = await window.showDirectoryPicker({
-                mode: 'read'
-            });
 
-            // Display reports from the selected directory
-            await this.displayFullReportFromDirectory(dirHandle);
-        } catch (error) {
-            // If user cancelled the dialog or there's a state error, do nothing
-            if (error.name === 'AbortError' || error.name === 'InvalidStateError') {
-                console.log('Операция отменена пользователем или недоступна: ', error.message);
-                return;
-            }
 
-            console.error('Ошибка выбора папки:', error);
-            this.showMessage('Ошибка выбора папки. Попробуйте еще раз.', 'error');
-        }
-    }
 
-    // Display reports from a directory for full report
-    async displayFullReportFromDirectory(dirHandle) {
-        try {
-            const reportsDisplay = document.getElementById('full-report-display');
-            reportsDisplay.innerHTML = '<p>Поиск отчетов...</p>';
 
-            const reports = [];
-
-            // Recursively search for JSON files in the directory
-            await this.searchReportsInDirectory(dirHandle, reports);
-
-            if (reports.length === 0) {
-                reportsDisplay.innerHTML = '<p>В выбранной папке не найдено отчетов.</p>';
-                return;
-            }
-
-            // Generate full report
-            await this.generateFullReport(reports, reportsDisplay);
-        } catch (error) {
-            console.error('Ошибка формирования полного отчета:', error);
-            const reportsDisplay = document.getElementById('full-report-display');
-            reportsDisplay.innerHTML = '<p>Ошибка формирования полного отчета. Попробуйте еще раз.</p>';
-        }
-    }
-
-    // Generate full report from individual reports
-    async generateFullReport(reports, container) {
-        try {
-            // Define postfixes for different form types
-            const formPostfixes = {
-                'teploelektracentral': '_tec',
-                'stokovye_vody': '_zsv',
-                'parosilovoe_hozyaystvo': '_pcx',
-                'elektroremontnyi_ceh': '_erc'
-            };
-
-            // Group reports by department
-            const reportsByDepartment = {};
-
-            // Sort reports by date (newest first)
-            reports.sort((a, b) => {
-                try {
-                    return new Date(b.metadata.last_modified || b.metadata.date_created) -
-                        new Date(a.metadata.last_modified || a.metadata.date_created);
-                } catch (error) {
-                    return 0;
-                }
-            });
-
-            // Process each report and group by department
-            for (const report of reports) {
-                // Determine which department this report belongs to based on postfix
-                for (const [dept, postfix] of Object.entries(formPostfixes)) {
-                    if (report.name.includes(postfix + '.json')) {
-                        if (!reportsByDepartment[dept]) {
-                            reportsByDepartment[dept] = report; // Keep only the latest report for each department
-                        }
-                        break;
-                    }
-                }
-            }
-
-            // Generate combined report HTML with proper page breaks for PDF
-            let fullReportHTML = `
-                <div class="combined-report-preview">
-                    <div class="combined-report-header">
-                        <h1 class="combined-report-title">ПОЛНЫЙ ОТЧЁТ О РАБОТЕ ПОДРАЗДЕЛЕНИЙ ЗА СУТКИ</h1>
-                        <div class="combined-report-date">Дата формирования: ${new Date().toLocaleDateString('ru-RU')}</div>
-                    </div>
-            `;
-
-            // Add each department's report section in the same order as on the main page
-            const departmentOrder = ['teploelektracentral', 'stokovye_vody', 'parosilovoe_hozyaystvo', 'elektroremontnyi_ceh'];
-
-            for (const dept of departmentOrder) {
-                if (reportsByDepartment[dept]) {
-                    const report = reportsByDepartment[dept];
-                    // Add page break class to all sections except the first one
-                    const pageBreakClass = dept === 'teploelektracentral' ? '' : 'before-page-break';
-                    fullReportHTML += `
-                        <div class="full-report-section ${pageBreakClass}">
-                            <div class="report-header">
-                                <div class="report-title">ОТЧЁТ О РАБОТЕ ${this.departments[dept].name} ЗА СУТКИ</div>
-                            </div>
-                            <div class="preview-content">
-                                ${this.generateDepartmentPreviewContent(report, dept)}
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-
-            fullReportHTML += `
-                </div>
-                <div style="text-align: center; margin-top: 20px;">
-                    <button id="generate-full-report-pdf" class="btn btn-primary">Сформировать отчет в PDF</button>
-                </div>
-            `;
-
-            container.innerHTML = fullReportHTML;
-
-            // Add event listener for PDF generation
-            document.getElementById('generate-full-report-pdf')?.addEventListener('click', async () => {
-                await this.exportFullReportToPDF(reportsByDepartment);
-            });
-
-        } catch (error) {
-            console.error('Ошибка генерации полного отчета:', error);
-            container.innerHTML = '<p>Ошибка генерации полного отчета. Попробуйте еще раз.</p>';
-        }
-    }
 
     // Generate preview content for a department report (same as individual preview)
     generateDepartmentPreviewContent(report, department) {
@@ -2895,69 +2642,7 @@ class ReportFormApp {
         `).join('');
     }
 
-    // Export full report to PDF
-    async exportFullReportToPDF(reportsByDepartment) {
-        try {
-            // Create a temporary element for the full report
-            const reportElement = document.querySelector('.combined-report-preview');
-            if (!reportElement) {
-                throw new Error('Элемент отчета не найден');
-            }
 
-            // Clone the element to avoid modifying the original
-            const clonedElement = reportElement.cloneNode(true);
-
-            // Generate filename with timestamp
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const date = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            const filename = `Полный_отчет_${year}-${month}-${date}_${hours}-${minutes}-${seconds}.pdf`;
-
-            // Use the same PDF export settings as individual reports for consistency
-            const opt = {
-                margin: [10, 5, 10, 5], // Same margins as individual reports
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    scrollX: 0,
-                    scrollY: 0
-                },
-                jsPDF: {
-                    unit: 'mm',
-                    format: 'a4',
-                    orientation: 'portrait',
-                    compress: true
-                },
-                pagebreak: {
-                    mode: ['avoid-all', 'css', 'legacy'],
-                    before: '.before-page-break',
-                    after: '.after-page-break',
-                    avoid: '.avoid-page-break'
-                }
-            };
-
-            // Try to use File System Access API first (for local server environment)
-            if ('showSaveFilePicker' in window) {
-                await this.exportPDFWithFileSystemAPI(clonedElement, opt, filename);
-            } else {
-                // Fallback to traditional method
-                await html2pdf().set(opt).from(clonedElement).save();
-            }
-
-            console.log('Полный отчет экспортирован успешно');
-            this.showMessage('Полный отчет успешно экспортирован в PDF!', 'success');
-        } catch (error) {
-            console.error('Ошибка экспорта полного отчета в PDF:', error);
-            this.showMessage('Ошибка экспорта полного отчета в PDF. Попробуйте еще раз.', 'error');
-        }
-    }
 
     // Generate full report from individual reports
     async generateFullReport(reports, container) {
@@ -3189,68 +2874,7 @@ class ReportFormApp {
         return '<div class="full-report-field"><span class="field-label">Нет специфических данных</span></div>';
     }
 
-    // Export full report to PDF
-    async exportFullReportToPDF(reportsByDepartment) {
-        try {
-            // Create a temporary element for the full report
-            const reportElement = document.querySelector('.combined-report-preview');
-            if (!reportElement) {
-                throw new Error('Элемент отчета не найден');
-            }
 
-            // Clone the element to avoid modifying the original
-            const clonedElement = reportElement.cloneNode(true);
-
-            // Generate filename with timestamp
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const date = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            const filename = "Полный_отчет_" + year + "-" + month + "-" + date + "_" + hours + "-" + minutes + "-" + seconds + ".pdf";
-
-            const opt = {
-                margin: [10, 5, 10, 5],
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    scrollX: 0,
-                    scrollY: 0
-                },
-                jsPDF: {
-                    unit: 'mm',
-                    format: 'a4',
-                    orientation: 'portrait',
-                    compress: true
-                },
-                pagebreak: {
-                    mode: ['avoid-all', 'css', 'legacy'],
-                    before: '.before-page-break',
-                    after: '.after-page-break',
-                    avoid: '.avoid-page-break'
-                }
-            };
-
-            // Try to use File System Access API first (for local server environment)
-            if ('showSaveFilePicker' in window) {
-                await this.exportPDFWithFileSystemAPI(clonedElement, opt, filename);
-            } else {
-                // Fallback to traditional method
-                await html2pdf().set(opt).from(clonedElement).save();
-            }
-
-            console.log('Полный отчет экспортирован успешно');
-            this.showMessage('Полный отчет успешно экспортирован в PDF!', 'success');
-        } catch (error) {
-            console.error('Ошибка экспорта полного отчета в PDF:', error);
-            this.showMessage('Ошибка экспорта полного отчета в PDF. Попробуйте еще раз.', 'error');
-        }
-    }
 
     // Handle selection of full report
     selectForm(formType) {
@@ -3587,42 +3211,7 @@ class ReportFormApp {
         }
     }
 
-    // Save report using File System Access API
-    async saveReportWithFileSystemAPI(filename, jsonContent, year, month) {
-        try {
-            // Create suggested file name with folder structure simulation
-            const suggestedName = `Отчеты / ${year} -${month}/${filename}`;
 
-            // Show save file picker
-            const fileHandle = await window.showSaveFilePicker({
-                suggestedName: filename,
-                types: [{
-                    description: 'JSON файлы отчетов',
-                    accept: {
-                        'application/json': ['.json']
-                    }
-                }]
-            });
-
-            // Create a FileSystemWritableFileStream to write to
-            const writable = await fileHandle.createWritable();
-
-            // Write the contents of the file to the stream
-            await writable.write(jsonContent);
-
-            // Close the file and write the contents to disk
-            await writable.close();
-        } catch (error) {
-            // If user cancelled the save dialog, re-throw the error
-            if (error.name === 'AbortError') {
-                throw error;
-            }
-
-            // For other errors, fall back to traditional download method
-            console.warn('File System Access API недоступен, используем традиционный метод загрузки:', error);
-            await this.saveReportWithDownload(filename, jsonContent);
-        }
-    }
 
     // Save report using traditional download method (fallback)
     async saveReportWithDownload(filename, jsonContent) {
@@ -4314,7 +3903,7 @@ class ReportFormApp {
         if (formType === 'monthly-retrospective') {
             // For monthly retrospective, we need admin authentication
             this.selectedForm = 'monthly-retrospective';
-            this.showScreen('retrospective-auth-screen');
+            this.showScreen('full-report-auth-screen');
             return;
         }
 
