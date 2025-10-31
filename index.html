@@ -136,7 +136,8 @@
                         <p>Выберите папку с отчетами для формирования ретроспективы:</p>
                         <button id="browse-retrospective-folder-btn" class="btn btn-primary">Выбрать папку с
                             отчетами</button>
-                        <button id="download-retrospective-test-reports-btn" class="btn btn-outline" style="margin-top: 10px;">Скачать тестовые отчеты</button>
+                        <button id="download-retrospective-test-reports-btn" class="btn btn-outline"
+                            style="margin-top: 10px;">Скачать тестовые отчеты</button>
                         <div class="feature-description" id="retrospective-description"
                             style="margin-top: 20px; padding: 15px; background-color: #f0f8ff; border-left: 4px solid #4CAF50;">
                             <h3>Ретроспектива аварийных ремонтов за месяц (Beta)</h3>
@@ -226,53 +227,51 @@
                     <!-- 1. Основные данные -->
                     <div class="form-section" data-step="1">
                         <h2>1. Основные данные</h2>
+                    </div>
+
+                    <!-- 1. Основные данные - Теплоэлектроцентраль (специальная структура для ТЭЦ) -->
+                    <div class="form-section" data-step="1" id="teploelektracentral-main-data" style="display: none;">
 
                         <div class="form-group">
-                            <label for="reportDate">Дата составления <span class="required">*</span></label>
-                            <input type="date" id="reportDate" name="reportDate" required>
+                            <label for="reportDate">Дата составления <span class="required"></span></label>
+                            <input type="date" id="reportDate" name="reportDate">
                             <div class="error-message" data-field="reportDate"></div>
                         </div>
 
                         <div class="form-group">
-                            <label for="periodStart">Период: с <span class="required">*</span></label>
-                            <input type="date" id="periodStart" name="periodStart" required>
-                            <div class="time-selection">
-                                <label>
-                                    <input type="radio" name="startTime" value="08-00" checked>
-                                    08-00
-                                </label>
-                                <label>
-                                    <input type="radio" name="startTime" value="20-00">
-                                    20-00
-                                </label>
-                            </div>
-                            <div class="error-message" data-field="periodStart"></div>
+                            <label for="te_periodStart">Период: с 08-00<span class="required"></span></label>
+                            <input type="date" id="te_periodStart" name="te_periodStart">
+                            <div class="error-message" data-field="te_periodStart"></div>
                         </div>
 
                         <div class="form-group">
-                            <label for="periodEnd">по <span class="required">*</span></label>
-                            <input type="date" id="periodEnd" name="periodEnd" required>
-                            <div class="time-selection">
-                                <label>
-                                    <input type="radio" name="endTime" value="08-00" checked>
-                                    08-00
-                                </label>
-                                <label>
-                                    <input type="radio" name="endTime" value="20-00">
-                                    20-00
-                                </label>
-                            </div>
-                            <div class="error-message" data-field="periodEnd"></div>
+                            <label for="te_periodEnd">по 20-00<span class="required"></span></label>
+                            <input type="date" id="te_periodEnd" name="te_periodEnd">
+                            <div class="error-message" data-field="te_periodEnd"></div>
                         </div>
-                    </div>
 
-                    <!-- 1. Основные данные - Теплоэлектроцентраль -->
-                    <div class="form-section" data-step="1" id="teploelektracentral-shift-supervisor"
-                        style="display: none;">
                         <div class="form-group">
-                            <label for="shiftSupervisor">Начальник смены ТЭЦ</label>
-                            <input type="text" id="shiftSupervisor" name="shiftSupervisor" placeholder="ФИО">
-                            <div class="error-message" data-field="shiftSupervisor"></div>
+                            <label for="dayShiftSupervisor">Начальник дневной смены ТЭЦ</label>
+                            <input type="text" id="dayShiftSupervisor" name="dayShiftSupervisor" placeholder="ФИО">
+                            <div class="error-message" data-field="dayShiftSupervisor"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dayPeriodStart">Период: с 20-00<span class="required"></span></label>
+                            <input type="date" id="dayPeriodStart" name="dayPeriodStart">
+                            <div class="error-message" data-field="dayPeriodStart"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dayPeriodEnd">по 08-00<span class="required"></span></label>
+                            <input type="date" id="dayPeriodEnd" name="dayPeriodEnd">
+                            <div class="error-message" data-field="dayPeriodEnd"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nightShiftSupervisor">Начальник ночной смены ТЭЦ</label>
+                            <input type="text" id="nightShiftSupervisor" name="nightShiftSupervisor" placeholder="ФИО">
+                            <div class="error-message" data-field="nightShiftSupervisor"></div>
                         </div>
                     </div>
 
