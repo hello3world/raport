@@ -657,15 +657,15 @@ class ReportFormApp {
 
                         newRow.innerHTML = `
                             <td>
-                                <input type="date" name="emergencyDate[]" class="emergency-date" value="${emergencyDate}">
                                 <input type="time" name="emergencyTime[]" class="emergency-time" step="60" value="${emergencyTime}">
+                                <input type="date" name="emergencyDate[]" class="emergency-date" value="${emergencyDate}">
                             </td>
                             <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
                             <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
                             <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
                             <td>
-                                <input type="date" name="emergencyRecoveryDate[]" class="emergency-date" value="${recoveryDate}">
                                 <input type="time" name="emergencyRecoveryTime[]" class="emergency-time" step="60" value="${recoveryTime}">
+                                <input type="date" name="emergencyRecoveryDate[]" class="emergency-date" value="${recoveryDate}">
                             </td>
                         `;
 
@@ -729,29 +729,29 @@ class ReportFormApp {
 
             newRow.innerHTML = `
                 <td>
-                    <input type="date" name="emergencyDate[]" class="emergency-date" value="${emergencyDate}">
                     <input type="time" name="emergencyTime[]" class="emergency-time" step="60" value="${emergencyTime}">
+                    <input type="date" name="emergencyDate[]" class="emergency-date" value="${emergencyDate}">
                 </td>
                 <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
                 <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
                 <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
                 <td>
-                    <input type="date" name="emergencyRecoveryDate[]" class="emergency-date" value="${recoveryDate}">
                     <input type="time" name="emergencyRecoveryTime[]" class="emergency-time" step="60" value="${recoveryTime}">
+                    <input type="date" name="emergencyRecoveryDate[]" class="emergency-date" value="${recoveryDate}">
                 </td>
             `;
         } else {
             newRow.innerHTML = `
                 <td>
-                    <input type="date" name="emergencyDate[]" class="emergency-date">
                     <input type="time" name="emergencyTime[]" class="emergency-time" step="60">
+                    <input type="date" name="emergencyDate[]" class="emergency-date">
                 </td>
                 <td><input type="text" name="emergencyEquipment[]"></td>
                 <td><input type="text" name="emergencyDescription[]"></td>
                 <td><input type="text" name="emergencyActions[]"></td>
                 <td>
-                    <input type="date" name="emergencyRecoveryDate[]" class="emergency-date">
                     <input type="time" name="emergencyRecoveryTime[]" class="emergency-time" step="60">
+                    <input type="date" name="emergencyRecoveryDate[]" class="emergency-date">
                 </td>
             `;
         }
@@ -1049,15 +1049,15 @@ class ReportFormApp {
 
             // We now have separate date and time inputs, so we need to handle them differently
             // Each row now has 7 inputs instead of 5:
-            // [date, time, equipment, description, actions, recoveryDate, recoveryTime]
+            // [time, date, equipment, description, actions, recoveryTime, recoveryDate]
             if (inputs.length >= 7) {
                 // Get date and time values for emergency time
-                const emergencyDateInput = inputs[0];
-                const emergencyTimeInput = inputs[1];
+                const emergencyTimeInput = inputs[0];
+                const emergencyDateInput = inputs[1];
 
                 // Get date and time values for recovery time
-                const recoveryDateInput = inputs[5];
-                const recoveryTimeInput = inputs[6];
+                const recoveryTimeInput = inputs[5];
+                const recoveryDateInput = inputs[6];
 
                 // Combine date and time values
                 let timeValue = '';
