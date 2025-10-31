@@ -1267,6 +1267,25 @@ body {
     /* Prevent scrolling within the cell */
 }
 
+/* Styles for emergency date and time inputs */
+.emergency-date,
+.emergency-time {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    margin-bottom: 2px;
+    box-sizing: border-box;
+}
+
+.emergency-date {
+    margin-bottom: 0px;
+}
+
+.emergency-time {
+    margin-top: 2px;
+}
+
 /* Textarea popup styles */
 #textarea-modal-overlay {
     position: fixed;
@@ -1423,6 +1442,8 @@ body {
     min-height: 50px;
 }
 
+input[type='date'],
+input[type='time'],
 #reportDate,
 #periodStart,
 #periodEnd {

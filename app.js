@@ -583,15 +583,94 @@ class ReportFormApp {
                     const descriptionDataValue = situation.description ? situation.description.replace(/\n/g, '\\n') : '';
                     const actionsDataValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
 
-                    newRow.innerHTML = `
-                        <td><input type="text" name="emergencyTime[]" value="${situation.time || ''}"></td>
-                        <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
-                        <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
-                        <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
-                        <td><input type="text" name="emergencyRecovery[]" value="${situation.recovery || ''}"></td>
-                    `;
+                    // Handle datetime-local inputs for emergencyTime and emergencyRecovery
+                    let timeValue = '';
+                    if (situation.time) {
+                        // Convert dd.mm.yyyy hh:mm format to yyyy-mm-ddThh:mm for datetime-local inputs
+                        const dateTimeParts = situation.time.split(' ');
+                        if (dateTimeParts.length === 2) {
+                            const dateParts = dateTimeParts[0].split('.');
+                            if (dateParts.length === 3) {
+                                const pad = (num) => num < 10 ? '0' + num : num;
+                                timeValue = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}T${dateTimeParts[1]}`;
+                            }
+                        }
+                    }
 
-                    tbody.appendChild(newRow);
+                    let recoveryValue = '';
+                    if (situation.recovery) {
+                        // Convert dd.mm.yyyy hh:mm format to yyyy-mm-ddThh:mm for datetime-local inputs
+                        const dateTimeParts = situation.recovery.split(' ');
+                        if (dateTimeParts.length === 2) {
+                            const dateParts = dateTimeParts[0].split('.');
+                            if (dateParts.length === 3) {
+                                const pad = (num) => num < 10 ? '0' + num : num;
+                                recoveryValue = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}T${dateTimeParts[1]}`;
+                            }
+                        }
+                    }
+
+                    // Add rows for each emergency situation
+                    this.formData.emergencySituations.forEach((situation, index) => {
+                        // Create a new row with the emergency situation data
+                        const newRow = document.createElement('tr');
+
+                        // Format the data properly for display
+                        const equipmentValue = situation.equipment ? situation.equipment.replace(/\\n/g, ' ') : '';
+                        const descriptionValue = situation.description ? situation.description.replace(/\\n/g, ' ') : '';
+                        const actionsValue = situation.actions ? situation.actions.replace(/\\n/g, ' ') : '';
+
+                        // Store the actual values with escaped newlines in data attributes
+                        const equipmentDataValue = situation.equipment ? situation.equipment.replace(/\n/g, '\\n') : '';
+                        const descriptionDataValue = situation.description ? situation.description.replace(/\n/g, '\\n') : '';
+                        const actionsDataValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
+
+                        // Split datetime values into separate date and time for emergencyTime
+                        let emergencyDate = '';
+                        let emergencyTime = '';
+                        if (situation.time) {
+                            const dateTimeParts = situation.time.split(' ');
+                            if (dateTimeParts.length === 2) {
+                                const dateParts = dateTimeParts[0].split('.');
+                                if (dateParts.length === 3) {
+                                    const pad = (num) => num < 10 ? '0' + num : num;
+                                    emergencyDate = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}`;
+                                    emergencyTime = dateTimeParts[1];
+                                }
+                            }
+                        }
+
+                        // Split datetime values into separate date and time for emergencyRecovery
+                        let recoveryDate = '';
+                        let recoveryTime = '';
+                        if (situation.recovery) {
+                            const dateTimeParts = situation.recovery.split(' ');
+                            if (dateTimeParts.length === 2) {
+                                const dateParts = dateTimeParts[0].split('.');
+                                if (dateParts.length === 3) {
+                                    const pad = (num) => num < 10 ? '0' + num : num;
+                                    recoveryDate = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}`;
+                                    recoveryTime = dateTimeParts[1];
+                                }
+                            }
+                        }
+
+                        newRow.innerHTML = `
+                            <td>
+                                <input type="date" name="emergencyDate[]" class="emergency-date" value="${emergencyDate}">
+                                <input type="time" name="emergencyTime[]" class="emergency-time" step="60" value="${emergencyTime}">
+                            </td>
+                            <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
+                            <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
+                            <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
+                            <td>
+                                <input type="date" name="emergencyRecoveryDate[]" class="emergency-date" value="${recoveryDate}">
+                                <input type="time" name="emergencyRecoveryTime[]" class="emergency-time" step="60" value="${recoveryTime}">
+                            </td>
+                        `;
+
+                        tbody.appendChild(newRow);
+                    });
                 });
             }
         }
@@ -601,6 +680,89 @@ class ReportFormApp {
             this.updateFormSections(this.selectedForm);
         }
         console.log('Форма восстановлена');
+    }
+
+    addEmergencyRow(situation = null) {
+        const tbody = document.getElementById('emergency-situations');
+        const newRow = document.createElement('tr');
+
+        if (situation) {
+            // Format the data properly for display
+            const equipmentValue = situation.equipment ? situation.equipment.replace(/\\n/g, ' ') : '';
+            const descriptionValue = situation.description ? situation.description.replace(/\\n/g, ' ') : '';
+            const actionsValue = situation.actions ? situation.actions.replace(/\\n/g, ' ') : '';
+
+            // Store the actual values with escaped newlines in data attributes
+            const equipmentDataValue = situation.equipment ? situation.equipment.replace(/\n/g, '\\n') : '';
+            const descriptionDataValue = situation.description ? situation.description.replace(/\n/g, '\\n') : '';
+            const actionsDataValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
+
+            // Split datetime values into separate date and time
+            let emergencyDate = '';
+            let emergencyTime = '';
+            let recoveryDate = '';
+            let recoveryTime = '';
+
+            if (situation.time) {
+                const dateTimeParts = situation.time.split(' ');
+                if (dateTimeParts.length === 2) {
+                    const dateParts = dateTimeParts[0].split('.');
+                    if (dateParts.length === 3) {
+                        const pad = (num) => num < 10 ? '0' + num : num;
+                        emergencyDate = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}`;
+                        emergencyTime = dateTimeParts[1];
+                    }
+                }
+            }
+
+            if (situation.recovery) {
+                const dateTimeParts = situation.recovery.split(' ');
+                if (dateTimeParts.length === 2) {
+                    const dateParts = dateTimeParts[0].split('.');
+                    if (dateParts.length === 3) {
+                        const pad = (num) => num < 10 ? '0' + num : num;
+                        recoveryDate = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}`;
+                        recoveryTime = dateTimeParts[1];
+                    }
+                }
+            }
+
+            newRow.innerHTML = `
+                <td>
+                    <input type="date" name="emergencyDate[]" class="emergency-date" value="${emergencyDate}">
+                    <input type="time" name="emergencyTime[]" class="emergency-time" step="60" value="${emergencyTime}">
+                </td>
+                <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
+                <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
+                <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
+                <td>
+                    <input type="date" name="emergencyRecoveryDate[]" class="emergency-date" value="${recoveryDate}">
+                    <input type="time" name="emergencyRecoveryTime[]" class="emergency-time" step="60" value="${recoveryTime}">
+                </td>
+            `;
+        } else {
+            newRow.innerHTML = `
+                <td>
+                    <input type="date" name="emergencyDate[]" class="emergency-date">
+                    <input type="time" name="emergencyTime[]" class="emergency-time" step="60">
+                </td>
+                <td><input type="text" name="emergencyEquipment[]"></td>
+                <td><input type="text" name="emergencyDescription[]"></td>
+                <td><input type="text" name="emergencyActions[]"></td>
+                <td>
+                    <input type="date" name="emergencyRecoveryDate[]" class="emergency-date">
+                    <input type="time" name="emergencyRecoveryTime[]" class="emergency-time" step="60">
+                </td>
+            `;
+        }
+
+        tbody.appendChild(newRow);
+
+        // Apply white-space styling to preserve line breaks in the new inputs
+        const inputs = newRow.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.style.whiteSpace = 'pre-wrap';
+        });
     }
 
     async checkForDrafts() {
@@ -746,6 +908,11 @@ class ReportFormApp {
 
         this.showScreen('loading-screen');
     }
+    async checkAndLoadDraft() {
+        if (this.latestDraftId) {
+            this.showScreen('loading-screen');
+        }
+    }
 
     async restoreDraft() {
         try {
@@ -876,20 +1043,52 @@ class ReportFormApp {
         // Собираем данные из таблицы аварийных ситуаций
         const emergencyRows = document.querySelectorAll('#emergency-situations tr');
         const emergencyData = [];
-        emergencyRows.forEach(row => {
+        emergencyRows.forEach((row, index) => {
+            // Get all inputs in the row
             const inputs = row.querySelectorAll('input');
-            if (inputs.length === 5) {
-                // Use dataset.value if available, otherwise use the input value
-                const equipmentValue = inputs[1].dataset.value ? inputs[1].dataset.value : inputs[1].value;
-                const descriptionValue = inputs[2].dataset.value ? inputs[2].dataset.value : inputs[2].value;
-                const actionsValue = inputs[3].dataset.value ? inputs[3].dataset.value : inputs[3].value;
+
+            // We now have separate date and time inputs, so we need to handle them differently
+            // Each row now has 7 inputs instead of 5:
+            // [date, time, equipment, description, actions, recoveryDate, recoveryTime]
+            if (inputs.length >= 7) {
+                // Get date and time values for emergency time
+                const emergencyDateInput = inputs[0];
+                const emergencyTimeInput = inputs[1];
+
+                // Get date and time values for recovery time
+                const recoveryDateInput = inputs[5];
+                const recoveryTimeInput = inputs[6];
+
+                // Combine date and time values
+                let timeValue = '';
+                if (emergencyDateInput.value && emergencyTimeInput.value) {
+                    // Convert yyyy-mm-dd format to dd.mm.yyyy format
+                    const dateParts = emergencyDateInput.value.split('-');
+                    if (dateParts.length === 3) {
+                        timeValue = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]} ${emergencyTimeInput.value}`;
+                    }
+                }
+
+                let recoveryValue = '';
+                if (recoveryDateInput.value && recoveryTimeInput.value) {
+                    // Convert yyyy-mm-dd format to dd.mm.yyyy format
+                    const dateParts = recoveryDateInput.value.split('-');
+                    if (dateParts.length === 3) {
+                        recoveryValue = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]} ${recoveryTimeInput.value}`;
+                    }
+                }
+
+                // Get other values
+                const equipmentValue = inputs[2].dataset.value ? inputs[2].dataset.value : inputs[2].value;
+                const descriptionValue = inputs[3].dataset.value ? inputs[3].dataset.value : inputs[3].value;
+                const actionsValue = inputs[4].dataset.value ? inputs[4].dataset.value : inputs[4].value;
 
                 emergencyData.push({
-                    time: inputs[0].value,
+                    time: timeValue,
                     equipment: equipmentValue.replace(/\\n/g, '\n'), // Convert escaped newlines back to actual newlines
                     description: descriptionValue.replace(/\\n/g, '\n'),
                     actions: actionsValue.replace(/\\n/g, '\n'),
-                    recovery: inputs[4].value
+                    recovery: recoveryValue
                 });
             }
         });
@@ -969,19 +1168,19 @@ class ReportFormApp {
             const actionsDataValue = situation.actions ? situation.actions.replace(/\n/g, '\\n') : '';
 
             newRow.innerHTML = `
-                <td><input type="text" name="emergencyTime[]" value="${situation.time || ''}"></td>
+                <td><input type="datetime-local" name="emergencyTime[]" value="${situation.time || ''}"></td>
                 <td><input type="text" name="emergencyEquipment[]" value="${equipmentValue}" data-value="${equipmentDataValue}"></td>
                 <td><input type="text" name="emergencyDescription[]" value="${descriptionValue}" data-value="${descriptionDataValue}"></td>
                 <td><input type="text" name="emergencyActions[]" value="${actionsValue}" data-value="${actionsDataValue}"></td>
-                <td><input type="text" name="emergencyRecovery[]" value="${situation.recovery || ''}"></td>
+                <td><input type="datetime-local" name="emergencyRecovery[]" value="${situation.recovery || ''}"></td>
             `;
         } else {
             newRow.innerHTML = `
-                <td><input type="text" name="emergencyTime[]"></td>
+                <td><input type="datetime-local" name="emergencyTime[]"></td>
                 <td><input type="text" name="emergencyEquipment[]"></td>
                 <td><input type="text" name="emergencyDescription[]"></td>
                 <td><input type="text" name="emergencyActions[]"></td>
-                <td><input type="text" name="emergencyRecovery[]"></td>
+                <td><input type="datetime-local" name="emergencyRecovery[]"></td>
             `;
         }
 

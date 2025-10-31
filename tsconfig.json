@@ -12,11 +12,16 @@
         "skipLibCheck": true,
         "noEmit": true,
         "allowSyntheticDefaultImports": true,
-        "strict": false
+        "strict": false,
+        "typeRoots": [
+            "./types",
+            "./node_modules/@types"
+        ]
     },
     "include": [
         "*.js",
-        "**/*.js"
+        "**/*.js",
+        "./types/**/*.d.ts"
     ],
     "exclude": [
         "node_modules"
