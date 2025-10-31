@@ -223,15 +223,14 @@
                     <div class="form-section" data-step="1">
                         <h2>1. Основные данные</h2>
                     </div>
+                    <div class="form-group">
+                        <label for="reportDate">Дата составления <span class="required"></span></label>
+                        <input type="date" id="reportDate" name="reportDate">
+                        <div class="error-message" data-field="reportDate"></div>
+                    </div>
 
                     <!-- 1. Основные данные - Теплоэлектроцентраль (специальная структура для ТЭЦ) -->
                     <div class="form-section" data-step="1" id="teploelektracentral-main-data" style="display: none;">
-
-                        <div class="form-group">
-                            <label for="reportDate">Дата составления <span class="required"></span></label>
-                            <input type="date" id="reportDate" name="reportDate">
-                            <div class="error-message" data-field="reportDate"></div>
-                        </div>
 
                         <div class="form-group">
                             <label for="te_periodStart">Период: с 08-00<span class="required"></span></label>
