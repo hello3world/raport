@@ -391,6 +391,11 @@ body {
     visibility: visible !important;
 }
 
+#retrospective-username,
+#retrospective-password {
+    width: 100%;
+}
+
 #shiftSupervisor {
     width: 70%;
 }
