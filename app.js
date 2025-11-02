@@ -14,29 +14,29 @@ class ReportFormApp {
             'teploelektracentral': {
                 name: 'ТЕПЛОЭЛЕКТРОЦЕНТРАЛИ',
                 users: {
-                    'teplo_user': 'teplo_pass',
-                    'admin': 'admin'
+                    'teplo_user': 'teplo',
+                    'admin': '13admin'
                 }
             },
             'stokovye_vody': {
                 name: 'УЧАСТКА ПО ЗАБОРУ, ПОДГОТОВКЕ И ОЧИСТКЕ СТОЧНЫХ ВОД',
                 users: {
-                    'stok_user': 'stok_pass',
-                    'admin': 'admin'
+                    'stok_user': 'stok',
+                    'admin': '13admin'
                 }
             },
             'parosilovoe_hozyaystvo': {
                 name: 'УЧАСТКА ПАРОСИЛОВОГО ХОЗЯЙСТВА',
                 users: {
-                    'paro_user': 'paro_pass',
-                    'admin': 'admin'
+                    'paro_user': 'paro',
+                    'admin': '13admin'
                 }
             },
             'elektroremontnyi_ceh': {
                 name: 'ЭЛЕКТРОРЕМОНТНОГО ЦЕХА',
                 users: {
-                    'elektro_user': 'elektro_pass',
-                    'admin': 'admin'
+                    'elektro_user': 'elektro',
+                    'admin': '13admin'
                 }
             }
         };
@@ -1442,7 +1442,7 @@ class ReportFormApp {
                     <span class="field-value">${this.formData.te_periodEnd || '___  ___  _____'}</span>
                 </div>
                 <div class="report-field">
-                    <span class="field-label">Начальник дневной смены ТЭЦ:</span>
+                    <span class="field-label">Начальник смены ТЭЦ:</span>
                     <span class="field-value">${this.formData.dayShiftSupervisor || '_________________'}</span>
                 </div>
                 <div class="report-field">
@@ -1454,7 +1454,7 @@ class ReportFormApp {
                     <span class="field-value">${this.formData.dayPeriodEnd || '___  ___  _____'}</span>
                 </div>
                 <div class="report-field">
-                    <span class="field-label">Начальник ночной смены ТЭЦ:</span>
+                    <span class="field-label">Начальник смены ТЭЦ:</span>
                     <span class="field-value">${this.formData.nightShiftSupervisor || '_________________'}</span>
                 </div>
             </div>
@@ -1573,14 +1573,6 @@ class ReportFormApp {
                     <span class="field-label">Дата составления:</span>
                     <span class="field-value">${reportDate}</span>
                 </div>
-                <div class="report-field">
-                    <span class="field-label">Период: с ${this.formData.startTime || '8-00'}</span>
-                    <span class="field-value">${periodStart}</span>
-                </div>
-                <div class="report-field">
-                    <span class="field-label">по ${this.formData.endTime || '8-00'}</span>
-                    <span class="field-value">${periodEnd}</span>
-                </div>
             </div>
 
             <div class="report-section">
@@ -1657,14 +1649,6 @@ class ReportFormApp {
                     <span class="field-label">Дата составления:</span>
                     <span class="field-value">${reportDate}</span>
                 </div>
-                <div class="report-field">
-                    <span class="field-label">Период: с ${this.formData.startTime || '8-00'}</span>
-                    <span class="field-value">${periodStart}</span>
-                </div>
-                <div class="report-field">
-                    <span class="field-label">по ${this.formData.endTime || '8-00'}</span>
-                    <span class="field-value">${periodEnd}</span>
-                </div>
             </div>
 
             <div class="report-section">
@@ -1700,14 +1684,6 @@ class ReportFormApp {
                 <div class="report-field">
                     <span class="field-label">Дата составления:</span>
                     <span class="field-value">${reportDate}</span>
-                </div>
-                <div class="report-field">
-                    <span class="field-label">Период: с ${this.formData.startTime || '8-00'}</span>
-                    <span class="field-value">${periodStart}</span>
-                </div>
-                <div class="report-field">
-                    <span class="field-label">по ${this.formData.endTime || '8-00'}</span>
-                    <span class="field-value">${periodEnd}</span>
                 </div>
             </div>
 
@@ -2297,7 +2273,7 @@ class ReportFormApp {
                     <span class="field-value">${data.te_periodEnd || '___  ___  _____'}</span>
                 </div>
                 <div class="report-field">
-                    <span class="field-label">Начальник дневной смены ТЭЦ:</span>
+                    <span class="field-label">Начальник смены ТЭЦ:</span>
                     <span class="field-value">${data.dayShiftSupervisor || '_________________'}</span>
                 </div>
                 <div class="report-field">
@@ -2309,7 +2285,7 @@ class ReportFormApp {
                     <span class="field-value">${data.dayPeriodEnd || '___  ___  _____'}</span>
                 </div>
                 <div class="report-field">
-                    <span class="field-label">Начальник ночной смены ТЭЦ:</span>
+                    <span class="field-label">Начальник смены ТЭЦ:</span>
                     <span class="field-value">${data.nightShiftSupervisor || '_________________'}</span>
                 </div>
             </div>
@@ -2429,14 +2405,6 @@ class ReportFormApp {
                     <span class="field-label">Дата составления:</span>
                     <span class="field-value">${reportDate}</span>
                 </div>
-                <div class="report-field">
-                    <span class="field-label">Период: с ${data.startTime || '8-00'}</span>
-                    <span class="field-value">${periodStart}</span>
-                </div>
-                <div class="report-field">
-                    <span class="field-label">по ${data.endTime || '8-00'}</span>
-                    <span class="field-value">${periodEnd}</span>
-                </div>
             </div>
 
             <div class="report-section">
@@ -2514,14 +2482,6 @@ class ReportFormApp {
                     <span class="field-label">Дата составления:</span>
                     <span class="field-value">${reportDate}</span>
                 </div>
-                <div class="report-field">
-                    <span class="field-label">Период: с ${data.startTime || '8-00'}</span>
-                    <span class="field-value">${periodStart}</span>
-                </div>
-                <div class="report-field">
-                    <span class="field-label">по ${data.endTime || '8-00'}</span>
-                    <span class="field-value">${periodEnd}</span>
-                </div>
             </div>
 
             <div class="report-section">
@@ -2558,14 +2518,6 @@ class ReportFormApp {
                 <div class="report-field">
                     <span class="field-label">Дата составления:</span>
                     <span class="field-value">${reportDate}</span>
-                </div>
-                <div class="report-field">
-                    <span class="field-label">Период: с ${data.startTime || '8-00'}</span>
-                    <span class="field-value">${periodStart}</span>
-                </div>
-                <div class="report-field">
-                    <span class="field-label">по ${data.endTime || '8-00'}</span>
-                    <span class="field-value">${periodEnd}</span>
                 </div>
             </div>
 
@@ -2758,7 +2710,7 @@ class ReportFormApp {
                 <span class="field-value">${data.te_periodEnd || '___  ___  _____'}</span>
             </div>
             <div class="full-report-field">
-                <span class="field-label">Начальник дневной смены ТЭЦ:</span>
+                <span class="field-label">Начальник смены ТЭЦ:</span>
                 <span class="field-value">${data.dayShiftSupervisor || '_________________'}</span>
             </div>
             <div class="full-report-field">
@@ -2770,7 +2722,7 @@ class ReportFormApp {
                 <span class="field-value">${data.dayPeriodEnd || '___  ___  _____'}</span>
             </div>
             <div class="full-report-field">
-                <span class="field-label">Начальник ночной смены ТЭЦ:</span>
+                <span class="field-label">Начальник смены ТЭЦ:</span>
                 <span class="field-value">${data.nightShiftSupervisor || '_________________'}</span>
             </div>
             <div class="full-report-field">
