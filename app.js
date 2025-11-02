@@ -437,6 +437,60 @@ class ReportFormApp {
         }
     }
 
+    // Export full report to PDF
+    async exportFullReportToPDF(reportsByDepartment) {
+        try {
+            // Locate the combined report preview element
+            const combined = document.querySelector('.combined-report-preview');
+            if (!combined) {
+                this.showMessage('Не найдено содержимое полного отчета для экспорта', 'error');
+                return;
+            }
+
+            // Clone to avoid reflow issues while exporting
+            const clonedElement = /** @type {HTMLElement} */(combined.cloneNode(true));
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+            const filename = `Полный_отчет_${year}-${month}-${date}.pdf`;
+
+            const opt = {
+                margin: [10, 5, 10, 5],
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait',
+                    compress: true
+                },
+                pagebreak: {
+                    mode: ['avoid-all', 'css', 'legacy'],
+                    before: '.before-page-break',
+                    after: '.after-page-break',
+                    avoid: '.avoid-page-break'
+                }
+            };
+
+            if ('showSaveFilePicker' in window) {
+                await this.exportPDFWithFileSystemAPI(clonedElement, opt, filename);
+            } else {
+                await html2pdf().set(opt).from(/** @type {HTMLElement} */(clonedElement)).save();
+            }
+        } catch (error) {
+            console.error('Ошибка экспорта полного отчета в PDF:', error);
+            this.showMessage('Ошибка экспорта полного отчета в PDF. Попробуйте еще раз.', 'error');
+        }
+    }
+
     initializeFlatpickr() {
         // Initialize Flatpickr for all datetime inputs
         // This provides a better user experience for date/time selection
@@ -547,13 +601,21 @@ class ReportFormApp {
                 } else if (element.type === 'date') {
                     // Handle date inputs
                     if (this.formData[key]) {
-                        // Convert dd.mm.yyyy format to yyyy-mm-dd for date inputs
-                        const dateParts = this.formData[key].split('.');
-                        if (dateParts.length === 3) {
+                        const raw = String(this.formData[key]).trim();
+                        // Support dd.mm.yyyy
+                        const dotParts = raw.split('.');
+                        if (dotParts.length === 3) {
                             const pad = (num) => num < 10 ? '0' + num : num;
-                            const formattedDate = `${dateParts[2]}-${pad(dateParts[1])}-${pad(dateParts[0])}`;
+                            const formattedDate = `${dotParts[2]}-${pad(Number(dotParts[1]))}-${pad(Number(dotParts[0]))}`;
                             element.value = formattedDate;
                             console.log(`Установлено значение даты ${key}:`, formattedDate);
+                        } else {
+                            // Support yyyy-mm-dd (already in input format)
+                            const isoDateRe = /^\d{4}-\d{2}-\d{2}$/;
+                            if (isoDateRe.test(raw)) {
+                                element.value = raw;
+                                console.log(`Установлено значение даты (ISO) ${key}:`, raw);
+                            }
                         }
                     }
                 } else if (element.type === 'datetime-local') {
@@ -1714,29 +1776,7 @@ class ReportFormApp {
         `;
     }
 
-    generateEmergencyTablePreview() {
-        if (!this.formData.emergencySituations || this.formData.emergencySituations.length === 0) {
-            return `
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            `;
-        }
 
-        return this.formData.emergencySituations.map(situation => `
-            <tr>
-                <td style="white-space: pre-wrap;">${situation.time || ''}</td>
-                <td style="white-space: pre-wrap;">${situation.equipment || ''}</td>
-                <td style="white-space: pre-wrap;">${situation.description || ''}</td>
-                <td style="white-space: pre-wrap;">${situation.actions || ''}</td>
-                <td style="white-space: pre-wrap;">${situation.recovery || ''}</td>
-            </tr>
-        `).join('');
-    }
 
     editForm() {
         this.showScreen('form-screen');
@@ -1795,7 +1835,7 @@ class ReportFormApp {
                 await this.exportPDFWithFileSystemAPI(wrapper, opt, filename);
             } else {
                 // Fallback to traditional method
-                await html2pdf().set(opt).from(wrapper).save();
+                await html2pdf().set(opt).from(/** @type {HTMLElement} */(wrapper)).save();
             }
 
             console.log('PDF экспортирован успешно');
@@ -1878,69 +1918,6 @@ class ReportFormApp {
             // For other errors, fall back to traditional download method
             console.warn('File System Access API недоступен, используем традиционный метод загрузки:', error);
             await this.saveReportWithDownload(filename, content);
-        }
-    }
-
-    // Export full report to PDF
-    async exportFullReportToPDF(reportsByDepartment) {
-        try {
-            // Create a temporary element for the full report
-            const reportElement = document.querySelector('.combined-report-preview');
-            if (!reportElement) {
-                throw new Error('Элемент отчета не найден');
-            }
-
-            // Clone the element to avoid modifying the original
-            const clonedElement = reportElement.cloneNode(true);
-
-            // Generate filename with timestamp
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const date = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            const filename = "Полный_отчет_" + year + "-" + month + "-" + date + "_" + hours + "-" + minutes + "-" + seconds + ".pdf";
-
-            const opt = {
-                margin: [10, 5, 10, 5], // Reduced margins: [top, right, bottom, left]
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    scrollX: 0,
-                    scrollY: 0
-                },
-                jsPDF: {
-                    unit: 'mm',
-                    format: 'a4',
-                    orientation: 'portrait',
-                    compress: true
-                },
-                pagebreak: {
-                    mode: ['avoid-all', 'css', 'legacy'],
-                    before: '.before-page-break',
-                    after: '.after-page-break',
-                    avoid: '.avoid-page-break'
-                }
-            };
-
-            // Try to use File System Access API first (for local server environment)
-            if ('showSaveFilePicker' in window) {
-                await this.exportPDFWithFileSystemAPI(clonedElement, opt, filename);
-            } else {
-                // Fallback to traditional method
-                await html2pdf().set(opt).from(/** @type {HTMLElement} */(clonedElement)).save();
-            }
-
-            console.log('Полный отчет экспортирован успешно');
-            this.showMessage('Полный отчет успешно экспортирован в PDF!', 'success');
-        } catch (error) {
-            console.error('Ошибка экспорта полного отчета в PDF:', error);
-            this.showMessage('Ошибка экспорта полного отчета в PDF. Попробуйте еще раз.', 'error');
         }
     }
 
@@ -2214,6 +2191,54 @@ class ReportFormApp {
             this.showMessage('Ошибка сохранения отчета. Попробуйте еще раз.', 'error');
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // duplicate removed
+
+    // duplicate removed
+
+    // duplicate removed
+
+    // duplicate removed
+
+    generateEmergencyTablePreview() {
+        if (!this.formData.emergencySituations || this.formData.emergencySituations.length === 0) {
+            return `
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            `;
+        }
+
+        return this.formData.emergencySituations.map(situation => `
+            <tr>
+                <td style="white-space: pre-wrap;">${situation.time || ''}</td>
+                <td style="white-space: pre-wrap;">${situation.equipment || ''}</td>
+                <td style="white-space: pre-wrap;">${situation.description || ''}</td>
+                <td style="white-space: pre-wrap;">${situation.actions || ''}</td>
+                <td style="white-space: pre-wrap;">${situation.recovery || ''}</td>
+            </tr>
+        `).join('');
+    }
+
+
 
 
 
@@ -3141,7 +3166,7 @@ class ReportFormApp {
                 await this.exportPDFWithFileSystemAPI(clonedElement, opt, filename);
             } else {
                 // Fallback to traditional method
-                await html2pdf().set(opt).from(/** @type {HTMLElement} */(clonedElement)).save();
+                await html2pdf().set(opt).from(clonedElement).save();
             }
 
             console.log('Ретроспектива экспортирована успешно');
@@ -3823,8 +3848,27 @@ class ReportFormApp {
                 throw new Error('Некорректная структура файла отчета');
             }
 
+            // Normalize field names for backward compatibility before setting form data
+            const normalizedData = { ...reportData.data };
+            // TEC period fields: support periodStart/periodEnd and camelCase tePeriodStart/tePeriodEnd
+            if (!normalizedData.te_periodStart) {
+                if (normalizedData.periodStart) normalizedData.te_periodStart = normalizedData.periodStart;
+                else if (normalizedData.tePeriodStart) normalizedData.te_periodStart = normalizedData.tePeriodStart;
+            }
+            if (!normalizedData.te_periodEnd) {
+                if (normalizedData.periodEnd) normalizedData.te_periodEnd = normalizedData.periodEnd;
+                else if (normalizedData.tePeriodEnd) normalizedData.te_periodEnd = normalizedData.tePeriodEnd;
+            }
+            // Day period fields: support snake_case -> camelCase mapping when missing/empty
+            if ((normalizedData.dayPeriodStart == null || normalizedData.dayPeriodStart === '') && normalizedData.day_periodStart) {
+                normalizedData.dayPeriodStart = normalizedData.day_periodStart;
+            }
+            if ((normalizedData.dayPeriodEnd == null || normalizedData.dayPeriodEnd === '') && normalizedData.day_periodEnd) {
+                normalizedData.dayPeriodEnd = normalizedData.day_periodEnd;
+            }
+
             // Set form data
-            this.formData = reportData.data;
+            this.formData = normalizedData;
 
             // Mark that form was opened from retrospective
             console.log('Setting formOpenedFrom to retrospective in loadReportFromJSON');
